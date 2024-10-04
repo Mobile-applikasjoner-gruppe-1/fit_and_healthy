@@ -83,11 +83,11 @@ class HomeView extends StatelessWidget {
                 child: Column(
                   children: [
                     ListTile(
-                      title: Text('Sleep'),
+                      title: Text('Goals'),
                       trailing: Icon(Icons.chevron_right),
                     ),
                     // add random content here
-                    Text('Sleep content'),
+                    Text('Goals content'),
                   ],
                 ),
               ),
@@ -96,11 +96,11 @@ class HomeView extends StatelessWidget {
                 child: Column(
                   children: [
                     ListTile(
-                      title: Text('Water'),
+                      title: Text('Something else'),
                       trailing: Icon(Icons.chevron_right),
                     ),
                     // add random content here
-                    Text('Water content'),
+                    Text('Something else content'),
                   ],
                 ),
               ),
