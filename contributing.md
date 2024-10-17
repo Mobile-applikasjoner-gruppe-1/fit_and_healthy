@@ -3,10 +3,10 @@ The project structure should be as in the image below:
 
 ![image](https://github.com/user-attachments/assets/400932c2-5232-4b4f-9ca9-83ad9d2dd876)
 
-Each feature should have its own folder under the features folder and then the presentation, state management and models should be divided into their own files and possible shared files/folders should be put in the shared folder in the root of the project.
-If there are multiple sub-features within a feature, then those sub-features should have its own folder underneath the main feature folder. For example: /features/auth/registration and /features/auth/login
+Each feature should have its own folder under the `/features` folder and then the presentation, state management and models should be divided into their own files/sub-folders. Any shared files/folders should be put in the `/shared` folder in the root of the project.
+If there are multiple sub-features within a feature, then those sub-features should have its own folder underneath the main feature folder. For example: `/features/auth/registration` and `/features/auth/login`
 ## Issues
-*Content coming*
+Every major change/functionality should have a seperate issue so that we can easily track progress and assign the issue to one of the group members.
 
 ## Git branches
 Every major change or added functionality should have its own git brach made from a copy of main (or dev if its latest changes are stable).
