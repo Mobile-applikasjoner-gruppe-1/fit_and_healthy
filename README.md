@@ -1,6 +1,8 @@
 # Fit & Healthy
 
-A new Flutter project.
+Fit & Healthy is a fitness and food-tracking app designed to help users log workouts, track meals, and monitor their progress. The app includes predefined exercises and meals, tips for beginners, and allows users to view their activity history. It features an intuitive UI with navigation for easy access to workout logs, food intake, and progress tracking.
+
+The project is a part of the IDATA2503 Mobile Application course at NTNU Aalesund.
 
 ## Getting Started
 
