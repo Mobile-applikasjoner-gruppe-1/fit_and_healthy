@@ -47,6 +47,7 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/exercise',
+              // TODO: Should be defined in a separate file, like DashboardView
               builder: (context, state) => Container(
                 child: Text('Exercise'),
               ),
@@ -55,6 +56,7 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/nutrition',
+              // TODO: Should be defined in a separate file, like DashboardView
               builder: (context, state) => Container(
                 child: Text('Nutrition'),
               ),
@@ -63,6 +65,7 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/something-else',
+              // TODO: Should be defined in a separate file, like DashboardView
               builder: (context, state) => Container(
                 child: Text('Something else'),
               ),
