@@ -5,7 +5,7 @@ class DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
         padding: const EdgeInsets.all(10),
         child: GridView.count(
           crossAxisCount: 2,
