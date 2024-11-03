@@ -1,5 +1,7 @@
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_appbar.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +28,7 @@ GoRouter appRouter = GoRouter(
               break;
             case 3:
               // TODO: Should be defined in a separate file, like DashboardAppbar
-              appBar = AppBar(title: Text('Something else'), centerTitle: true);
+              appBar = AppBar(title: Text('Settings temp'), centerTitle: true);
               break;
             default:
               appBar = defaultAppBar;
@@ -64,12 +66,19 @@ GoRouter appRouter = GoRouter(
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/something-else',
-              // TODO: Should be defined in a separate file, like DashboardView
-              builder: (context, state) => Container(
-                child: Text('Something else'),
-              ),
-            ),
+                path: '/settings',
+                builder: (context, state) => const SettingsView(),
+                routes: [
+                  GoRoute(
+                    path: '/profile',
+                    builder: (context, state) => ProfileSettingsPage(),
+                  ),
+                  GoRoute(
+                    path: '/Theme',
+                    builder: (context, state) =>
+                        Container(child: Text('Theme')),
+                  ),
+                ]),
           ])
         ]),
   ],
