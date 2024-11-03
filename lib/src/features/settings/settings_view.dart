@@ -19,17 +19,15 @@ class SettingsView extends ConsumerWidget {
     final controller = ref.watch(settingsControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
       body: Column(
         children: [
           Column(
             children: [
               ListTile(
                 title: Text('Profile'),
+                leading: Icon(Icons.person),
                 onTap: () {
-                  context.go('/settings/profile');
+                  context.push('/settings/profile');
                 },
               )
             ],
