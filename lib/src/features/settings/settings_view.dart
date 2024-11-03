@@ -1,6 +1,6 @@
+import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'settings_provider.dart';
 import 'package:go_router/go_router.dart';
 
 /// Displays the various settings that can be customized by the user.
@@ -16,7 +16,7 @@ class SettingsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.watch(settingsControllerProvider);
+    final settingsState = ref.watch(settingsControllerProvider).value;
 
     return Scaffold(
       body: Column(
@@ -40,9 +40,10 @@ class SettingsView extends ConsumerWidget {
             // SettingsController is updated, which rebuilds the MaterialApp.
             child: DropdownButton<ThemeMode>(
               // Read the selected themeMode from the controller
-              value: controller.themeMode,
+              value: settingsState!.themeMode,
               // Call the updateThemeMode method any time the user selects a theme.
-              onChanged: controller.updateThemeMode,
+              onChanged:
+                  ref.read(settingsControllerProvider.notifier).updateThemeMode,
               items: const [
                 DropdownMenuItem(
                   value: ThemeMode.system,
