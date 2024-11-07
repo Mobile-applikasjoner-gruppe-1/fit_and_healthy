@@ -29,7 +29,28 @@ class SettingsView extends ConsumerWidget {
                 onTap: () {
                   context.push('/settings/profile');
                 },
-              )
+              ),
+              ListTile(
+                title: Text('Widgets'),
+                leading: Icon(Icons.widgets),
+                onTap: () {
+                  context.push('/settings/profile');
+                },
+              ),
+              ListTile(
+                title: Text('Goals'),
+                leading: Icon(Icons.star),
+                onTap: () {
+                  context.push('/settings/goals');
+                },
+              ),
+              ListTile(
+                title: Text('GDPR'),
+                leading: Icon(Icons.document_scanner),
+                onTap: () {
+                  context.push('/settings/profile');
+                },
+              ),
             ],
           ),
           Padding(

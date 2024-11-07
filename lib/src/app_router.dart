@@ -1,5 +1,6 @@
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_appbar.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
@@ -76,6 +77,10 @@ GoRouter appRouter = GoRouter(
                 path: '/Theme',
                 builder: (context, state) => Container(child: Text('Theme')),
               ),
+              GoRoute(
+                path: '/goals',
+                builder: (context, state) => GoalsSettingsPage(),
+              ),
             ],
           ),
         ])
@@ -94,11 +99,14 @@ PreferredSizeWidget getSettingsAppBar(String route, BuildContext context) {
         onPressed: () => context.go('/settings'), // Navigate back to /settings
       ),
     );
-  } else if (route.endsWith('/theme')) {
+  } else if (route.endsWith('/goals')) {
     return AppBar(
-      title: Text('Theme Settings'),
+      title: Text('Goals Settings'),
       centerTitle: true,
-      leading: BackButton(onPressed: () => context.pop()),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () => context.go('/settings'), // Navigate back to /settings
+      ),
     );
   } else {
     return AppBar(
