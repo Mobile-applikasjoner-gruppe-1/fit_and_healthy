@@ -21,12 +21,13 @@ PreferredSizeWidget defaultAppBar =
 
 @riverpod
 GoRouter appRouter(Ref ref) {
-  final auth = ref.watch(authRepositoryProvider);
+  final firebaseAuthRepository = ref.watch(firebaseAuthRepositoryProvider);
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    refreshListenable: StreamListenable(auth.authStateChanges()),
+    refreshListenable:
+        StreamListenable(firebaseAuthRepository.authStateChanges()),
     redirect: (context, state) =>
-        appRouterRedirectHandler(context, state, auth),
+        appRouterRedirectHandler(context, state, firebaseAuthRepository),
     routes: [
       StatefulShellRoute.indexedStack(
           pageBuilder: (context, state, navigationShell) {

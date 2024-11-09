@@ -22,39 +22,42 @@ final firebaseAuthProvider = Provider<FirebaseAuth>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FirebaseAuthRef = ProviderRef<FirebaseAuth>;
-String _$authRepositoryHash() => r'9d3a38240e59bad3c1a3a8d2c9e63221e7edbcaa';
+String _$firebaseAuthRepositoryHash() =>
+    r'fc210e85754d1f189169198ee44a029f7e85e339';
 
-/// See also [authRepository].
-@ProviderFor(authRepository)
-final authRepositoryProvider = Provider<FirebaseAuthRepository>.internal(
-  authRepository,
-  name: r'authRepositoryProvider',
+/// See also [firebaseAuthRepository].
+@ProviderFor(firebaseAuthRepository)
+final firebaseAuthRepositoryProvider =
+    Provider<FirebaseAuthRepository>.internal(
+  firebaseAuthRepository,
+  name: r'firebaseAuthRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$authRepositoryHash,
+      : _$firebaseAuthRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AuthRepositoryRef = ProviderRef<FirebaseAuthRepository>;
-String _$authStateChangeHash() => r'13565a8e927e644060491f8e10cca3bbaedd897e';
+typedef FirebaseAuthRepositoryRef = ProviderRef<FirebaseAuthRepository>;
+String _$firebaseAuthStateChangeHash() =>
+    r'1af71ed788116b722276a1559f6e68c8393fbc3a';
 
-/// See also [authStateChange].
-@ProviderFor(authStateChange)
-final authStateChangeProvider = StreamProvider<AppUser?>.internal(
-  authStateChange,
-  name: r'authStateChangeProvider',
+/// See also [firebaseAuthStateChange].
+@ProviderFor(firebaseAuthStateChange)
+final firebaseAuthStateChangeProvider = StreamProvider<AppUser?>.internal(
+  firebaseAuthStateChange,
+  name: r'firebaseAuthStateChangeProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$authStateChangeHash,
+      : _$firebaseAuthStateChangeHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AuthStateChangeRef = StreamProviderRef<AppUser?>;
+typedef FirebaseAuthStateChangeRef = StreamProviderRef<AppUser?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
