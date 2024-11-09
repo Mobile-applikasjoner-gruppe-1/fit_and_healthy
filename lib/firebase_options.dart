@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:726238086088:android:88add68cc7dae9e7a276fd',
     messagingSenderId: '726238086088',
     projectId: 'fit-and-healthy-a24e9',
-    storageBucket: 'fit-and-healthy-a24e9.appspot.com',
+    storageBucket: 'fit-and-healthy-a24e9.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -62,7 +62,8 @@ class DefaultFirebaseOptions {
     appId: '1:726238086088:ios:443ec9a2481183e9a276fd',
     messagingSenderId: '726238086088',
     projectId: 'fit-and-healthy-a24e9',
-    storageBucket: 'fit-and-healthy-a24e9.appspot.com',
+    storageBucket: 'fit-and-healthy-a24e9.firebasestorage.app',
     iosBundleId: 'no.ntnu.fitAndHealthy',
   );
+
 }
