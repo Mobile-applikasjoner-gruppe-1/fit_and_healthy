@@ -99,7 +99,7 @@ GoRouter appRouter(Ref ref) {
         name: LoginView.routeName,
         pageBuilder: (context, state) {
           return MaterialPage(
-            child: LoginView(rd: state.pathParameters['rd']),
+            child: LoginView(),
           );
         },
       ),
@@ -108,7 +108,7 @@ GoRouter appRouter(Ref ref) {
         name: RegisterView.routeName,
         pageBuilder: (context, state) {
           return MaterialPage(
-            child: RegisterView(rd: state.pathParameters['rd']),
+            child: RegisterView(),
           );
         },
       ),

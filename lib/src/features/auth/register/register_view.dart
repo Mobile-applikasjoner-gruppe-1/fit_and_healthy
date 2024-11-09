@@ -4,9 +4,7 @@ class RegisterView extends StatelessWidget {
   static const route = '/register';
   static const routeName = 'register';
 
-  const RegisterView({super.key, this.rd});
-
-  final String? rd;
+  const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
