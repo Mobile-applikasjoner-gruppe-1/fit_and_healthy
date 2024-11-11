@@ -4,6 +4,7 @@ import 'package:fit_and_healthy/src/features/exercise/exercise_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 
 PreferredSizeWidget defaultAppBar =
     AppBar(title: Text('Fit and Healthy'), centerTitle: true);
@@ -48,7 +49,9 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/exercise',
-              builder: (context, state) => ExerciseView(),
+              builder: (context, state) => ExerciseView(
+                workouts: sampleWorkouts
+              ),
             ),
           ]),
           StatefulShellBranch(routes: [
