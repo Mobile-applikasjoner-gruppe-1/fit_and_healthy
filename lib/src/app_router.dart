@@ -4,6 +4,8 @@ import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'openfoodfacts/nutritionScreen.dart';
+
 final _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'Root Navigator');
 
@@ -62,10 +64,8 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/nutrition',
-              // TODO: Should be defined in a separate file, like DashboardView
-              builder: (context, state) => Container(
-                child: Text('Nutrition'),
-              ),
+              builder: (context, state) =>
+                  NutritionScreen(), // Changed to use NutritionScreen for the Nutrition tab
             ),
           ]),
           StatefulShellBranch(routes: [
