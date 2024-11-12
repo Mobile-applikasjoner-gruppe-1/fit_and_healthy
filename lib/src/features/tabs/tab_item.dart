@@ -5,7 +5,7 @@ class TabItem {
   final String title;
   final IconData icon;
   final String label;
-  final Function(StatefulNavigationShell) onTap;
+  final Function(StatefulNavigationShell, BuildContext) onTap;
 
   const TabItem({
     required this.title,

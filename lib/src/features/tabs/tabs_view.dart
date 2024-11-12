@@ -37,7 +37,7 @@ class TabsView extends ConsumerWidget {
           NavigationBar(
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
             onDestinationSelected: (index) =>
-                tabs[index].onTap(navigationShell),
+                tabs[index].onTap(navigationShell, context),
             selectedIndex: _getTabIndex(),
             destinations: tabs
                 .map((tab) => NavigationDestination(
