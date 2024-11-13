@@ -1,82 +1,93 @@
 import 'package:flutter/material.dart';
-import '../../../shared/models/exercise.dart';
+import 'package:intl/intl.dart';
+import 'package:fit_and_healthy/shared/models/exercise.dart';
 
-// The ExerciseWorkoutCard widget
-class ExerciseWorkoutCard extends StatelessWidget {
-  const ExerciseWorkoutCard({
+/**
+ * The ExerciseWorkoutItem widget displays a summary of a workout, including its title,
+ * date, and the list of exercises. This widget displays all workout sessions where each 
+ * workout can be tapped to view more details.
+ * 
+ * Features:
+ * - Displays the workout title and formatted date.
+ * - Lists exercises, or showing a message if no exercises are available.
+ * - Responds to tap events to allow navigation to a detailed workout screen.
+ */
+class ExerciseWorkoutItem extends StatelessWidget {
+  const ExerciseWorkoutItem({
     super.key,
     required this.workout,
-    required this.onSelectWorkout,
+    required this.onSelectWorkout
   });
 
-  final Workout workout;
-  final void Function() onSelectWorkout;
+  final Workout workout; // The workout to be displayed.
+  final void Function(Workout workout) onSelectWorkout; // Callback function when workout is tapped.
+
+  /**
+   * The formatDate method, format the date as 'MMM d, yyyy'. 
+   * This could be for example, 'November 13, 2024'
+   */
+  String _formatDate(DateTime date) {
+    return DateFormat('MMMM d, yyyy').format(date);
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onSelectWorkout,
-      splashColor: Theme.of(context).primaryColor,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [
-              Colors.grey.withOpacity(0.55),
-              Colors.grey.withOpacity(0.9),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Display workout title
-            Text(
-              workout.title,
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-            ),
-            SizedBox(height: 4),
-
-            // Display workout time
-            Text(
-              "Time: ${workout.time}",
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 12),
-
-            // Display exercises label
-            Text(
-              "Exercises:",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 4),
-
-            // Display list of exercises, with a fallback message if no exercises are available
-            if (workout.exercises.isEmpty)
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: InkWell(
+        onTap: () {
+          onSelectWorkout(workout);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                "No exercises available",
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-              )
-            else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: workout.exercises.map((exercise) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2.0),
-                    child: Text(
-                      "- ${exercise.exerciseInfoList.name}",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                }).toList(),
+                workout.title,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                _formatDate(workout.dateTime),
+              ),
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Icon(Icons.fitness_center, size: 18),
+                  const SizedBox(width: 4),
+                  Text("Exercises:"),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              if (workout.exercises.isEmpty)
+                Text("No exercises available")
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: workout.exercises.map((exercise) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "- ${exercise.exerciseInfoList.name}",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
         ),
       ),
     );
