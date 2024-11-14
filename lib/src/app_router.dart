@@ -1,8 +1,10 @@
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_appbar.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 
 import 'openfoodfacts/nutritionScreen.dart';
 
@@ -55,9 +57,8 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/exercise',
-              // TODO: Should be defined in a separate file, like DashboardView
-              builder: (context, state) => Container(
-                child: Text('Exercise'),
+              builder: (context, state) => ExerciseView(
+                workouts: sampleWorkouts
               ),
             ),
           ]),
