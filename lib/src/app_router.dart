@@ -6,27 +6,33 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 
+import 'openfoodfacts/nutritionScreen.dart';
+
+final _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'Root Navigator');
+
 PreferredSizeWidget defaultAppBar =
     AppBar(title: Text('Fit and Healthy'), centerTitle: true);
 
 GoRouter appRouter = GoRouter(
+  navigatorKey: _rootNavigatorKey,
   routes: [
     StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
+        pageBuilder: (context, state, navigationShell) {
           PreferredSizeWidget appBar = defaultAppBar;
-          switch (navigationShell.currentIndex) {
-            case 0:
+          switch (state.fullPath) {
+            case DashboardView.route:
               appBar = DashboardAppbar;
               break;
-            case 1:
+            case '/exercise':
               // TODO: Should be defined in a separate file, like DashboardAppbar
               appBar = AppBar(title: Text('Exercise'), centerTitle: true);
               break;
-            case 2:
+            case '/nutrition':
               // TODO: Should be defined in a separate file, like DashboardAppbar
               appBar = AppBar(title: Text('Nutrition'), centerTitle: true);
               break;
-            case 3:
+            case '/something-else':
               // TODO: Should be defined in a separate file, like DashboardAppbar
               appBar = AppBar(title: Text('Something else'), centerTitle: true);
               break;
@@ -34,15 +40,17 @@ GoRouter appRouter = GoRouter(
               appBar = defaultAppBar;
           }
 
-          return TabsView(
-            navigationShell: navigationShell,
-            appBar: appBar,
+          return MaterialPage(
+            child: TabsView(
+              navigationShell: navigationShell,
+              appBar: appBar,
+            ),
           );
         },
         branches: [
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/',
+              path: DashboardView.route,
               builder: (context, state) => DashboardView(),
             ),
           ]),
@@ -57,10 +65,8 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/nutrition',
-              // TODO: Should be defined in a separate file, like DashboardView
-              builder: (context, state) => Container(
-                child: Text('Nutrition'),
-              ),
+              builder: (context, state) =>
+                  NutritionScreen(), // Changed to use NutritionScreen for the Nutrition tab
             ),
           ]),
           StatefulShellBranch(routes: [
