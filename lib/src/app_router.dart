@@ -77,6 +77,7 @@ GoRouter appRouter = GoRouter(
                 routes: [
                   GoRoute(
                     path: ProfileSettingsPage.routeName,
+                    parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) => ProfileSettingsPage(),
                   )
                 ]),

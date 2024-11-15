@@ -7,8 +7,13 @@ class ProfileSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
-      Text('Here will the user have settings options :)'),
-    ]);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Hie"),
+      ),
+      body: ListView(children: [
+        Text('Here will the user have settings options :)'),
+      ]),
+    );
   }
 }
