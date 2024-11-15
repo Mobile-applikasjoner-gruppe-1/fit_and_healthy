@@ -3,9 +3,13 @@ import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_appbar.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
+
+import 'openfoodfacts/nutritionScreen.dart';
 
 final _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'Root Navigator');
@@ -55,19 +59,15 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/exercise',
-              // TODO: Should be defined in a separate file, like DashboardView
-              builder: (context, state) => Container(
-                child: Text('Exercise'),
-              ),
+              builder: (context, state) =>
+                  ExerciseView(workouts: sampleWorkouts),
             ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/nutrition',
-              // TODO: Should be defined in a separate file, like DashboardView
-              builder: (context, state) => Container(
-                child: Text('Nutrition'),
-              ),
+              builder: (context, state) =>
+                  NutritionScreen(), // Changed to use NutritionScreen for the Nutrition tab
             ),
           ]),
           StatefulShellBranch(routes: [
