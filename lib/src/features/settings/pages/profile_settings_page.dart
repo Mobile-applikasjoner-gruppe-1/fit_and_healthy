@@ -9,10 +9,10 @@ class ProfileSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Hie"),
+        title: Text("Profile"),
       ),
       body: ListView(children: [
-        Text('Here will the user have settings options :)'),
+        Text('Profile options like change values, name and theme?'),
       ]),
     );
   }

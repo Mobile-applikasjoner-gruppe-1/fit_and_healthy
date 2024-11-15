@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class GoalsSettingsPage extends StatefulWidget {
+  static const routeName = '/goals';
+
   _GoalsSettingsPage createState() => _GoalsSettingsPage();
 }
 
@@ -65,100 +67,105 @@ class _GoalsSettingsPage extends State<GoalsSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextFormField(
-              controller: _weightController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Weigth (kg)',
-                border: OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Goals"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _weightController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Weigth (kg)',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your weight';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your weight';
-                }
-                if (double.tryParse(value) == null) {
-                  return 'Please enter a valid number';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            TextFormField(
-              controller: _heightController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Height (cm)',
-                border: OutlineInputBorder(),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _heightController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Height (cm)',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your height';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your height';
-                }
-                if (double.tryParse(value) == null) {
-                  return 'Please enter a valid number';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            //TODO dateTimePicker? since people age xd
-            TextFormField(
-              controller: _ageController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Age',
-                border: OutlineInputBorder(),
+              SizedBox(height: 16),
+              //TODO dateTimePicker? since people age xd
+              TextFormField(
+                controller: _ageController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Age',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your age';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your age';
-                }
-                if (int.tryParse(value) == null) {
-                  return 'Please enter a valid number';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedActivityLevel,
-              isExpanded: true,
-              items: _activityLevels.map((level) {
-                return DropdownMenuItem(
-                  value: level,
-                  child: Text(level),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedActivityLevel = value;
-                });
-              },
-              decoration: InputDecoration(
-                labelText: 'Activity Level',
-                border: OutlineInputBorder(),
+              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedActivityLevel,
+                isExpanded: true,
+                items: _activityLevels.map((level) {
+                  return DropdownMenuItem(
+                    value: level,
+                    child: Text(level),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedActivityLevel = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  labelText: 'Activity Level',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) =>
+                    value == null ? 'Please select an activity level' : null,
               ),
-              validator: (value) =>
-                  value == null ? 'Please select an activity level' : null,
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _calculatedCalories,
-              child: Text('Calculate Calories'),
-            ),
-            SizedBox(height: 24),
-            if (_caloriesNeeded != null)
-              Text(
-                  'You need approximately ${_caloriesNeeded!.toStringAsFixed(0)} calories per day.',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-          ],
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _calculatedCalories,
+                child: Text('Calculate Calories'),
+              ),
+              SizedBox(height: 24),
+              if (_caloriesNeeded != null)
+                Text(
+                    'You need approximately ${_caloriesNeeded!.toStringAsFixed(0)} calories per day.',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+            ],
+          ),
         ),
       ),
     );

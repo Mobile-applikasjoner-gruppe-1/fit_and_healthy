@@ -1,5 +1,7 @@
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_appbar.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_appbar.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
@@ -79,6 +81,16 @@ GoRouter appRouter = GoRouter(
                     path: ProfileSettingsPage.routeName,
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) => ProfileSettingsPage(),
+                  ),
+                  GoRoute(
+                    path: GoalsSettingsPage.routeName,
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => GoalsSettingsPage(),
+                  ),
+                  GoRoute(
+                    path: GdprSettingsPage.routeName,
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => GdprSettingsPage(),
                   )
                 ]),
           ])

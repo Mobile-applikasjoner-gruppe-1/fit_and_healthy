@@ -48,7 +48,7 @@ class SettingsView extends ConsumerWidget {
                 title: Text('GDPR'),
                 leading: Icon(Icons.document_scanner),
                 onTap: () {
-                  context.push('/settings/profile');
+                  context.push('/settings/gdpr');
                 },
               ),
             ],
