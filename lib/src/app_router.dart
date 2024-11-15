@@ -1,5 +1,10 @@
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_appbar.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/settings_appbar.dart';
+import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:flutter/material.dart';
@@ -32,9 +37,8 @@ GoRouter appRouter = GoRouter(
               // TODO: Should be defined in a separate file, like DashboardAppbar
               appBar = AppBar(title: Text('Nutrition'), centerTitle: true);
               break;
-            case '/something-else':
-              // TODO: Should be defined in a separate file, like DashboardAppbar
-              appBar = AppBar(title: Text('Something else'), centerTitle: true);
+            case SettingsView.routeName:
+              appBar = SettingsAppBar;
               break;
             default:
               appBar = defaultAppBar;
@@ -57,9 +61,8 @@ GoRouter appRouter = GoRouter(
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/exercise',
-              builder: (context, state) => ExerciseView(
-                workouts: sampleWorkouts
-              ),
+              builder: (context, state) =>
+                  ExerciseView(workouts: sampleWorkouts),
             ),
           ]),
           StatefulShellBranch(routes: [
@@ -71,12 +74,25 @@ GoRouter appRouter = GoRouter(
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/something-else',
-              // TODO: Should be defined in a separate file, like DashboardView
-              builder: (context, state) => Container(
-                child: Text('Something else'),
-              ),
-            ),
+                path: SettingsView.routeName,
+                builder: (context, state) => SettingsView(),
+                routes: [
+                  GoRoute(
+                    path: ProfileSettingsPage.routeName,
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => ProfileSettingsPage(),
+                  ),
+                  GoRoute(
+                    path: GoalsSettingsPage.routeName,
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => GoalsSettingsPage(),
+                  ),
+                  GoRoute(
+                    path: GdprSettingsPage.routeName,
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => GdprSettingsPage(),
+                  )
+                ]),
           ])
         ]),
   ],
