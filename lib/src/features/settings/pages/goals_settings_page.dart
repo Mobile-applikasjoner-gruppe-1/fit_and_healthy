@@ -1,4 +1,6 @@
+import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:flutter/material.dart';
+import 'package:fit_and_healthy/shared/utils/calorie_calculator.dart';
 
 class GoalsSettingsPage extends StatefulWidget {
   static const routeName = '/goals';
@@ -11,44 +13,8 @@ class _GoalsSettingsPage extends State<GoalsSettingsPage> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  String? _selectedActivityLevel;
+  ActivityLevel? _selectedActivityLevel;
   double? _caloriesNeeded;
-  // TODO, add calculations for female and male
-
-  final List<String> _activityLevels = [
-    'Sedentary (little or no exercise)',
-    'Lightly active (light exercise/sports 1-3 days/week)',
-    'Moderately active (moderate exercise/sports 3-5 days/week)',
-    'Very active (hard exercise/sports 6-7 days a week)',
-    'Super active (very hard exercise & physical job)',
-  ];
-
-  double calculateCalories(
-      double weight, double height, int age, String activityLevel) {
-    double bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
-    double activityMultiplier;
-    switch (activityLevel) {
-      case 'Sedentary (little or no exercise)':
-        activityMultiplier = 1.2;
-        break;
-      case 'Lightly active (light exercise/sports 1-3 days/week)':
-        activityMultiplier = 1.375;
-        break;
-      case 'Moderately active (moderate exercise/sports 3-5 days/week)':
-        activityMultiplier = 1.55;
-        break;
-      case 'Very active (hard exercise/sports 6-7 days a week)':
-        activityMultiplier = 1.725;
-        break;
-      case 'Super active (very hard exercise & physical job)':
-        activityMultiplier = 1.9;
-        break;
-      default:
-        activityMultiplier = 1.2;
-    }
-
-    return bmr * activityMultiplier;
-  }
 
   void _calculatedCalories() {
     if (_formKey.currentState?.validate() ?? false) {
@@ -56,8 +22,8 @@ class _GoalsSettingsPage extends State<GoalsSettingsPage> {
       final height = double.tryParse(_heightController.text) ?? 0;
       final age = int.parse(_ageController.text);
       if (_selectedActivityLevel != null) {
-        final calories =
-            calculateCalories(weight, height, age, _selectedActivityLevel!);
+        final calories = CalorieCalculator.calculateCalories(
+            weight, height, age, _selectedActivityLevel!);
         setState(() {
           _caloriesNeeded = calories;
         });
@@ -133,13 +99,13 @@ class _GoalsSettingsPage extends State<GoalsSettingsPage> {
                 },
               ),
               SizedBox(height: 16),
-              DropdownButtonFormField<String>(
+              DropdownButtonFormField<ActivityLevel>(
                 value: _selectedActivityLevel,
                 isExpanded: true,
-                items: _activityLevels.map((level) {
+                items: ActivityLevel.values.map((level) {
                   return DropdownMenuItem(
                     value: level,
-                    child: Text(level),
+                    child: Text(level.description),
                   );
                 }).toList(),
                 onChanged: (value) {
