@@ -34,7 +34,7 @@ class SettingsView extends ConsumerWidget {
                 title: Text('Widgets'),
                 leading: Icon(Icons.widgets),
                 onTap: () {
-                  context.push('/settings/profile');
+                  context.push('/settings/widget');
                 },
               ),
               ListTile(
