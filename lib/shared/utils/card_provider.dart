@@ -8,16 +8,19 @@ final allCards = [
       id: '1',
       title: 'Workout amount weekly',
       size: 0.5,
+      widgetCardCategory: WidgetCardCategory.workout,
       builder: () => CardAmountWeeklyWorkout()),
   WidgetCard(
       id: '2',
       title: 'Workout amount weekly 2',
       size: 1.0,
+      widgetCardCategory: WidgetCardCategory.workout,
       builder: () => CardAmountWeeklyWorkout()),
   WidgetCard(
     id: '3',
     title: 'Weight',
     size: 1.0,
+    widgetCardCategory: WidgetCardCategory.measurament,
     builder: () => CardWeight(),
   ),
 ];
