@@ -1,6 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_and_healthy/src/features/auth/app_user_model.dart';
+import 'package:fit_and_healthy/src/features/auth/auth_providers/auth_providers.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'firebase_auth_repository.g.dart';
@@ -61,5 +65,39 @@ class FirebaseAuthRepository {
     );
   }
 
-  // TODO: Add methods for sending and verifying email verification and/or OTP (one-time password)
+  Future<void> signInWithProvider(SupportedAuthProvider provider) async {
+    // TODO: Check if signInWithPopup is good for our use-case
+    switch (provider) {
+      case SupportedAuthProvider.google:
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        final GoogleSignInAuthentication? googleAuth =
+            await googleUser?.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth?.accessToken,
+          idToken: googleAuth?.idToken,
+        );
+
+        await _firebaseAuth.signInWithCredential(credential);
+        break;
+      case SupportedAuthProvider.facebook: // Trigger the sign-in flow
+        final LoginResult loginResult = await FacebookAuth.instance.login();
+        final OAuthCredential facebookAuthCredential =
+            FacebookAuthProvider.credential(loginResult.accessToken!.token);
+        await _firebaseAuth.signInWithCredential(facebookAuthCredential);
+        break;
+      case SupportedAuthProvider.apple:
+        final appleProvider = AppleAuthProvider();
+        if (kIsWeb) {
+          await _firebaseAuth.signInWithPopup(appleProvider);
+        } else {
+          await _firebaseAuth.signInWithProvider(appleProvider);
+        }
+        break;
+      default:
+        throw UnimplementedError(
+            'Provider ${provider.providerId} is not implemented');
+    }
+  }
+
+  // TODO: Add methods for sending and verifying email verification, reset password-link and/or OTP (one-time password)
 }
