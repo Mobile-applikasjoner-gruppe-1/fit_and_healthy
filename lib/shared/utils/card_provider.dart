@@ -8,6 +8,11 @@ final allCards = [
       title: 'Workout amount weekly',
       size: 0.5,
       builder: () => CardAmountWeeklyWorkout()),
+  WidgetCard(
+      id: '2',
+      title: 'Workout amount weekly 2',
+      size: 1.0,
+      builder: () => CardAmountWeeklyWorkout()),
 ];
 
 final CardProvider = StateProvider<List<WidgetCard>>((ref) => []);

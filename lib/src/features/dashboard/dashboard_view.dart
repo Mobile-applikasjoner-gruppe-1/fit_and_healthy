@@ -27,7 +27,7 @@ class DashboardView extends ConsumerWidget {
                 crossAxisCount: 2,
                 mainAxisSpacing: 8.0,
                 crossAxisSpacing: 8.0,
-                childAspectRatio: 2,
+                //childAspectRatio: 2,
               ),
               itemCount: selectedCards.length,
               itemBuilder: (context, index) {
