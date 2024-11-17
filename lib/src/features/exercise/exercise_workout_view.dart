@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_workout_detail.dart';
@@ -18,6 +19,9 @@ class ExerciseView extends StatelessWidget {
     required this.workouts,
   });
 
+  static const route = '/exercise';
+  static const routeName = 'Exercise';
+
   final List<Workout> workouts; // List of workouts to be displayed in the view.
 
   /**
@@ -27,6 +31,7 @@ class ExerciseView extends StatelessWidget {
    * [workout] - The selected Workout object to be passed to the detail view.
    */
   void selectWorkout(BuildContext context, Workout workout) {
+    // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => WorkoutDetailView(
@@ -36,15 +41,13 @@ class ExerciseView extends StatelessWidget {
     );
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     Widget content = SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Uh oh ... nothing here!'
-          ),
+          Text('Uh oh ... nothing here!'),
           const SizedBox(height: 16),
           Text(
             'Try adding a workout session!',
@@ -63,16 +66,11 @@ class ExerciseView extends StatelessWidget {
           },
         ),
       );
-
-      return content;
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Workouts!'),
-      ),
+    return NestedScaffold(
+      appBar: AppBar(title: const Text('Exercise'), centerTitle: true),
       body: content,
     );
   }
 }
-

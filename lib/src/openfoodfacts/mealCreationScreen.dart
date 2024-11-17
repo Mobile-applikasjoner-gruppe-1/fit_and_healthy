@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealClass.dart';
 import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealHolderClass.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'mealDetailScreen.dart';
 
 class MealListScreen extends StatefulWidget {
+  static const route = '/create-meal';
+  static const routeName = 'Create Meal';
+
   @override
   _MealListScreenState createState() => _MealListScreenState();
 }
@@ -29,7 +33,7 @@ class _MealListScreenState extends State<MealListScreen> {
   Widget build(BuildContext context) {
     final totalNutrition = mealHolder.calculateTotalNutrition();
 
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(
         title: Text(
             'Meals on ${mealHolder.date.toLocal().toString().split(' ')[0]}'), // Display date
@@ -69,6 +73,7 @@ class _MealListScreenState extends State<MealListScreen> {
                     onPressed: () => _removeMeal(meal.id), // Remove meal by ID
                   ),
                   onTap: () {
+                    // TODO: Switch to a routing based approach to navigate to the MealDetailScreen. Use path parameters to pass the meal id.
                     Navigator.push(
                       context,
                       MaterialPageRoute(

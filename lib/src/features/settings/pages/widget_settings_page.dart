@@ -1,12 +1,14 @@
 import 'package:fit_and_healthy/shared/models/widget_card.dart';
 import 'package:fit_and_healthy/shared/utils/card_provider.dart';
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class WidgetSettingsPage extends ConsumerWidget {
   const WidgetSettingsPage({super.key});
 
-  static const routeName = '/widget';
+  static const route = '/widget';
+  static const routeName = 'Widget Settings';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,7 +18,7 @@ class WidgetSettingsPage extends ConsumerWidget {
 
     final groupedCards = _groupCardsByCategory();
 
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(title: Text('Widgets')),
       body: ListView(
         children: groupedCards.entries.map(

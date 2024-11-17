@@ -1,4 +1,10 @@
+import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/widget_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/settings_appbar.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +16,8 @@ import 'package:go_router/go_router.dart';
 class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
-  static const routeName = '/settings';
+  static const route = '/settings';
+  static const routeName = 'Settings';
 
   //final SettingsController controller;
 
@@ -18,7 +25,8 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsState = ref.watch(settingsControllerProvider).value;
 
-    return Scaffold(
+    return NestedScaffold(
+      appBar: SettingsAppBar,
       body: Column(
         children: [
           Column(
@@ -27,28 +35,28 @@ class SettingsView extends ConsumerWidget {
                 title: Text('Profile'),
                 leading: Icon(Icons.person),
                 onTap: () {
-                  context.push('/settings/profile');
+                  context.pushNamed(ProfileSettingsPage.routeName);
                 },
               ),
               ListTile(
                 title: Text('Widgets'),
                 leading: Icon(Icons.widgets),
                 onTap: () {
-                  context.push('/settings/widget');
+                  context.pushNamed(WidgetSettingsPage.routeName);
                 },
               ),
               ListTile(
                 title: Text('Goals'),
                 leading: Icon(Icons.star),
                 onTap: () {
-                  context.push('/settings/goals');
+                  context.pushNamed(GoalsSettingsPage.routeName);
                 },
               ),
               ListTile(
                 title: Text('GDPR'),
                 leading: Icon(Icons.document_scanner),
                 onTap: () {
-                  context.push('/settings/gdpr');
+                  context.pushNamed(GdprSettingsPage.routeName);
                 },
               ),
             ],

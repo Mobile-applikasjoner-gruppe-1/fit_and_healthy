@@ -1,9 +1,11 @@
 import 'package:fit_and_healthy/shared/models/activity_level.dart';
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_and_healthy/shared/utils/calorie_calculator.dart';
 
 class GoalsSettingsPage extends StatefulWidget {
-  static const routeName = '/goals';
+  static const route = '/goals';
+  static const routeName = 'Goals Settings';
 
   _GoalsSettingsPage createState() => _GoalsSettingsPage();
 }
@@ -33,7 +35,7 @@ class _GoalsSettingsPage extends State<GoalsSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(
         title: Text("Goals"),
       ),
