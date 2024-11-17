@@ -18,7 +18,8 @@ Examples for branch names:
 - `feature/{issue-number}-{short-description}`
 - `bugfix/{issue-number}-{short-description}`
 - `hotfix/{short-description}`
-- `issue/{issue-number}-{description}`
+- `issue/{issue-number}-{short-description}`
+- `refactor/{issue-number}-{short-description}`
 ## Pull requests
 When merging into main or dev/test you should always create a pull request unless it is a very small hotfix that has no chance of breaking code.
 Create a pull request (PR) from your branch into dev and then write a small description about what was added/changed and possibly why.

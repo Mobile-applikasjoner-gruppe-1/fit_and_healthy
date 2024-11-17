@@ -4,14 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class TabsView extends ConsumerWidget {
-  const TabsView(
-      {super.key,
-      this.appBar,
-      this.bottomNavigationBar,
-      required this.navigationShell});
+  const TabsView({super.key, required this.navigationShell});
 
-  final PreferredSizeWidget? appBar;
-  final Widget? bottomNavigationBar;
   final StatefulNavigationShell navigationShell;
 
   @override
@@ -26,26 +20,24 @@ class TabsView extends ConsumerWidget {
         case 3:
           return index + 1;
         default:
-          return 1;
+          return 0;
       }
     }
 
     return Scaffold(
-      appBar: appBar,
       body: navigationShell,
-      bottomNavigationBar: bottomNavigationBar ??
-          NavigationBar(
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-            onDestinationSelected: (index) =>
-                tabs[index].onTap(navigationShell, context),
-            selectedIndex: _getTabIndex(),
-            destinations: tabs
-                .map((tab) => NavigationDestination(
-                      icon: Icon(tab.icon),
-                      label: tab.label,
-                    ))
-                .toList(),
-          ),
+      bottomNavigationBar: NavigationBar(
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        onDestinationSelected: (index) =>
+            tabs[index].onTap(navigationShell, context),
+        selectedIndex: _getTabIndex(),
+        destinations: tabs
+            .map((tab) => NavigationDestination(
+                  icon: Icon(tab.icon),
+                  label: tab.label,
+                ))
+            .toList(),
+      ),
     );
   }
 }
