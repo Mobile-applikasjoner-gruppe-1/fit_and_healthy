@@ -1,13 +1,15 @@
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class GdprSettingsPage extends StatelessWidget {
   const GdprSettingsPage({super.key});
 
-  static const routeName = '/gdpr';
+  static const route = '/gdpr';
+  static const routeName = 'GDPR Settings';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(
         title: Text("GDPR"),
       ),

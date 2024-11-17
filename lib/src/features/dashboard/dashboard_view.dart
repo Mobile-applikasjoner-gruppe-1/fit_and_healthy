@@ -1,13 +1,20 @@
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
 
   static const route = '/';
+  static const routeName = 'Dashboard';
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return NestedScaffold(
+      appBar: AppBar(
+        title: const Text('Dashboard'),
+        centerTitle: true,
+      ),
+      body: Container(
         padding: const EdgeInsets.all(10),
         child: GridView.count(
           crossAxisCount: 2,
@@ -67,6 +74,8 @@ class DashboardView extends StatelessWidget {
               ),
             ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

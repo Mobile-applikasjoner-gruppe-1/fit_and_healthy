@@ -1,4 +1,5 @@
 // FoodSearchScreen.dart
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 
 import '../foodrelatedclasses/fooditem.dart';
@@ -6,6 +7,9 @@ import '../openFoodApi.dart';
 import 'fooditemwidget.dart';
 
 class FoodSearchScreen extends StatefulWidget {
+  static const route = '/search';
+  static const routeName = 'Nutrition Search';
+
   @override
   _FoodSearchScreenState createState() => _FoodSearchScreenState();
 }
@@ -35,7 +39,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(
         title: Text('Search Products'),
         centerTitle: true,

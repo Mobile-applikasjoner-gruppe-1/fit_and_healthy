@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
@@ -12,12 +13,15 @@ import 'package:fit_and_healthy/src/features/exercise/exercise_item.dart';
  * - Displays a message if no exercises are available in the workout.
  */
 class WorkoutDetailView extends StatelessWidget {
-  const WorkoutDetailView({
-    super.key,
-    required this.workout
-  });
+  const WorkoutDetailView({super.key, required this.workout});
 
   final Workout workout; // The workout to be displayed.
+
+  // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
+  // static const route = '/exercise/workout-detail/:workoutId';
+  // WorkoutDetailView({required this.workoutId});
+  // final String workoutId;
+  // final Workout workout = <something>.getWorkoutById(workoutId);
 
   /**
    * The formatDate method, format the date as 'MMM d, yyyy'. 
@@ -39,7 +43,6 @@ class WorkoutDetailView extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-
           if (workout.exercises.isEmpty)
             Center(
               child: Text(
@@ -57,7 +60,7 @@ class WorkoutDetailView extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(
         title: Text(workout.title),
       ),
