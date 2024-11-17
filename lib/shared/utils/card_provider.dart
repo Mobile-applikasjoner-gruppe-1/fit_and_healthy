@@ -1,5 +1,6 @@
 import 'package:fit_and_healthy/shared/models/widget_card.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/card_amount_weekly_workout.dart';
+import 'package:fit_and_healthy/shared/widgets/cards/card_weight.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final allCards = [
@@ -13,6 +14,12 @@ final allCards = [
       title: 'Workout amount weekly 2',
       size: 1.0,
       builder: () => CardAmountWeeklyWorkout()),
+  WidgetCard(
+    id: '3',
+    title: 'Weight',
+    size: 1.0,
+    builder: () => CardWeight(),
+  ),
 ];
 
 final CardProvider = StateProvider<List<WidgetCard>>((ref) => []);
