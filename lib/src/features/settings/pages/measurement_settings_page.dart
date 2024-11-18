@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/shared/widgets/charts/weight_chart.dart';
 
 // Providers
 final weightEntriesProvider = StateProvider<List<WeightEntry>>((ref) => []);
@@ -49,45 +49,8 @@ class MeasurementSettingsPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            // Graph and Informational Text
-            Expanded(
-              child: Column(
-                children: [
-                  // Chart
-                  filteredEntries.isEmpty
-                      ? Center(
-                          child: Text(
-                            'No weight data available.',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        )
-                      : Expanded(
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: LineChart(
-                              _buildLineChart(filteredEntries),
-                            ),
-                          ),
-                        ),
-                  const SizedBox(height: 16),
-                  // Informational Text
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      'For accurate results, weigh yourself at the same time daily, '
-                      'preferably in the morning before eating or drinking, '
-                      'and after using the bathroom.',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Reusable Chart
+            Expanded(child: WeightChart(entries: filteredEntries)),
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton(
@@ -146,97 +109,6 @@ class MeasurementSettingsPage extends ConsumerWidget {
       case ChartFilter.all:
         return entries;
     }
-  }
-
-  // Build Line Chart Data
-  LineChartData _buildLineChart(List<WeightEntry> entries) {
-    if (entries.isEmpty) return LineChartData();
-
-    // Normalize x-axis by the earliest date
-    final earliestDate = entries.first.timestamp;
-    final spots = entries.map((entry) {
-      final x = entry.timestamp.difference(earliestDate).inDays.toDouble();
-      return FlSpot(x, entry.weight.toDouble());
-    }).toList();
-
-    return LineChartData(
-      gridData: FlGridData(
-        show: true,
-        horizontalInterval: 5,
-        verticalInterval: 5,
-        getDrawingHorizontalLine: (value) => FlLine(
-          color: Colors.grey.withOpacity(0.5),
-          strokeWidth: 0.5,
-        ),
-        getDrawingVerticalLine: (value) => FlLine(
-          color: Colors.grey.withOpacity(0.5),
-          strokeWidth: 0.5,
-        ),
-      ),
-      titlesData: FlTitlesData(
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            getTitlesWidget: (value, meta) {
-              return Text(
-                '${value.toInt()}kg',
-                style: const TextStyle(fontSize: 10),
-              );
-            },
-            reservedSize: 40,
-          ),
-        ),
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            getTitlesWidget: (value, meta) {
-              // Map `FlSpot` x-values back to their corresponding dates
-              final int daysFromStart = value.toInt();
-              final date = earliestDate.add(Duration(days: daysFromStart));
-              return Text(
-                '${date.day}/${date.month}',
-                style: const TextStyle(fontSize: 10),
-              );
-            },
-            reservedSize: 30,
-          ),
-        ),
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false,
-          ),
-        ),
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false,
-          ),
-        ),
-      ),
-      lineBarsData: [
-        LineChartBarData(
-          isCurved: true,
-          spots: spots,
-          barWidth: 4,
-          color: Colors.blue,
-          dotData: FlDotData(show: true),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              colors: [
-                Colors.blue.withOpacity(0.3),
-                Colors.blue.withOpacity(0)
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-        ),
-      ],
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: Colors.grey.withOpacity(0.5)),
-      ),
-    );
   }
 
   // Show Modal Bottom Sheet
