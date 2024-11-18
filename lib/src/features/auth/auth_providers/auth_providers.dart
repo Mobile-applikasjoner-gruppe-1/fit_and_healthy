@@ -1,7 +1,5 @@
 enum SupportedAuthProvider {
-  google('google.com'),
-  facebook('facebook.com'),
-  apple('apple.com');
+  google('google.com');
 
   final String providerId;
   const SupportedAuthProvider(this.providerId);

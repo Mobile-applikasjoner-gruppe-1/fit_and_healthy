@@ -1,5 +1,6 @@
 import 'package:fit_and_healthy/src/features/app_router/app_router_redirect.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
+import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_password_view.dart';
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_view.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
@@ -131,19 +132,22 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: LoginView.route,
         name: LoginView.routeName,
-        pageBuilder: (context, state) {
-          return MaterialPage(
-            child: LoginView(),
-          );
+        builder: (context, state) {
+          return LoginView();
         },
       ),
       GoRoute(
         path: RegisterView.route,
         name: RegisterView.routeName,
-        pageBuilder: (context, state) {
-          return MaterialPage(
-            child: RegisterView(),
-          );
+        builder: (context, state) {
+          return RegisterView();
+        },
+      ),
+      GoRoute(
+        path: ForgotPasswordView.route,
+        name: ForgotPasswordView.routeName,
+        builder: (context, state) {
+          return ForgotPasswordView();
         },
       ),
     ],

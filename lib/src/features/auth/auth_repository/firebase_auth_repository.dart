@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_and_healthy/src/features/auth/app_user_model.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_providers/auth_providers.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -31,6 +29,8 @@ class FirebaseAuthRepository {
 
   final FirebaseAuth _firebaseAuth;
 
+  DateTime? emailVerificationLastSent;
+
   AppUser? _convertUser(User? user) {
     return user == null ? null : AppUser.fromFirebaseUser(user);
   }
@@ -56,20 +56,26 @@ class FirebaseAuthRepository {
   }
 
   Future<void> createUserWithEmailAndPassword({
+    required String firstName,
+    required String lastName,
     required String email,
     required String password,
   }) async {
-    await _firebaseAuth.createUserWithEmailAndPassword(
+    final creds = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
+    await creds.user?.updateDisplayName('$firstName $lastName');
+    await creds.user?.sendEmailVerification();
   }
 
   Future<void> signInWithProvider(SupportedAuthProvider provider) async {
-    // TODO: Check if signInWithPopup is good for our use-case
     switch (provider) {
       case SupportedAuthProvider.google:
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        final GoogleSignInAccount? googleUser = await GoogleSignIn(
+                clientId:
+                    '726238086088-jipbremhtmsjbnji99k8f3d5j77jjks8.apps.googleusercontent.com')
+            .signIn();
         final GoogleSignInAuthentication? googleAuth =
             await googleUser?.authentication;
         final credential = GoogleAuthProvider.credential(
@@ -79,25 +85,43 @@ class FirebaseAuthRepository {
 
         await _firebaseAuth.signInWithCredential(credential);
         break;
-      case SupportedAuthProvider.facebook: // Trigger the sign-in flow
-        final LoginResult loginResult = await FacebookAuth.instance.login();
-        final OAuthCredential facebookAuthCredential =
-            FacebookAuthProvider.credential(loginResult.accessToken!.token);
-        await _firebaseAuth.signInWithCredential(facebookAuthCredential);
-        break;
-      case SupportedAuthProvider.apple:
-        final appleProvider = AppleAuthProvider();
-        if (kIsWeb) {
-          await _firebaseAuth.signInWithPopup(appleProvider);
-        } else {
-          await _firebaseAuth.signInWithProvider(appleProvider);
-        }
-        break;
       default:
         throw UnimplementedError(
             'Provider ${provider.providerId} is not implemented');
     }
   }
 
-  // TODO: Add methods for sending and verifying email verification, reset password-link and/or OTP (one-time password)
+  // TODO: Check if we need other methods for reset password-link and/or OTP (one-time password)
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> confirmPasswordReset(String code, String newPassword) async {
+    await _firebaseAuth.confirmPasswordReset(
+        code: code, newPassword: newPassword);
+  }
+
+  Future<void> sendEmailVerification() async {
+    if (_firebaseAuth.currentUser == null) {
+      throw Exception('No user is currently signed in');
+    }
+
+    if (_firebaseAuth.currentUser!.emailVerified) {
+      throw Exception('Email is already verified');
+    }
+
+    if (_firebaseAuth.currentUser!.email == null ||
+        _firebaseAuth.currentUser!.email!.isEmpty) {
+      throw Exception('User was created without email verification');
+    }
+
+    if (emailVerificationLastSent != null &&
+        DateTime.now().difference(emailVerificationLastSent!) <
+            Duration(seconds: 30)) {
+      throw Exception('Email verification already sent');
+    }
+
+    await _firebaseAuth.currentUser?.sendEmailVerification();
+    emailVerificationLastSent = DateTime.now();
+  }
 }

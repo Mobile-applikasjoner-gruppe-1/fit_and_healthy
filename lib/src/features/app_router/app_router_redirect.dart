@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
+import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_password_view.dart';
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_view.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
@@ -14,7 +15,8 @@ FutureOr<String?> appRouterRedirectHandler(
 ) {
   final bool isLoggedIn = auth.currentUser != null;
   final bool isLoggingIn = state.matchedLocation == LoginView.route ||
-      state.matchedLocation == RegisterView.route;
+      state.matchedLocation == RegisterView.route ||
+      state.matchedLocation == ForgotPasswordView.route;
 
   // Redirect to the dashboard (main page) if the user is already logged in.
   if (isLoggedIn && isLoggingIn) {
