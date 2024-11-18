@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_workout_detail.dart';
 
 import 'openfoodfacts/nutritionScreen.dart';
 
@@ -41,22 +42,21 @@ GoRouter appRouter = GoRouter(
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-                path: ExerciseView.route,
-                name: ExerciseView.routeName,
-                builder: (context, state) =>
-                    ExerciseView(workouts: sampleWorkouts),
-                routes: [
-                  // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
-                  // GoRoute(
-                  //   path: WorkoutDetailView.route,
-                  //   builder: (context, state) {
-                  //     final workoutId = state.pathParameters['workoutId']!;
-                  //     final workout = sampleWorkouts
-                  //         .firstWhere((workout) => workout.id == workoutId);
-                  //     return WorkoutDetailView(workout: workout);
-                  //   },
-                  // )
-                ]),
+              path: ExerciseView.route,
+              name: ExerciseView.routeName,
+              builder: (context, state) =>
+                  ExerciseView(workouts: sampleWorkouts),
+              routes: [
+                GoRoute(
+                  path: ':id',
+                  name: 'WorkoutDetail',
+                  builder: (context, state) {
+                    final workoutId = state.pathParameters['id']!;
+                    return WorkoutDetailView(workoutId: workoutId);
+                  },
+                ),
+              ],
+            ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(

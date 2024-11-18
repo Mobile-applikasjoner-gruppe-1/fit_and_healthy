@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_item.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 
 /**
  * The WorkoutDetailView widget displays detailed information about a single workout,
@@ -13,15 +14,42 @@ import 'package:fit_and_healthy/src/features/exercise/exercise_item.dart';
  * - Displays a message if no exercises are available in the workout.
  */
 class WorkoutDetailView extends StatelessWidget {
-  const WorkoutDetailView({super.key, required this.workout});
+  const WorkoutDetailView({super.key, required this.workoutId});
 
-  final Workout workout; // The workout to be displayed.
+  final String workoutId; // The workout to be displayed.
 
-  // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
-  // static const route = '/exercise/workout-detail/:workoutId';
-  // WorkoutDetailView({required this.workoutId});
-  // final String workoutId;
-  // final Workout workout = <something>.getWorkoutById(workoutId);
+  /**
+ * Retrieves a Workout object from the sampleWorkouts list using the provided workoutId.
+ *
+ * Functionality:
+ * - Converts the workoutId (String) to an integer.
+ * - Searches the sampleWorkouts list for a workout with a matching ID.
+ * - Throws an exception if:
+ *   - The workoutId is not a valid integer.
+ *   - No workout with the given ID is found.
+ *
+ * Parameters:
+ * - [workoutId] (String): The ID of the workout to retrieve.
+ *
+ * Returns:
+ * - [Workout]: The workout object matching the provided ID.
+ *
+ * Throws:
+ * - Exception if the workoutId is invalid or the workout is not found.
+ */
+  Workout _getWorkoutById(String workoutId) {
+    final id = int.tryParse(workoutId);
+    if (id == null) {
+      throw Exception('Invalid workout ID: $workoutId');
+    }
+
+    return sampleWorkouts.firstWhere(
+      (workout) => workout.id == id,
+      orElse: () {
+        throw Exception('Workout with id $id not found');
+      },
+    );
+  }
 
   /**
    * The formatDate method, format the date as 'MMM d, yyyy'. 
@@ -33,6 +61,7 @@ class WorkoutDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final workout = _getWorkoutById(workoutId);
     Widget content = SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
