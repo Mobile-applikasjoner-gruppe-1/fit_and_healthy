@@ -4,6 +4,7 @@ import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
@@ -52,17 +53,18 @@ class DashboardView extends ConsumerWidget {
             )
           : Container(
               padding: const EdgeInsets.all(10),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8.0,
-                  crossAxisSpacing: 8.0,
-                ),
-                itemCount: selectedCards.length,
-                itemBuilder: (context, index) {
-                  final card = selectedCards[index];
-                  return card.builder();
-                },
+              child: StaggeredGrid.count(
+                crossAxisCount: 2, // Two columns
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                children: selectedCards.map((card) {
+                  return StaggeredGridTile.count(
+                    crossAxisCellCount:
+                        card.size == 1.0 ? 2 : 1, // Full-width or half-width
+                    mainAxisCellCount: 1, // Uniform height
+                    child: card.builder(),
+                  );
+                }).toList(),
               ),
             ),
     );
