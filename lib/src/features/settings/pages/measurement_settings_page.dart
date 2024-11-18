@@ -49,9 +49,26 @@ class MeasurementSettingsPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            // Reusable Chart
-            Expanded(child: WeightChart(entries: filteredEntries)),
+            // Chart with Max Height
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 300), // Set max height
+              child: WeightChart(entries: filteredEntries),
+            ),
             const SizedBox(height: 16),
+            // Informational Text
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                'For accurate results:\n'
+                '- Weigh yourself at the same time daily, preferably in the morning.\n'
+                '- Do it before eating or drinking.\n'
+                '- After using the toilet.\n'
+                '- Once a week on the same day for consistent tracking.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Add Weight Button
             Center(
               child: ElevatedButton(
                 onPressed: () {
@@ -164,7 +181,8 @@ class MeasurementSettingsPage extends ConsumerWidget {
                       context: context,
                       initialDate: selectedDate,
                       firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
+                      lastDate:
+                          DateTime.now(), // Restrict to current or past dates
                     );
                     if (pickedDate != null) {
                       setState(() {

@@ -30,10 +30,15 @@ class WeightChart extends StatelessWidget {
   }
 
   LineChartData _buildLineChart(List<WeightEntry> entries) {
+    if (entries.isEmpty) return LineChartData();
+
+    // Normalize x-axis by the earliest date
     final earliestDate = entries.first.timestamp;
     final spots = entries.map((entry) {
-      final x = entry.timestamp.difference(earliestDate).inDays.toDouble();
-      return FlSpot(x, entry.weight.toDouble());
+      final x =
+          entry.timestamp.difference(earliestDate).inMilliseconds.toDouble();
+      return FlSpot(x / (24 * 60 * 60 * 1000),
+          entry.weight.toDouble()); // Convert milliseconds to days
     }).toList();
 
     return LineChartData(
@@ -51,14 +56,9 @@ class WeightChart extends StatelessWidget {
         ),
       ),
       titlesData: FlTitlesData(
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false, // Remove top titles
-          ),
-        ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
-            showTitles: true, // Keep kg text on the left
+            showTitles: true,
             getTitlesWidget: (value, meta) {
               return Text(
                 '${value.toInt()}kg',
@@ -70,9 +70,17 @@ class WeightChart extends StatelessWidget {
         ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
-            showTitles: true, // Keep dates on the bottom
+            showTitles: true,
             getTitlesWidget: (value, meta) {
-              final int daysFromStart = value.toInt();
+              // Show labels only under data points
+              final spot = spots.firstWhere(
+                (spot) => spot.x == value,
+                orElse: () => FlSpot.nullSpot,
+              );
+              if (spot.isNull()) return const SizedBox.shrink();
+
+              // Map the x value back to the corresponding date
+              final daysFromStart = spot.x.toInt();
               final date = earliestDate.add(Duration(days: daysFromStart));
               return Text(
                 '${date.day}/${date.month}',
@@ -82,15 +90,16 @@ class WeightChart extends StatelessWidget {
             reservedSize: 30,
           ),
         ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // Remove top titles
+        ),
         rightTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false, // Remove right titles
-          ),
+          sideTitles: SideTitles(showTitles: false), // Remove right titles
         ),
       ),
       lineBarsData: [
         LineChartBarData(
-          isCurved: true,
+          isCurved: false,
           spots: spots,
           barWidth: 4,
           color: Colors.blue,
