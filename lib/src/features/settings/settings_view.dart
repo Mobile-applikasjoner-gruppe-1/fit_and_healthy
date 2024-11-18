@@ -1,5 +1,6 @@
 import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/measurement_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_appbar.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
@@ -42,6 +43,13 @@ class SettingsView extends ConsumerWidget {
                 leading: Icon(Icons.widgets),
                 onTap: () {
                   context.pushNamed(ProfileSettingsPage.routeName);
+                },
+              ),
+              ListTile(
+                title: Text('Measurment'),
+                leading: Icon(Icons.monitor_weight_rounded),
+                onTap: () {
+                  context.pushNamed(MeasurementSettingsPage.routeName);
                 },
               ),
               ListTile(
