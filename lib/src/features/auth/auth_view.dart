@@ -21,53 +21,57 @@ class AuthView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(Sizes.s200),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          title,
-          form,
-          Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: Sizes.s25, vertical: Sizes.s100),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(child: Divider()),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: Sizes.s200),
-                  child: Text('Or'),
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              title,
+              form,
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: Sizes.s25, vertical: Sizes.s100),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: Sizes.s200),
+                      child: Text('Or'),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
                 ),
-                Expanded(child: Divider()),
-              ],
-            ),
+              ),
+              ...providerButtons
+                  .asMap()
+                  .map(
+                    (index, providerButton) => MapEntry(
+                      index,
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index == providerButtons.length - 1
+                              ? 0
+                              : Sizes.s100,
+                        ),
+                        child: ProviderButtonView(
+                          onPressed: () {
+                            ref
+                                .read(authControllerProvider.notifier)
+                                .signInWithProvider(providerButton.provider);
+                          },
+                          buttonData: providerButton,
+                        ),
+                      ),
+                    ),
+                  )
+                  .values
+                  .toList(),
+              SizedBox(height: Sizes.s200),
+              navigationLink,
+            ],
           ),
-          ...providerButtons
-              .asMap()
-              .map(
-                (index, providerButton) => MapEntry(
-                  index,
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom:
-                          index == providerButtons.length - 1 ? 0 : Sizes.s100,
-                    ),
-                    child: ProviderButtonView(
-                      onPressed: () {
-                        ref
-                            .read(authControllerProvider.notifier)
-                            .signInWithProvider(providerButton.provider);
-                      },
-                      buttonData: providerButton,
-                    ),
-                  ),
-                ),
-              )
-              .values
-              .toList(),
-          SizedBox(height: Sizes.s200),
-          navigationLink,
-        ],
+        ),
       ),
     );
   }

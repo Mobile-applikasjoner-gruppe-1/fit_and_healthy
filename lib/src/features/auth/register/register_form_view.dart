@@ -18,21 +18,24 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
 
   final double gapSize = Sizes.s200;
 
+  // TODO: Split the different form fields into separate pages to not have too many fields on one page
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
+    return Column(
       children: [
         Form(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Text(
-              //   'First Name',
-              //   style: TextStyle(fontSize: 16),
-              // ),
-              // SizedBox(height: Sizes.s100),
+              Text(
+                'First Name',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: Sizes.s100),
               TextFormField(
                 controller: _firstNameController,
                 decoration: InputDecoration(
@@ -43,11 +46,14 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
                 autofillHints: [AutofillHints.givenName],
               ),
               SizedBox(height: gapSize),
-              // Text(
-              //   'Last Name',
-              //   style: TextStyle(fontSize: 16),
-              // ),
-              // SizedBox(height: Sizes.s100),
+              Text(
+                'Last Name',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: Sizes.s100),
               TextFormField(
                 controller: _lastNameController,
                 decoration: InputDecoration(
@@ -58,11 +64,14 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
                 autofillHints: [AutofillHints.familyName],
               ),
               SizedBox(height: gapSize),
-              // Text(
-              //   'Email',
-              //   style: TextStyle(fontSize: 16),
-              // ),
-              // SizedBox(height: Sizes.s100),
+              Text(
+                'Email',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: Sizes.s100),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -73,11 +82,14 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
                 autofillHints: [AutofillHints.email],
               ),
               SizedBox(height: gapSize),
-              // Text(
-              //   'Password',
-              //   style: TextStyle(fontSize: 16),
-              // ),
-              // SizedBox(height: Sizes.s100),
+              Text(
+                'Password',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: Sizes.s100),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -93,20 +105,23 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
         ),
         SizedBox(height: gapSize),
         Container(
-          child: ElevatedButton(
-            onPressed: () {
-              ref
-                  .read(authControllerProvider.notifier)
-                  .createUserWithEmailAndPassword(
-                    firstName: _firstNameController.text,
-                    lastName: _lastNameController.text,
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                  );
-            },
-            child: Text('Register'),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                ref
+                    .read(authControllerProvider.notifier)
+                    .createUserWithEmailAndPassword(
+                      firstName: _firstNameController.text,
+                      lastName: _lastNameController.text,
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    );
+              },
+              child: Text('Register'),
+            ),
           ),
-        )
+        ),
       ],
     );
   }

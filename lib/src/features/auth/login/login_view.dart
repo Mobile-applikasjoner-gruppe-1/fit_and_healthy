@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_view.dart';
 import 'package:fit_and_healthy/src/features/auth/login/login_form_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_view.dart';
@@ -22,13 +23,25 @@ class LoginView extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text('Don\'t have an account?'),
-              TextButton(
-                onPressed: () {
+              Text('Don\'t have an account? '),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
                   context.replaceNamed(RegisterView.routeName);
                 },
-                child: Text('Sign up'),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: Sizes.s50),
+                  child: Text(
+                    'Sign up',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
               ),
+              Text('.'),
             ],
           ),
         ),

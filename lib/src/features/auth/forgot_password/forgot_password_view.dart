@@ -26,14 +26,23 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(Sizes.s200),
+        padding: const EdgeInsets.only(
+          left: Sizes.s200,
+          right: Sizes.s200,
+          bottom: Sizes.s200,
+        ),
         child: ListView(
           shrinkWrap: true,
           physics: ClampingScrollPhysics(),
           children: [
             Text(
-              'Email',
+              'Enter the email address associated with your account and we will send you an email with instructions to reset your password.',
               style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: gapSize),
+            Text(
+              'Email',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: Sizes.s100),
             TextFormField(

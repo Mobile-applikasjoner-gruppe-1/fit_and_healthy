@@ -20,22 +20,24 @@ class _LoginFormViewState extends ConsumerState<LoginFormView> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
+    return Column(
       children: [
         Form(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Text(
-              //   'Email',
-              //   style: TextStyle(fontSize: 16),
-              // ),
-              // SizedBox(height: Sizes.s100),
+              Text(
+                'Email',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: Sizes.s100),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
+                  label: null,
                   labelText: 'Email',
                   border: OutlineInputBorder(),
                 ),
@@ -43,17 +45,21 @@ class _LoginFormViewState extends ConsumerState<LoginFormView> {
                 autofillHints: [AutofillHints.email],
               ),
               SizedBox(height: gapSize),
-              // Text(
-              //   'Password',
-              //   style: TextStyle(fontSize: 16),
-              // ),
-              // SizedBox(height: Sizes.s100),
+              Text(
+                'Password',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: Sizes.s100),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
                 ),
+                keyboardType: TextInputType.visiblePassword,
                 autofillHints: [AutofillHints.password],
                 obscureText: true,
               ),
@@ -77,14 +83,25 @@ class _LoginFormViewState extends ConsumerState<LoginFormView> {
             ),
           ),
         ),
-        SizedBox(height: Sizes.s25),
+        SizedBox(height: Sizes.s100),
         Align(
           alignment: Alignment.centerLeft,
-          child: TextButton(
-            onPressed: () {
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
               context.pushNamed(ForgotPasswordView.routeName);
             },
-            child: Text('Forgot Password?'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: Sizes.s50),
+              child: Text(
+                'Forgot Password?',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
           ),
         ),
       ],
