@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "726238086088",
+    "project_id": "fit-and-healthy-a24e9",
+    "storage_bucket": "fit-and-healthy-a24e9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726238086088:android:88add68cc7dae9e7a276fd",
+        "android_client_info": {
+          "package_name": "no.ntnu.fit_and_healthy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHz8X3f2dvASYp2kq0BOUqlQBRhbUF0A8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
