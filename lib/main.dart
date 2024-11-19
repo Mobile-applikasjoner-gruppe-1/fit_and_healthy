@@ -1,9 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:fit_and_healthy/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'src/app.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
   //final settingsController = SettingsController(SettingsService());
