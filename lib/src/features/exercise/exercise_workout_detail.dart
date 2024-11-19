@@ -14,9 +14,10 @@ import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
  * - Displays a message if no exercises are available in the workout.
  */
 class WorkoutDetailView extends StatelessWidget {
-  const WorkoutDetailView({super.key, required this.workoutId});
+  const WorkoutDetailView({super.key, required this.workoutId, required this.workouts});
 
   final String workoutId; // The workout to be displayed.
+  final List<Workout> workouts;
 
   /**
  * Retrieves a Workout object from the sampleWorkouts list using the provided workoutId.

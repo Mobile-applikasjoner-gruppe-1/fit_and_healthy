@@ -52,7 +52,7 @@ GoRouter appRouter = GoRouter(
                   name: 'WorkoutDetail',
                   builder: (context, state) {
                     final workoutId = state.pathParameters['id']!;
-                    return WorkoutDetailView(workoutId: workoutId);
+                    return WorkoutDetailView(workoutId: workoutId, workouts: sampleWorkouts);
                   },
                 ),
               ],
