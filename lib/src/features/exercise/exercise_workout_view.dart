@@ -41,23 +41,26 @@ class ExerciseView extends StatelessWidget {
     context.push('${ExerciseView.route}/${id}'); 
   }
 
+  /**
+   * Navigates to the Add Workout screen.
+   */
+  void navigateToAddWorkout(BuildContext context) {
+    context.push('/add-workout');
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget content = SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Uh oh ... nothing here!'),
-          const SizedBox(height: 16),
-          Text(
-            'Try adding a workout session!',
-          ),
-        ],
-      ),
-    );
+    Widget loggedWorkouts;
 
-    if (workouts.isNotEmpty) {
-      content = ListView.builder(
+    if (workouts.isEmpty) {
+      loggedWorkouts = const Text(
+        'No workouts logged',
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+      );
+    } else {
+      loggedWorkouts = ListView.builder(
+        shrinkWrap: true, // Ensures it integrates well in the scrollable content
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: workouts.length,
         itemBuilder: (ctx, index) => ExerciseWorkoutItem(
           workout: workouts[index],
@@ -67,6 +70,48 @@ class ExerciseView extends StatelessWidget {
         ),
       );
     }
+
+    Widget content = SingleChildScrollView(
+      child: Center(
+        child: Padding(
+        padding: const EdgeInsets.all(16.0), 
+        child: 
+          Column(
+            children:[
+              ElevatedButton(
+                onPressed: () => navigateToAddWorkout(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                ),
+                child: Text(
+                  'Add Workout', 
+                  style: TextStyle(
+                    fontSize: 16, 
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Logged',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black.withOpacity(0.7),
+                ),
+              ),
+              const Divider(
+                thickness: 1,
+                color: Colors.blue,
+              ),
+              const SizedBox(height: 16),
+              loggedWorkouts,
+            ],
+          ),
+        ),
+      ),
+    );
 
     return NestedScaffold(
       appBar: AppBar(title: const Text('Exercise'), centerTitle: true),
