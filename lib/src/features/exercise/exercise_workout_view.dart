@@ -45,7 +45,7 @@ class ExerciseView extends StatelessWidget {
    * Navigates to the Add Workout screen.
    */
   void navigateToAddWorkout(BuildContext context) {
-    context.push('/add-workout');
+    context.push('${ExerciseView.route}/add-workout');
   }
 
   @override
