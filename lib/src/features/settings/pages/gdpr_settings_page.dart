@@ -2,6 +2,7 @@ import 'package:fit_and_healthy/src/features/settings/pages/privacy_gdpr_policy_
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
 class GdprSettingsPage extends StatelessWidget {
@@ -16,92 +17,99 @@ class GdprSettingsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("GDPR"),
       ),
-      body: Column(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Update Information'),
-            subtitle: const Text('Edit your personal details.'),
-            onTap: () {
-              context.pushNamed(ProfileSettingsPage.routeName);
-            },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.download),
-            title: const Text('Download Your Data'),
-            subtitle: const Text('Get a copy of all your personal data.'),
-            onTap: () {
-              _showConfirmationDialog(
+          elevation: 2,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildListTile(
                 context,
-                title: 'Download Data',
-                content: 'Are you sure you want to download your data?',
-                onConfirm: _downloadData,
-              );
-            },
-          ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: GestureDetector(
-              onTap: () {
-                _showConfirmationDialog(
-                  context,
-                  title: 'Delete Account',
-                  content:
-                      'Are you sure you want to delete your account? This action cannot be undone.',
-                  onConfirm: _deleteAccount,
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.error.withOpacity(0.1),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.delete,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Delete Your Account',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ],
-                ),
+                icon: Icons.person,
+                title: 'Update Information',
+                onTap: () {
+                  context.pushNamed(ProfileSettingsPage.routeName);
+                },
               ),
-            ),
+              const Divider(height: 1, thickness: 1),
+              _buildListTile(
+                context,
+                icon: Icons.download,
+                title: 'Download Your Data',
+                onTap: () {
+                  _showConfirmationDialog(
+                    context,
+                    title: 'Download Data',
+                    content: 'Are you sure you want to download your data?',
+                    onConfirm: _downloadData,
+                  );
+                },
+              ),
+              const Divider(height: 1, thickness: 1),
+              _buildDeleteAccountTile(context),
+              const Divider(height: 1, thickness: 1),
+              _buildListTile(
+                context,
+                icon: Icons.info_outline,
+                title: 'Our GDPR Policies',
+                onTap: () {
+                  context.pushNamed(PrivacyGdprPolicySettingsPage.routeName);
+                },
+              ),
+            ],
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Our GDPR Policies'),
-            subtitle:
-                const Text('Learn more about our data handling practices.'),
-            onTap: () {
-              context.pushNamed(PrivacyGdprPolicySettingsPage.routeName);
-            },
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  // Common ListTile Widget
+  Widget _buildListTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    VoidCallback? onTap,
+  }) {
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: Icon(icon, color: theme.colorScheme.primary),
+      title: Text(title, style: theme.textTheme.bodyLarge),
+      subtitle: subtitle != null
+          ? Text(subtitle, style: theme.textTheme.bodyMedium)
+          : null,
+      trailing: Icon(Icons.chevron_right, color: theme.colorScheme.onSurface),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildDeleteAccountTile(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: Icon(Icons.delete, color: theme.colorScheme.error),
+      title: Text(
+        'Delete Your Account',
+        style: TextStyle(
+          color: theme.colorScheme.error,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      trailing: Icon(Icons.chevron_right, color: theme.colorScheme.error),
+      onTap: () {
+        _showConfirmationDialog(
+          context,
+          title: 'Delete Account',
+          content:
+              'Are you sure you want to delete your account? This action cannot be undone.',
+          onConfirm: _deleteAccount,
+        );
+      },
     );
   }
 
@@ -111,30 +119,23 @@ class GdprSettingsPage extends StatelessWidget {
     required String content,
     required VoidCallback onConfirm,
   }) {
-    final theme = Theme.of(context);
-    showDialog(
+    showCupertinoDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: theme.colorScheme.background,
-          title: Text(
-            title,
-            style: theme.textTheme.titleLarge,
-          ),
-          content: Text(
-            content,
-            style: theme.textTheme.bodyMedium,
-          ),
+        return CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(content),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
                 onConfirm();
               },
+              isDestructiveAction: true,
               child: const Text('Confirm'),
             ),
           ],
