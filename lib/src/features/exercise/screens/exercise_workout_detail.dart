@@ -2,7 +2,7 @@ import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_item.dart';
+import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_item.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 
 /**

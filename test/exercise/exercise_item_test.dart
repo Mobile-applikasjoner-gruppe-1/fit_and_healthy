@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_item.dart';
+import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_item.dart';
 
 void main() {
   // Create a mock Exercise object for testing

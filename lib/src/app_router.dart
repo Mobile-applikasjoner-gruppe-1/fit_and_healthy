@@ -1,10 +1,10 @@
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_add_workout.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_workout.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:fit_and_healthy/src/openfoodfacts/fooditemwidgets/foodSearchScreen.dart';
 import 'package:fit_and_healthy/src/openfoodfacts/mealCreationScreen.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_workout_detail.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_workout_detail.dart';
 
 import 'openfoodfacts/nutritionScreen.dart';
 

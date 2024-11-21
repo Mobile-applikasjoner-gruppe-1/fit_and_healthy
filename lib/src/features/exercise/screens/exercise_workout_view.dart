@@ -1,7 +1,7 @@
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_workout_item.dart';
+import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_workout_item.dart';
 import 'package:go_router/go_router.dart';
 
 /**
@@ -114,7 +114,10 @@ class ExerciseView extends StatelessWidget {
     );
 
     return NestedScaffold(
-      appBar: AppBar(title: const Text('Exercise'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Exercise'), 
+        centerTitle: true,
+        ),
       body: content,
     );
   }
