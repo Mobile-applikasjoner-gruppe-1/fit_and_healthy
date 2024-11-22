@@ -32,6 +32,10 @@ class ExerciseView extends StatelessWidget {
    */
   void selectWorkout(BuildContext context, Workout workout) {
     // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
+    // context.pushNamed(
+    //   WorkoutDetailView.routeName,
+    //   pathParameters: {'workoutId': workout.id},
+    // );
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => WorkoutDetailView(
