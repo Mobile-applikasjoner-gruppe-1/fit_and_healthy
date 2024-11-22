@@ -74,6 +74,10 @@ class _MealListScreenState extends State<MealListScreen> {
                   ),
                   onTap: () {
                     // TODO: Switch to a routing based approach to navigate to the MealDetailScreen. Use path parameters to pass the meal id.
+                    // context.pushNamed(
+                    //   MealDetailScreen.routeName,
+                    //   pathParameters: {'mealId': meal.id},
+                    // );
                     Navigator.push(
                       context,
                       MaterialPageRoute(

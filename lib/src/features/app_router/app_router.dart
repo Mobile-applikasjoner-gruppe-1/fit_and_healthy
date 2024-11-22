@@ -67,6 +67,7 @@ GoRouter appRouter(Ref ref) {
                     // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
                     // GoRoute(
                     //   path: WorkoutDetailView.route,
+                    //   name: WorkoutDetailView.routeName,
                     //   builder: (context, state) {
                     //     final workoutId = state.pathParameters['workoutId']!;
                     //     final workout = sampleWorkouts
@@ -102,7 +103,8 @@ GoRouter appRouter(Ref ref) {
                   //       return MealDetailScreen(
                   //         mealId: mealId,
                   //       );
-                  //     }),
+                  //     },
+                  // ),
                 ],
               ),
             ]),
