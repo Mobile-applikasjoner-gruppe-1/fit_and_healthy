@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/privacy_gdpr_policy_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
@@ -18,10 +19,10 @@ class GdprSettingsPage extends StatelessWidget {
         title: const Text("GDPR"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(Sizes.s200),
         child: Card(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(Sizes.s200),
           ),
           elevation: 2,
           child: Column(

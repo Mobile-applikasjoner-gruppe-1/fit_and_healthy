@@ -1,10 +1,11 @@
+import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class PrivacyGdprPolicySettingsPage extends StatelessWidget {
   const PrivacyGdprPolicySettingsPage({super.key});
 
-  static const route = '/privacypolicy';
+  static const route = '/privacy-policy';
   static const routeName = 'Privacy Policy';
 
   @override
@@ -14,14 +15,14 @@ class PrivacyGdprPolicySettingsPage extends StatelessWidget {
         title: const Text('Privacy Policy & GDPR'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(Sizes.s200),
         child: ListView(
           children: [
             const Text(
               'Privacy Policy',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Sizes.s100),
             const Text(
               'We are committed to protecting your privacy. This application collects only the '
               'necessary data to ensure functionality. Here are the key points of our policy:\n\n'
@@ -29,17 +30,17 @@ class PrivacyGdprPolicySettingsPage extends StatelessWidget {
               '- You can request a copy of your data at any time.\n'
               '- You can delete your account, which will remove all stored data permanently.\n'
               '- We do not share your data with third parties without your consent.\n\n'
-              'For further details, please contact uss.',
+              'For further details, please contact us.',
               style: TextStyle(fontSize: 14),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: Sizes.s200),
             const Divider(),
-            const SizedBox(height: 16),
+            const SizedBox(height: Sizes.s200),
             const Text(
               'GDPR Compliance',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Sizes.s100),
             const Text(
               'Our application is fully compliant with GDPR standards. Here’s how we ensure compliance:\n\n'
               '- You have the right to access your data and know how it is used.\n'
