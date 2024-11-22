@@ -18,7 +18,6 @@ class ProfileSettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsState = ref.watch(settingsControllerProvider).value;
-    final settingsNotifier = ref.read(settingsControllerProvider.notifier);
 
     final selectedGender = ref.watch(genderProvider);
     final height = ref.watch(heightProvider);
@@ -83,7 +82,7 @@ class ProfileSettingsPage extends ConsumerWidget {
                   _buildThemeSwitcher(
                     context,
                     themeMode: settingsState!.themeMode,
-                    notifier: settingsNotifier,
+                    ref: ref,
                   ),
                   _buildDivider(),
                   _buildEditableGenderField(
@@ -109,7 +108,7 @@ class ProfileSettingsPage extends ConsumerWidget {
   Widget _buildThemeSwitcher(
     BuildContext context, {
     required ThemeMode themeMode,
-    required dynamic notifier,
+    required WidgetRef ref,
   }) {
     final theme = Theme.of(context);
 
@@ -118,7 +117,8 @@ class ProfileSettingsPage extends ConsumerWidget {
       title: const Text('Theme'),
       trailing: DropdownButton<ThemeMode>(
         value: themeMode,
-        onChanged: notifier.updateThemeMode,
+        onChanged:
+            ref.read(settingsControllerProvider.notifier).updateThemeMode,
         items: const [
           DropdownMenuItem(
             value: ThemeMode.system,
@@ -257,6 +257,8 @@ class ProfileSettingsPage extends ConsumerWidget {
               labelText: 'Height (cm)',
               border: OutlineInputBorder(),
             ),
+            // TODO: Add input validation
+            // TODO: Add save on keyboard done(?)
           ),
           actions: [
             TextButton(
