@@ -1,6 +1,8 @@
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 
 final genderProvider = StateProvider<Gender>((ref) => Gender.male);
 final heightProvider = StateProvider<String>((ref) => '170 cm');
@@ -23,23 +25,24 @@ class ProfileSettingsPage extends ConsumerWidget {
 
     final theme = Theme.of(context);
 
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(
         title: const Text("Profile"),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(
+            horizontal: Sizes.s200, vertical: Sizes.s300),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Card(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(Sizes.s200),
               ),
               elevation: 2,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(Sizes.s200),
                 child: Row(
                   children: [
                     CircleAvatar(
@@ -49,7 +52,7 @@ class ProfileSettingsPage extends ConsumerWidget {
                         size: 40,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: Sizes.s200),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -69,13 +72,12 @@ class ProfileSettingsPage extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            // Settings Card
+            const SizedBox(height: Sizes.s300),
             Card(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(Sizes.s200),
               ),
-              elevation: 2,
+              elevation: Sizes.s25,
               child: Column(
                 children: [
                   _buildThemeSwitcher(
@@ -152,7 +154,7 @@ class ProfileSettingsPage extends ConsumerWidget {
             selectedGender == Gender.male ? 'Male' : 'Female',
             style: theme.textTheme.bodyMedium,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: Sizes.s100),
           const Icon(Icons.chevron_right),
         ],
       ),
@@ -183,7 +185,7 @@ class ProfileSettingsPage extends ConsumerWidget {
             height,
             style: theme.textTheme.bodyMedium,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: Sizes.s100),
           const Icon(Icons.chevron_right),
         ],
       ),
