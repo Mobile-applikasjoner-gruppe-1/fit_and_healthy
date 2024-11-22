@@ -8,6 +8,7 @@ import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.d
 import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/measurement_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/widget_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
@@ -115,6 +116,11 @@ GoRouter appRouter(Ref ref) {
                       path: ProfileSettingsPage.route,
                       name: ProfileSettingsPage.routeName,
                       builder: (context, state) => ProfileSettingsPage(),
+                    ),
+                    GoRoute(
+                      path: WidgetSettingsPage.route,
+                      name: WidgetSettingsPage.routeName,
+                      builder: (context, state) => WidgetSettingsPage(),
                     ),
                     GoRoute(
                       path: MeasurementSettingsPage.route,
