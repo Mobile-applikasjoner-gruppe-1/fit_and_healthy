@@ -21,6 +21,8 @@ class ProfileSettingsPage extends ConsumerWidget {
     final selectedGender = ref.watch(genderProvider);
     final height = ref.watch(heightProvider);
 
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Profile"),
@@ -29,43 +31,72 @@ class ProfileSettingsPage extends ConsumerWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Profile Picture Placeholder
-            CircleAvatar(
-              radius: 50,
-              child: const Icon(
-                Icons.person,
-                size: 50,
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      child: const Icon(
+                        Icons.person,
+                        size: 40,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'User Name',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        Text(
+                          'user@example.com',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            // Placeholder Name
-            Text(
-              'User Name',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            // Placeholder Email
-            Text(
-              'user@example.com',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const Divider(height: 32),
-            // Theme Switcher
-            _buildThemeSwitcher(settingsState!.themeMode, settingsNotifier),
-            const Divider(height: 32),
-            // Update Gender
-            _buildEditableGenderField(
-              context,
-              ref,
-              selectedGender: selectedGender,
-            ),
-            const Divider(height: 32),
-            // Update Height
-            _buildEditableHeightField(
-              context,
-              ref,
-              height: height,
+            const SizedBox(height: 24),
+            // Settings Card
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              child: Column(
+                children: [
+                  _buildThemeSwitcher(
+                    context,
+                    themeMode: settingsState!.themeMode,
+                    notifier: settingsNotifier,
+                  ),
+                  _buildDivider(),
+                  _buildEditableGenderField(
+                    context,
+                    ref,
+                    selectedGender: selectedGender,
+                  ),
+                  _buildDivider(),
+                  _buildEditableHeightField(
+                    context,
+                    ref,
+                    height: height,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -73,33 +104,34 @@ class ProfileSettingsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildThemeSwitcher(ThemeMode currentMode, dynamic notifier) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Theme',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        DropdownButton<ThemeMode>(
-          value: currentMode,
-          onChanged: notifier.updateThemeMode,
-          items: const [
-            DropdownMenuItem(
-              value: ThemeMode.system,
-              child: Text('System'),
-            ),
-            DropdownMenuItem(
-              value: ThemeMode.light,
-              child: Text('Light'),
-            ),
-            DropdownMenuItem(
-              value: ThemeMode.dark,
-              child: Text('Dark'),
-            ),
-          ],
-        ),
-      ],
+  Widget _buildThemeSwitcher(
+    BuildContext context, {
+    required ThemeMode themeMode,
+    required dynamic notifier,
+  }) {
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: Icon(Icons.color_lens, color: theme.colorScheme.primary),
+      title: const Text('Theme'),
+      trailing: DropdownButton<ThemeMode>(
+        value: themeMode,
+        onChanged: notifier.updateThemeMode,
+        items: const [
+          DropdownMenuItem(
+            value: ThemeMode.system,
+            child: Text('System'),
+          ),
+          DropdownMenuItem(
+            value: ThemeMode.light,
+            child: Text('Light'),
+          ),
+          DropdownMenuItem(
+            value: ThemeMode.dark,
+            child: Text('Dark'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -108,7 +140,22 @@ class ProfileSettingsPage extends ConsumerWidget {
     WidgetRef ref, {
     required Gender selectedGender,
   }) {
-    return GestureDetector(
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: Icon(Icons.person, color: theme.colorScheme.primary),
+      title: const Text('Gender'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            selectedGender == Gender.male ? 'Male' : 'Female',
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(width: 8),
+          const Icon(Icons.chevron_right),
+        ],
+      ),
       onTap: () {
         _showGenderEditDialog(
           context,
@@ -116,27 +163,6 @@ class ProfileSettingsPage extends ConsumerWidget {
           selectedGender: selectedGender,
         );
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Gender',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-          Row(
-            children: [
-              Text(
-                selectedGender == Gender.male ? 'Male' : 'Female',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
@@ -145,7 +171,22 @@ class ProfileSettingsPage extends ConsumerWidget {
     WidgetRef ref, {
     required String height,
   }) {
-    return GestureDetector(
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: Icon(Icons.height, color: theme.colorScheme.primary),
+      title: const Text('Height'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            height,
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(width: 8),
+          const Icon(Icons.chevron_right),
+        ],
+      ),
       onTap: () {
         _showHeightEditDialog(
           context,
@@ -153,31 +194,13 @@ class ProfileSettingsPage extends ConsumerWidget {
           height: height,
         );
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Height',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-          Row(
-            children: [
-              Text(
-                height,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
-  // Gender Edit Dialog
+  Widget _buildDivider() {
+    return const Divider(height: 1, thickness: 1);
+  }
+
   void _showGenderEditDialog(
     BuildContext context,
     WidgetRef ref, {
