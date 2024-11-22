@@ -1,6 +1,7 @@
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /**
  * The AddWorkoutView widget provides functionality for adding and managing
@@ -12,10 +13,19 @@ import 'package:flutter/material.dart';
  * - Contains a floating action button for additional options.
  */
 class AddWorkoutView extends StatelessWidget {
-  const AddWorkoutView({super.key});
+  const AddWorkoutView({super.key, required this.workouts});
 
   static const route = '/exercise';
   static const routeName = 'Exercise';
+  
+  final List<Workout> workouts;
+
+  /**
+   * Navigates to the Add Exercise screen.
+   */
+  void navigateToAddExercise(BuildContext context) {
+    context.push('${AddWorkoutView.route}/add-exercise');
+  }
 
   void createWorkout(Workout workout) {
     // Create workout logic 
@@ -31,7 +41,9 @@ class AddWorkoutView extends StatelessWidget {
           Column(
             children:[
               ElevatedButton(
-                onPressed: () => (),
+                onPressed: () => {
+                  navigateToAddExercise(context),
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                 ),

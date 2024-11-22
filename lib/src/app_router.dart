@@ -1,4 +1,5 @@
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_workout.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
@@ -48,11 +49,18 @@ GoRouter appRouter = GoRouter(
               builder: (context, state) =>
                   ExerciseView(workouts: sampleWorkouts),
               routes: [
-                GoRoute(
-                  path: 'add-workout', 
-                  name: 'AddWorkout',
-                  builder: (context, state) => AddWorkoutView(),
-                ),
+              GoRoute(
+                path: 'add-workout',
+                name: 'AddWorkout',
+                builder: (context, state) =>
+                    AddWorkoutView(workouts: sampleWorkouts),
+              ),
+              GoRoute(
+                path: 'add-exercise',
+                name: 'AddExercise',
+                builder: (context, state) =>
+                    AddExercise(workouts: sampleWorkouts),
+              ),
                 GoRoute(
                   path: ':id',
                   name: 'WorkoutDetail',
