@@ -8,7 +8,7 @@
 PRODUCT_NAME = fit_and_healthy
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.fitAndHealthy
+PRODUCT_BUNDLE_IDENTIFIER = no.ntnu.fitAndHealthy
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2024 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2024 no.ntnu. All rights reserved.

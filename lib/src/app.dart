@@ -1,4 +1,4 @@
-import 'package:fit_and_healthy/src/app_router.dart';
+import 'package:fit_and_healthy/src/features/app_router/app_router.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +18,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsFuture = ref.watch(settingsControllerProvider.future);
+    final appRouter = ref.watch(appRouterProvider);
     return FutureBuilder(
         future: settingsFuture,
         builder: (context, snapshot) {
