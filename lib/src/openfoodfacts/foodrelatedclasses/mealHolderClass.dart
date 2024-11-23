@@ -99,10 +99,12 @@ class MealHolder {
     DateTime? date,
     List<Meal>? meals,
   }) {
-    return MealHolder.empty(
+    final newMeal = MealHolder.empty(
       id: this.id,
       date: date ?? this.date,
       meals: meals ?? this.meals,
     );
+    newMeal.calculateTotalNutrition();
+    return newMeal;
   }
 }
