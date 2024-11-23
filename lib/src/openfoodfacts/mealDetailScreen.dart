@@ -63,23 +63,26 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
         'fiber': (product['nutriments']['fiber_100g'] ?? 0).toDouble(),
         'carbs': (product['nutriments']['carbohydrates_100g'] ?? 0).toDouble(),
       },
+      grams: grams,
     );
 
-    widget.meal.addFoodItem(foodItem, grams);
+    widget.meal.addFoodItem(foodItem);
     setState(() {}); // Refresh to reflect changes in meal items and nutrition
   }
 
   // Edit grams of an existing food item
   void _editFoodItemGrams(int index, double grams) {
+    // TODO: Consider using the id instead to make changing to database easier
     setState(() {
-      widget.meal.items[index].grams = grams;
+      widget.meal.items[index].setGrams(grams);
     });
   }
 
   // Remove a food item from the meal
   void _removeFoodItem(int index) {
+    // TODO: Consider using the id instead to make changing to database easier
     setState(() {
-      widget.meal.items.removeAt(index);
+      widget.meal.removeFoodItemByIndex(index);
     });
   }
 
@@ -144,7 +147,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
               itemBuilder: (context, index) {
                 final item = widget.meal.items[index]; // item is _MealItem
                 return ListTile(
-                  title: Text(item.foodItem.name),
+                  title: Text(item.name),
                   subtitle: Text('${item.grams} grams'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,

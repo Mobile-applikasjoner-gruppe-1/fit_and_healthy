@@ -32,8 +32,8 @@ void main() {
         // Fetch the FoodItem by barcode using OpenFoodApi
         final result = await api.fetchProductByBarcode(barcode);
         if (result != null) {
-          final foodItem = FoodItem.fromJson(result);
-          meal.addFoodItem(foodItem, grams);
+          final foodItem = FoodItem.fromFoodFactsJson(result);
+          meal.addFoodItem(foodItem);
           print('Added ${foodItem.name} (${grams}g) to the meal.');
         } else {
           print('No food item found for barcode: $barcode');

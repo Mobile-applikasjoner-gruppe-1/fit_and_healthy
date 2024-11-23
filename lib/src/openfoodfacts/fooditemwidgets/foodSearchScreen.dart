@@ -24,7 +24,8 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     final api = OpenFoodApi(); // Assuming you have the API set up
     final results = await api.searchProductsByName(query);
     setState(() {
-      _searchResults = results.map((json) => FoodItem.fromJson(json)).toList();
+      _searchResults =
+          results.map((json) => FoodItem.fromFoodFactsJson(json)).toList();
     });
   }
 

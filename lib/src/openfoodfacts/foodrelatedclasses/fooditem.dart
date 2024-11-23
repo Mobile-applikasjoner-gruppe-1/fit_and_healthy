@@ -6,6 +6,8 @@ class FoodItem {
   final String? allergens;
   final String? servingSize;
   final Map<String, double> nutritionInfo;
+  double _grams;
+  final List<Function> changeNotifiers = [];
 
   FoodItem({
     required this.name,
@@ -15,11 +17,32 @@ class FoodItem {
     this.allergens,
     this.servingSize,
     required this.nutritionInfo,
-  });
+    double grams = 100,
+  }) : _grams = grams;
+
+  void addChangeNotifier(Function notifier) {
+    changeNotifiers.add(notifier);
+  }
+
+  void notifyChange() {
+    for (var notifier in changeNotifiers) {
+      notifier();
+    }
+  }
+
+  void setGrams(double grams) {
+    this._grams = grams;
+    notifyChange();
+  }
+
+  double get grams => _grams;
 
   // Factory constructor to create a FoodItem from JSON data
-  factory FoodItem.fromJson(Map<String, dynamic> json) {
+  factory FoodItem.fromFoodFactsJson(Map<String, dynamic> json) {
     final nutriments = json['nutriments'] ?? {};
+
+    // TODO: Add validation for required fields
+
     return FoodItem(
       name: json['product_name'] ?? 'Unknown Product',
       barcode: json['code'] ?? 'No Barcode',
@@ -35,6 +58,7 @@ class FoodItem {
         'fiber': (nutriments['fiber_100g'] ?? 0).toDouble(),
         'carbs': (nutriments['carbohydrates_100g'] ?? 0).toDouble(),
       },
+      grams: json['grams'],
     );
   }
 
@@ -48,11 +72,12 @@ class FoodItem {
       'allergens': allergens,
       'servingSize': servingSize,
       'nutritionInfo': nutritionInfo,
+      'grams': _grams,
     };
   }
 
   // Factory constructor to create FoodItem from Firestore DocumentSnapshot
-  factory FoodItem.fromFirestore(Map<String, dynamic> json) {
+  factory FoodItem.fromJSON(Map<String, dynamic> json) {
     return FoodItem(
       name: json['name'],
       barcode: json['barcode'],
@@ -61,6 +86,18 @@ class FoodItem {
       allergens: json['allergens'],
       servingSize: json['servingSize'],
       nutritionInfo: Map<String, double>.from(json['nutritionInfo']),
+      grams: json['grams'],
     );
+  }
+
+  Map<String, double> calculateNutrition() {
+    return {
+      'calories': nutritionInfo['calories']! * _grams / 100,
+      'protein': nutritionInfo['protein']! * _grams / 100,
+      'fat': nutritionInfo['fat']! * _grams / 100,
+      'sugars': nutritionInfo['sugars']! * _grams / 100,
+      'fiber': nutritionInfo['fiber']! * _grams / 100,
+      'carbs': nutritionInfo['carbs']! * _grams / 100,
+    };
   }
 }

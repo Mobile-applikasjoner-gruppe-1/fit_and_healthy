@@ -5,39 +5,49 @@ import 'fooditem.dart'; // For unique ID generation
 class Meal {
   final String id; // Unique identifier for the meal
   final String name; // Name of the meal
-  final List<_MealItem> _items = []; // Food items in the meal
+  final List<FoodItem> _items = []; // Food items in the meal
+  final List<Function> changeNotifiers = [];
 
   Meal({required this.name})
       : id = Uuid().v4(); // Generate a unique ID using the uuid package
 
+  void addChangeNotifier(Function notifier) {
+    changeNotifiers.add(notifier);
+  }
+
+  void notifyChange() {
+    for (var notifier in changeNotifiers) {
+      notifier();
+    }
+  }
+
   // Method to add a FoodItem with a specified weight in grams
-  void addFoodItem(FoodItem foodItem, double grams) {
-    _items.add(_MealItem(foodItem, grams));
+  void addFoodItem(FoodItem foodItem) {
+    _items.add(foodItem);
+    foodItem.addChangeNotifier(notifyChange);
+    notifyChange();
   }
 
   // Getter to access _items outside the class
-  List<_MealItem> get items => _items;
-
-  // Method to update the grams of an existing FoodItem
-  void updateFoodItemGrams(FoodItem foodItem, double newGrams) {
-    for (var item in _items) {
-      if (item.foodItem == foodItem) {
-        item.grams = newGrams; // Update the grams value
-        break; // Exit loop once the item is found and updated
-      }
-    }
-  }
+  List<FoodItem> get items => _items;
 
   // Method to remove a FoodItem based on its barcode or name
   void removeFoodItem({String? barcode, String? name}) {
     _items.removeWhere((item) {
       if (barcode != null) {
-        return item.foodItem.barcode == barcode; // Remove by barcode
+        notifyChange();
+        return item.barcode == barcode; // Remove by barcode
       } else if (name != null) {
-        return item.foodItem.name == name; // Remove by name
+        notifyChange();
+        return item.name == name; // Remove by name
       }
       return false; // No match found
     });
+  }
+
+  void removeFoodItemByIndex(int index) {
+    _items.removeAt(index);
+    notifyChange();
   }
 
   // Method to calculate total nutrition values for the meal
@@ -52,20 +62,14 @@ class Meal {
     };
 
     for (var item in _items) {
-      final nutritionInfo = item.foodItem.nutritionInfo;
-      final multiplier = item.grams / 100;
+      final itemNutrion = item.calculateNutrition();
 
-      totals['calories'] =
-          totals['calories']! + (nutritionInfo['calories']! * multiplier);
-      totals['protein'] =
-          totals['protein']! + (nutritionInfo['protein']! * multiplier);
-      totals['fat'] = totals['fat']! + (nutritionInfo['fat']! * multiplier);
-      totals['sugars'] =
-          totals['sugars']! + (nutritionInfo['sugars']! * multiplier);
-      totals['fiber'] =
-          totals['fiber']! + (nutritionInfo['fiber']! * multiplier);
-      totals['carbs'] =
-          totals['carbs']! + (nutritionInfo['carbs']! * multiplier);
+      totals['calories'] = totals['calories']! + (itemNutrion['calories']!);
+      totals['protein'] = totals['protein']! + (itemNutrion['protein']!);
+      totals['fat'] = totals['fat']! + (itemNutrion['fat']!);
+      totals['sugars'] = totals['sugars']! + (itemNutrion['sugars']!);
+      totals['fiber'] = totals['fiber']! + (itemNutrion['fiber']!);
+      totals['carbs'] = totals['carbs']! + (itemNutrion['carbs']!);
     }
 
     return totals;
@@ -84,26 +88,9 @@ class Meal {
   factory Meal.fromJson(Map<String, dynamic> json) {
     final meal = Meal(name: json['name']);
     for (var item in json['items']) {
-      final foodItem = FoodItem.fromJson(item['foodItem']);
-      final grams = item['grams'];
-      meal.addFoodItem(foodItem, grams);
+      final foodItem = FoodItem.fromFoodFactsJson(item['foodItem']);
+      meal.addFoodItem(foodItem);
     }
     return meal;
-  }
-}
-
-// Helper class to store each FoodItem and its weight in the meal
-class _MealItem {
-  final FoodItem foodItem;
-  double grams;
-
-  _MealItem(this.foodItem, this.grams);
-
-  // Method to convert _MealItem object to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'foodItem': foodItem.toJson(), // FoodItem has a toJson method
-      'grams': grams,
-    };
   }
 }

@@ -18,7 +18,8 @@ void main() {
         'carbs': 20.0,
       });
       final meal = Meal(name: 'Breakfast');
-      meal.addFoodItem(foodItem, 100); // Add food item to meal
+      foodItem.setGrams(100);
+      meal.addFoodItem(foodItem); // Add food item to meal
 
       // Act
       mealHolder.addMeal(meal);
@@ -76,16 +77,20 @@ void main() {
         'carbs': 40.0,
       });
       final meal1 = Meal(name: 'Breakfast');
-      meal1.addFoodItem(foodItem1, 100);
+      foodItem1.setGrams(100);
+      meal1.addFoodItem(foodItem1);
       final meal2 = Meal(name: 'Lunch');
-      meal2.addFoodItem(foodItem2, 200);
-      meal2.addFoodItem(foodItem3, 50);
+      foodItem2.setGrams(200);
+      foodItem3.setGrams(50);
+      meal2.addFoodItem(foodItem2);
+      meal2.addFoodItem(foodItem3);
 
       mealHolder.addMeal(meal1);
       mealHolder.addMeal(meal2);
 
       // Act
-      final totalNutrition = mealHolder.calculateTotalNutrition();
+      mealHolder.calculateTotalNutrition();
+      final totalNutrition = mealHolder.totalNutrition;
 
       // Assert
       expect(totalNutrition['calories'], 550.0);
@@ -108,8 +113,9 @@ void main() {
         'fiber': 2.0,
         'carbs': 20.0,
       });
+      foodItem.setGrams(100);
       final meal = Meal(name: 'Breakfast');
-      meal.addFoodItem(foodItem, 100);
+      meal.addFoodItem(foodItem);
       mealHolder.addMeal(meal);
 
       // Act
