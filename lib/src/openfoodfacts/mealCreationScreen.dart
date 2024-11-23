@@ -1,46 +1,26 @@
-import 'package:fit_and_healthy/src/nested_scaffold.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealClass.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealHolderClass.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'foodrelatedclasses/mealnotifier.dart';
 import 'mealDetailScreen.dart';
 
-class MealListScreen extends StatefulWidget {
+class MealListScreen extends ConsumerWidget {
   static const route = '/create-meal';
   static const routeName = 'Create Meal';
 
   @override
-  _MealListScreenState createState() => _MealListScreenState();
-}
-
-class _MealListScreenState extends State<MealListScreen> {
-  final MealHolder mealHolder =
-      MealHolder(date: DateTime.now()); // Initialize with current date
-
-  void _addMeal(String name) {
-    setState(() {
-      mealHolder.addMeal(Meal(name: name));
-    });
-  }
-
-  void _removeMeal(String mealId) {
-    setState(() {
-      mealHolder.removeMeal(mealId);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mealHolder = ref.watch(mealNotifierProvider);
     final totalNutrition = mealHolder.calculateTotalNutrition();
 
-    return NestedScaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Meals on ${mealHolder.date.toLocal().toString().split(' ')[0]}'), // Display date
+          'Meals on ${mealHolder.date.toLocal().toString().split(' ')[0]}',
+        ),
       ),
       body: Column(
         children: [
-          // Display total nutrition for all meals in the MealHolder
+          // Display total nutrition
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -70,10 +50,11 @@ class _MealListScreenState extends State<MealListScreen> {
                   title: Text(meal.name),
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
-                    onPressed: () => _removeMeal(meal.id), // Remove meal by ID
+                    onPressed: () => ref
+                        .read(mealNotifierProvider.notifier)
+                        .removeMeal(meal.id),
                   ),
                   onTap: () {
-                    // TODO: Switch to a routing based approach to navigate to the MealDetailScreen. Use path parameters to pass the meal id.
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -92,7 +73,7 @@ class _MealListScreenState extends State<MealListScreen> {
         onPressed: () async {
           String? name = await _showAddMealDialog(context);
           if (name != null && name.isNotEmpty) {
-            _addMeal(name);
+            ref.read(mealNotifierProvider.notifier).addMeal(name);
           }
         },
       ),
