@@ -130,7 +130,7 @@ class MetricsController extends _$MetricsController {
   }
 
   // Handle the weight goal
-  Future<void> updateWeightGoal(WeightGoal goal) async {
+  Future<void> updateWeightGoal(WeightGoal? goal) async {
     await _metricsService.updateWeightGoal(goal);
 
     final currentState = state.asData?.value;
@@ -142,8 +142,12 @@ class MetricsController extends _$MetricsController {
     }
   }
 
+  Future<WeightGoal?> getWeightGoal() async {
+    return _metricsService.getWeightGoal();
+  }
+
   // Handle the activity level
-  Future<void> updateActivityLevel(ActivityLevel level) async {
+  Future<void> updateActivityLevel(ActivityLevel? level) async {
     await _metricsService.updateActivityLevel(level);
 
     final currentState = state.asData?.value;

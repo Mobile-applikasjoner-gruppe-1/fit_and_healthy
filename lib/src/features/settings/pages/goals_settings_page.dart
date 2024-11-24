@@ -35,6 +35,7 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
 
     final height = await metricsController.getHeight();
     final activityLevel = await metricsController.getActivityLevel();
+    final weightgoal = await metricsController.getWeightGoal();
 
     final latestWeight =
         await ref.read(metricsControllerProvider.notifier).getLatestWeight();
@@ -44,7 +45,8 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
             latestWeight.toString(); // Pre-fill the text field
       }
       _height = '${height.toInt()} cm';
-      _activityLevel = activityLevel;
+      _activityLevel = activityLevel ?? ActivityLevel.lightlyActive;
+      _weightGoal = weightgoal;
     });
   }
 
@@ -224,10 +226,13 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     this.setState(() {
                       _weightGoal = selectedGoal;
                     });
+                    await ref
+                        .read(metricsControllerProvider.notifier)
+                        .updateWeightGoal(selectedGoal);
                     Navigator.of(context).pop();
                   },
                   child: const Text('Save'),
@@ -246,7 +251,7 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
         TextEditingController(text: _height.replaceAll(' cm', ''));
     final TextEditingController ageController = TextEditingController();
     final TextEditingController birthdayController = TextEditingController();
-    ActivityLevel? selectedActivityLevel;
+    ActivityLevel? selectedActivityLevel = _activityLevel;
 
     showModalBottomSheet(
       context: context,
@@ -396,9 +401,16 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                                 }
 
                                 if (selectedActivityLevel != null) {
+                                  setState(() {
+                                    _activityLevel = selectedActivityLevel;
+                                  });
                                   await ref
                                       .read(metricsControllerProvider.notifier)
                                       .addWeight(weight);
+                                  await ref
+                                      .read(metricsControllerProvider.notifier)
+                                      .updateActivityLevel(
+                                          selectedActivityLevel);
                                   final calories =
                                       CalorieCalculator.calculateCalories(
                                     weight,

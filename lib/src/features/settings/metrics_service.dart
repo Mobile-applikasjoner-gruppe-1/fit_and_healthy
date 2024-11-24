@@ -9,7 +9,7 @@ class MetricsService {
   Gender? _gender;
   DateTime? _birthday;
   int _weeklyWorkoutGoal = 3;
-  WeightGoal _weightGoal = WeightGoal.maintain;
+  WeightGoal? _weightGoal = WeightGoal.maintain;
   ActivityLevel? _activityLevel;
 
   // Weight History
@@ -64,11 +64,11 @@ class MetricsService {
   }
 
   // Weight Goals
-  Future<WeightGoal> getWeightGoal() async {
+  Future<WeightGoal?> getWeightGoal() async {
     return _weightGoal;
   }
 
-  Future<void> updateWeightGoal(WeightGoal goal) async {
+  Future<void> updateWeightGoal(WeightGoal? goal) async {
     _weightGoal = goal;
   }
 
@@ -77,7 +77,7 @@ class MetricsService {
     return _activityLevel;
   }
 
-  Future<void> updateActivityLevel(ActivityLevel level) async {
+  Future<void> updateActivityLevel(ActivityLevel? level) async {
     _activityLevel = level;
   }
 }
