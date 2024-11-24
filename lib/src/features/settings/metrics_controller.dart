@@ -2,15 +2,10 @@ import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/settings/metrics_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metrics_controller.g.dart';
-
-final metricsServiceProvider = Provider<MetricsService>((ref) {
-  return MetricsService();
-});
 
 @riverpod
 class MetricsController extends _$MetricsController {
@@ -18,7 +13,7 @@ class MetricsController extends _$MetricsController {
 
   @override
   Future<Map<String, dynamic>> build() async {
-    _metricsService = ref.read(metricsServiceProvider);
+    _metricsService = MetricsService();
 
     return {
       'weightHistory': await _metricsService.getWeightHistory(),
