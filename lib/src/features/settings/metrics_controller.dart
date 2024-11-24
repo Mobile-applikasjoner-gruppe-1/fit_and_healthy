@@ -1,3 +1,6 @@
+import 'package:fit_and_healthy/shared/models/activity_level.dart';
+import 'package:fit_and_healthy/shared/models/gender.dart';
+import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/settings/metrics_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
@@ -5,13 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metrics_controller.g.dart';
 
-enum Gender { male, female }
-
-enum WeightGoal { gain, maintain, lose }
-
-enum IntensityLevel { low, medium, high }
-
-// Singleton for MetricsService
 final metricsServiceProvider = Provider<MetricsService>((ref) {
   return MetricsService();
 });
@@ -23,12 +19,16 @@ class MetricsController extends _$MetricsController {
   @override
   Future<Map<String, dynamic>> build() async {
     _metricsService = ref.read(metricsServiceProvider);
+
     return {
       'weightHistory': await _metricsService.getWeightHistory(),
       'height': await _metricsService.getHeight(),
-      'gender': Gender.male,
-      'weightGoal': WeightGoal.maintain,
-      'intensityLevel': IntensityLevel.medium,
+      'gender':
+          await _metricsService.getGender() ?? Gender.male, // Default gender
+      'birthday': await _metricsService.getBirthday(),
+      'weeklyWorkoutGoal': await _metricsService.getWeeklyWorkoutGoal(),
+      'weightGoal': await _metricsService.getWeightGoal(),
+      'intensityLevel': await _metricsService.getActivityLevel(),
     };
   }
 
@@ -46,6 +46,7 @@ class MetricsController extends _$MetricsController {
     }
   }
 
+  // Handle the weight
   Future<void> addWeight(double weight) async {
     final entry = WeightEntry(timestamp: DateTime.now(), weight: weight);
     await _metricsService.addWeightEntry(entry);
@@ -62,5 +63,99 @@ class MetricsController extends _$MetricsController {
 
   Future<double?> getLatestWeight() async {
     return _metricsService.getLatestWeight();
+  }
+
+  //Handle the height
+  Future<double> getHeight() async {
+    return _metricsService.getHeight();
+  }
+
+  Future<void> updateHeight(double height) async {
+    await _metricsService.updateHeight(height);
+
+    final currentState = state.asData?.value;
+    if (currentState != null) {
+      state = AsyncValue.data({
+        ...currentState,
+        'height': height,
+      });
+    }
+  }
+
+// Handle the Gender
+  Future<Gender?> getGender() async {
+    return _metricsService.getGender();
+  }
+
+  Future<void> updateGender(Gender gender) async {
+    await _metricsService.updateGender(gender);
+
+    final currentState = state.asData?.value;
+    if (currentState != null) {
+      state = AsyncValue.data({
+        ...currentState,
+        'gender': gender,
+      });
+    }
+  }
+
+  // Handle the birthday
+  Future<DateTime?> getBirthday() async {
+    return _metricsService.getBirthday();
+  }
+
+  Future<void> setBirthday(DateTime birthday) async {
+    await _metricsService.setBirthday(birthday);
+
+    final currentState = state.asData?.value;
+    if (currentState != null) {
+      state = AsyncValue.data({
+        ...currentState,
+        'birthday': birthday,
+      });
+    }
+  }
+
+  // Handle the weekly workouts
+  Future<void> updateWeeklyWorkoutGoal(int goal) async {
+    await _metricsService.updateWeeklyWorkoutGoal(goal);
+
+    final currentState = state.asData?.value;
+    if (currentState != null) {
+      state = AsyncValue.data({
+        ...currentState,
+        'weeklyWorkoutGoal': goal,
+      });
+    }
+  }
+
+  // Handle the weight goal
+  Future<void> updateWeightGoal(WeightGoal goal) async {
+    await _metricsService.updateWeightGoal(goal);
+
+    final currentState = state.asData?.value;
+    if (currentState != null) {
+      state = AsyncValue.data({
+        ...currentState,
+        'weightGoal': goal,
+      });
+    }
+  }
+
+  // Handle the activity level
+  Future<void> updateActivityLevel(ActivityLevel level) async {
+    await _metricsService.updateActivityLevel(level);
+
+    final currentState = state.asData?.value;
+    if (currentState != null) {
+      state = AsyncValue.data({
+        ...currentState,
+        'activityLevel': level,
+      });
+    }
+  }
+
+  Future<ActivityLevel?> getActivityLevel() async {
+    return _metricsService.getActivityLevel();
   }
 }
