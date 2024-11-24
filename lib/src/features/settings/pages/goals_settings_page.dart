@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,9 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
   double? _caloriesNeeded;
   String _height = '';
   ActivityLevel? _activityLevel = ActivityLevel.lightlyActive;
+  double? _latestWeight;
+  int? _age;
+  Gender? _gender;
 
   late final TextEditingController weightController;
 
@@ -36,6 +40,17 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
     final height = await metricsController.getHeight();
     final activityLevel = await metricsController.getActivityLevel();
     final weightgoal = await metricsController.getWeightGoal();
+    final birthday = await metricsController.getBirthday();
+    final gender = await metricsController.getGender();
+
+    if (birthday != null) {
+      final today = DateTime.now();
+      final age = today.year - birthday.year;
+      _age = today.month < birthday.month ||
+              (today.month == birthday.month && today.day < birthday.day)
+          ? age - 1
+          : age;
+    }
 
     final latestWeight =
         await ref.read(metricsControllerProvider.notifier).getLatestWeight();
@@ -43,11 +58,37 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
       if (latestWeight != null) {
         weightController.text =
             latestWeight.toString(); // Pre-fill the text field
+        _latestWeight = latestWeight;
       }
       _height = '${height.toInt()} cm';
       _activityLevel = activityLevel ?? ActivityLevel.lightlyActive;
       _weightGoal = weightgoal;
+      _gender = gender ?? Gender.male;
     });
+    if (_latestWeight != null &&
+        _age != null &&
+        _height.isNotEmpty &&
+        _activityLevel != null &&
+        _gender != null) {
+      _updateCalorieCalculation();
+    }
+  }
+
+  void _updateCalorieCalculation() {
+    final heightValue = double.tryParse(_height.replaceAll(' cm', '')) ?? 0;
+    if (_latestWeight != null && _age != null && heightValue > 0) {
+      final calories = CalorieCalculator.calculateCalories(
+        _latestWeight!,
+        heightValue,
+        _age!,
+        _activityLevel!,
+        _gender!,
+        _weightGoal ?? WeightGoal.maintain,
+      );
+      setState(() {
+        _caloriesNeeded = calories;
+      });
+    }
   }
 
   @override
@@ -89,6 +130,11 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                     : 'Get your daily calorie requirement',
                 onTap: _showCalorieCalculatorModal,
               ),
+              const Divider(height: 1, thickness: 1),
+              ListTile(
+                title: Text('Calories to consume'),
+                subtitle: Text('Hey'),
+              )
             ],
           ),
         ),
@@ -417,6 +463,8 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                                     height,
                                     age,
                                     selectedActivityLevel!,
+                                    Gender.male,
+                                    WeightGoal.maintain,
                                   );
                                   setState(() {
                                     _caloriesNeeded = calories;
