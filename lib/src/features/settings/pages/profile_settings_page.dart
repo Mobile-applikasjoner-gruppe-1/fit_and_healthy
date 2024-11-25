@@ -17,34 +17,15 @@ class ProfileSettingsPage extends ConsumerStatefulWidget {
 }
 
 class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
-  String _height = '170 cm'; // Default height
-  Gender _gender = Gender.male; // Default gender
-  DateTime? _birthday; // Null by default
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    final metricsController = ref.read(metricsControllerProvider.notifier);
-
-    final height = await metricsController.getHeight();
-    final gender = await metricsController.getGender();
-    final birthday = await metricsController.getBirthday();
-
-    setState(() {
-      _height = '${height.toInt()} cm'; // Ensure height is a string with "cm"
-      _gender = gender ?? Gender.male; // Default to Gender.male if null
-      _birthday = birthday; // Default to null
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final settingsState = ref.watch(settingsControllerProvider).value;
+    final metricsState = ref.watch(metricsControllerProvider);
     final theme = Theme.of(context);
+
+    final height = metricsState.asData?.value['height'].toInt() ?? 170;
+    final gender = metricsState.asData?.value['gender'] ?? Gender.male;
+    final birthday = metricsState.asData?.value['birthday'];
 
     return NestedScaffold(
       appBar: AppBar(
@@ -107,11 +88,11 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
                     ref: ref,
                   ),
                   _buildDivider(),
-                  _buildEditableGenderField(context),
+                  _buildEditableGenderField(context, ref, gender),
                   _buildDivider(),
-                  _buildEditableHeightField(context),
+                  _buildEditableHeightField(context, ref, height),
                   _buildDivider(),
-                  _buildEditableBirthdayField(context),
+                  _buildEditableBirthdayField(context, ref, birthday),
                 ],
               ),
             ),
@@ -153,7 +134,11 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     );
   }
 
-  Widget _buildEditableGenderField(BuildContext context) {
+  Widget _buildEditableGenderField(
+    BuildContext context,
+    WidgetRef ref,
+    Gender gender,
+  ) {
     final theme = Theme.of(context);
 
     return ListTile(
@@ -163,7 +148,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _gender == Gender.male ? 'Male' : 'Female',
+            gender == Gender.male ? 'Male' : 'Female',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(width: Sizes.s100),
@@ -171,12 +156,16 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         ],
       ),
       onTap: () {
-        _showGenderEditDialog(context);
+        _showGenderEditDialog(context, ref, gender);
       },
     );
   }
 
-  Widget _buildEditableHeightField(BuildContext context) {
+  Widget _buildEditableHeightField(
+    BuildContext contex,
+    WidgetRef ref,
+    int height,
+  ) {
     final theme = Theme.of(context);
 
     return ListTile(
@@ -186,7 +175,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _height,
+            height.toString(),
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(width: Sizes.s100),
@@ -194,12 +183,13 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         ],
       ),
       onTap: () {
-        _showHeightEditDialog(context);
+        _showHeightEditDialog(context, ref, height);
       },
     );
   }
 
-  Widget _buildEditableBirthdayField(BuildContext context) {
+  Widget _buildEditableBirthdayField(
+      BuildContext context, WidgetRef ref, DateTime? birthday) {
     final theme = Theme.of(context);
 
     return ListTile(
@@ -209,8 +199,8 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _birthday != null
-                ? '${_birthday!.day}/${_birthday!.month}/${_birthday!.year}'
+            birthday != null
+                ? '${birthday.day}/${birthday.month}/${birthday.year}'
                 : 'Set Birthday',
             style: theme.textTheme.bodyMedium,
           ),
@@ -219,7 +209,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         ],
       ),
       onTap: () {
-        _showBirthdayEditDialog(context);
+        _showBirthdayEditDialog(context, ref, birthday);
       },
     );
   }
@@ -228,7 +218,11 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     return const Divider(height: 1, thickness: 1);
   }
 
-  void _showGenderEditDialog(BuildContext context) {
+  void _showGenderEditDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Gender currentGender,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
@@ -240,12 +234,9 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
               return RadioListTile<Gender>(
                 title: Text(gender == Gender.male ? 'Male' : 'Female'),
                 value: gender,
-                groupValue: _gender,
+                groupValue: currentGender,
                 onChanged: (newGender) async {
                   if (newGender != null) {
-                    setState(() {
-                      _gender = newGender;
-                    });
                     await ref
                         .read(metricsControllerProvider.notifier)
                         .updateGender(newGender);
@@ -260,9 +251,13 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     );
   }
 
-  void _showHeightEditDialog(BuildContext context) {
+  void _showHeightEditDialog(
+    BuildContext context,
+    WidgetRef ref,
+    int height,
+  ) {
     final TextEditingController controller =
-        TextEditingController(text: _height.replaceAll(' cm', ''));
+        TextEditingController(text: height.toString());
 
     showDialog(
       context: context,
@@ -286,9 +281,6 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
               onPressed: () async {
                 final int? newHeight = int.tryParse(controller.text);
                 if (newHeight != null) {
-                  setState(() {
-                    _height = '$newHeight cm';
-                  });
                   await ref
                       .read(metricsControllerProvider.notifier)
                       .updateHeight(newHeight.toDouble());
@@ -310,7 +302,8 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     );
   }
 
-  void _showBirthdayEditDialog(BuildContext context) {
+  void _showBirthdayEditDialog(
+      BuildContext context, WidgetRef ref, DateTime? birthday) {
     showDialog(
       context: context,
       builder: (context) {
@@ -320,14 +313,11 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
             onPressed: () async {
               final selectedDate = await showDatePicker(
                 context: context,
-                initialDate: _birthday ?? DateTime(2000),
+                initialDate: birthday ?? DateTime(2000),
                 firstDate: DateTime(1900),
                 lastDate: DateTime.now(),
               );
               if (selectedDate != null) {
-                setState(() {
-                  _birthday = selectedDate;
-                });
                 await ref
                     .read(metricsControllerProvider.notifier)
                     .setBirthday(selectedDate);
