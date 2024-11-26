@@ -1,35 +1,45 @@
 import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
-import 'package:fit_and_healthy/src/features/metrics/metrics_service.dart';
+import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/src/features/user/user_repository.dart';
+import 'package:fit_and_healthy/src/features/user/weight_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metrics_controller.g.dart';
 
 @riverpod
 class MetricsController extends _$MetricsController {
-  late final MetricsService _metricsService;
+  late final UserRepository _userRepository;
+  late final WeightRepository _weightRepository;
 
   @override
   Future<Map<String, dynamic>> build() async {
-    _metricsService = MetricsService();
+    final authRepository = ref.read(firebaseAuthRepositoryProvider);
+    _userRepository = UserRepository(authRepository);
+    _weightRepository = WeightRepository(authRepository);
+    //_metricsService = MetricsService();
+    final userData = await _userRepository.getUser();
+    final weightHistory = await _weightRepository.getWeightHistory();
 
     return {
-      'weightHistory': await _metricsService.getWeightHistory(),
-      'height': await _metricsService.getHeight(),
-      'gender':
-          await _metricsService.getGender() ?? Gender.male, // Default gender
-      'birthday': await _metricsService.getBirthday(),
-      'weeklyWorkoutGoal': await _metricsService.getWeeklyWorkoutGoal(),
-      'weightGoal': await _metricsService.getWeightGoal(),
-      'intensityLevel': await _metricsService.getActivityLevel(),
+      'weightHistory': weightHistory,
+      'height': userData?['height'] ?? 0.0,
+      'gender': userData?['gender'] ?? Gender.male,
+      'birthday': userData?['birthday'] != null
+          ? DateTime.parse(userData?['birthday'])
+          : null,
+      'weeklyWorkoutGoal': userData?['weeklyWorkoutGoal'] ?? 0,
+      'weightGoal': userData?['weightGoal'] ?? WeightGoal.maintain,
+      'intensityLevel':
+          userData?['activityLevel'] ?? ActivityLevel.moderatelyActive,
     };
   }
 
   Future<void> addWeightEntry(double weight, DateTime date) async {
     final entry = WeightEntry(timestamp: date, weight: weight);
-    await _metricsService.addWeightEntry(entry);
+    await _weightRepository.addWeightEntry(entry);
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -44,7 +54,7 @@ class MetricsController extends _$MetricsController {
   // Handle the weight
   Future<void> addWeight(double weight) async {
     final entry = WeightEntry(timestamp: DateTime.now(), weight: weight);
-    await _metricsService.addWeightEntry(entry);
+    await _weightRepository.addWeightEntry(entry);
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -57,16 +67,30 @@ class MetricsController extends _$MetricsController {
   }
 
   Future<double?> getLatestWeight() async {
-    return _metricsService.getLatestWeight();
+    final weigthHistory = await _weightRepository.getWeightHistory();
+
+    if (weigthHistory.isNotEmpty) {
+      final latestEntry = weigthHistory
+          .reduce((a, b) => a.timestamp.isAfter(b.timestamp) ? a : b);
+      return latestEntry.weight;
+    }
+    return null;
   }
 
   //Handle the height
   Future<double> getHeight() async {
-    return _metricsService.getHeight();
+    final userData = await _userRepository.getUser();
+
+    if (userData != null && userData['height'] != null) {
+      return userData['height'] as double;
+    }
+
+    throw Exception('Height not found for the user');
   }
 
   Future<void> updateHeight(double height) async {
-    await _metricsService.updateHeight(height);
+    print('Updating height');
+    await _userRepository.updateUser({'height': height});
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -79,11 +103,17 @@ class MetricsController extends _$MetricsController {
 
 // Handle the Gender
   Future<Gender?> getGender() async {
-    return _metricsService.getGender();
+    final userData = await _userRepository.getUser();
+
+    if (userData != null && userData['gender'] != null) {
+      return userData['gender'] as Gender;
+    }
+
+    throw Exception('Gender not found for the user');
   }
 
   Future<void> updateGender(Gender gender) async {
-    await _metricsService.updateGender(gender);
+    await _userRepository.updateUser({'gender': gender});
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -96,11 +126,17 @@ class MetricsController extends _$MetricsController {
 
   // Handle the birthday
   Future<DateTime?> getBirthday() async {
-    return _metricsService.getBirthday();
+    final userData = await _userRepository.getUser();
+
+    if (userData != null && userData['birthday'] != null) {
+      return userData['birthday'] as DateTime;
+    }
+
+    throw Exception('Birthday not found for the user');
   }
 
   Future<void> setBirthday(DateTime birthday) async {
-    await _metricsService.setBirthday(birthday);
+    await _userRepository.updateUser({'birthday': birthday});
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -113,7 +149,7 @@ class MetricsController extends _$MetricsController {
 
   // Handle the weekly workouts
   Future<void> updateWeeklyWorkoutGoal(int goal) async {
-    await _metricsService.updateWeeklyWorkoutGoal(goal);
+    await _userRepository.updateUser({'weeklyWorkoutGoal': goal});
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -126,7 +162,7 @@ class MetricsController extends _$MetricsController {
 
   // Handle the weight goal
   Future<void> updateWeightGoal(WeightGoal? goal) async {
-    await _metricsService.updateWeightGoal(goal);
+    await _userRepository.updateUser({'weightGoal': goal});
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -138,12 +174,18 @@ class MetricsController extends _$MetricsController {
   }
 
   Future<WeightGoal?> getWeightGoal() async {
-    return _metricsService.getWeightGoal();
+    final userData = await _userRepository.getUser();
+
+    if (userData != null && userData['weightGoal'] != null) {
+      return userData['weightGoal'] as WeightGoal;
+    }
+
+    throw Exception('Weight goal not found for the user');
   }
 
   // Handle the activity level
   Future<void> updateActivityLevel(ActivityLevel? level) async {
-    await _metricsService.updateActivityLevel(level);
+    await _userRepository.updateUser({'activityLevel': level});
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -155,6 +197,12 @@ class MetricsController extends _$MetricsController {
   }
 
   Future<ActivityLevel?> getActivityLevel() async {
-    return _metricsService.getActivityLevel();
+    final userData = await _userRepository.getUser();
+
+    if (userData != null && userData['activityLevel'] != null) {
+      return userData['activityLevel'] as ActivityLevel;
+    }
+
+    throw Exception('Activity level not found for the user');
   }
 }

@@ -6,7 +6,7 @@ part of 'metrics_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$metricsControllerHash() => r'3853f7753038aa1b1601f621f87c686e2471ca1c';
+String _$metricsControllerHash() => r'c0a28ed36b0971431fcde127ee863e655730e647';
 
 /// See also [MetricsController].
 @ProviderFor(MetricsController)
