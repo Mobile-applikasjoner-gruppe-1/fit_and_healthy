@@ -35,9 +35,11 @@ class RegisterView extends ConsumerWidget {
                   child: Text(
                     'Sign in',
                     style: TextStyle(
-                      color: Theme.of(context).primaryColor,
+                      color:
+                          Theme.of(context).primaryTextTheme.bodySmall!.color,
                       decoration: TextDecoration.underline,
-                      decorationColor: Theme.of(context).primaryColor,
+                      decorationColor:
+                          Theme.of(context).primaryTextTheme.bodySmall!.color,
                     ),
                   ),
                 ),
