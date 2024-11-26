@@ -96,10 +96,9 @@ class _LoginFormViewState extends ConsumerState<LoginFormView> {
               child: Text(
                 'Forgot Password?',
                 style: TextStyle(
-                  color: Theme.of(context).primaryTextTheme.bodySmall!.color,
+                  color: Theme.of(context).textTheme.bodySmall!.color,
                   decoration: TextDecoration.underline,
-                  decorationColor:
-                      Theme.of(context).primaryTextTheme.bodySmall!.color,
+                  decorationColor: Theme.of(context).textTheme.bodySmall!.color,
                 ),
               ),
             ),
