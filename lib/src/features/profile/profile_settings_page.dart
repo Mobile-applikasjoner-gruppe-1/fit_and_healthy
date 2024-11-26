@@ -1,4 +1,4 @@
-import 'package:fit_and_healthy/src/features/settings/metrics_controller.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';

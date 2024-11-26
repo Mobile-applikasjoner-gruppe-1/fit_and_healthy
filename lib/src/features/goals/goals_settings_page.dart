@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/utils/calorie_calculator.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
-import 'package:fit_and_healthy/src/features/settings/metrics_controller.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 
 class GoalsSettingsPage extends ConsumerStatefulWidget {
   static const route = '/goals';

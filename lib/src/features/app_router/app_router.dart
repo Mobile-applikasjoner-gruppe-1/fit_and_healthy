@@ -4,11 +4,11 @@ import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_passwor
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_view.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/measurement_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/privacy_gdpr_policy_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
+import 'package:fit_and_healthy/src/features/gdpr_policy/gdpr_settings_page.dart';
+import 'package:fit_and_healthy/src/features/goals/goals_settings_page.dart';
+import 'package:fit_and_healthy/src/features/metrics/measurement_settings_page.dart';
+import 'package:fit_and_healthy/src/features/gdpr_policy/privacy_gdpr_policy_settings_page.dart';
+import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';

@@ -1,7 +1,7 @@
 import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
-import 'package:fit_and_healthy/src/features/settings/metrics_service.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_service.dart';
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
