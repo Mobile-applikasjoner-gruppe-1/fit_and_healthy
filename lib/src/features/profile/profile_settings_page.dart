@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/shared/widgets/fields/height_editor.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
@@ -182,8 +183,17 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
           const Icon(Icons.chevron_right),
         ],
       ),
-      onTap: () {
-        _showHeightEditDialog(context, ref, height);
+      onTap: () async {
+        //_showHeightEditDialog(context, ref, height);
+        final newHeight = await HeightEditor.showDialogForHeight(
+          context,
+          height.toDouble(),
+        );
+        if (newHeight != null) {
+          await ref
+              .read(metricsControllerProvider.notifier)
+              .updateHeight(newHeight);
+        }
       },
     );
   }
@@ -246,57 +256,6 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
               );
             }).toList(),
           ),
-        );
-      },
-    );
-  }
-
-  void _showHeightEditDialog(
-    BuildContext context,
-    WidgetRef ref,
-    int height,
-  ) {
-    final TextEditingController controller =
-        TextEditingController(text: height.toString());
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Height'),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Height (cm)',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final int? newHeight = int.tryParse(controller.text);
-                if (newHeight != null) {
-                  await ref
-                      .read(metricsControllerProvider.notifier)
-                      .updateHeight(newHeight.toDouble());
-                  Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid number.'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
         );
       },
     );

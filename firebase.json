@@ -1,1 +1,26 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"fit-and-healthy-a24e9","appId":"1:726238086088:android:88add68cc7dae9e7a276fd","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"fit-and-healthy-a24e9","configurations":{"android":"1:726238086088:android:88add68cc7dae9e7a276fd","ios":"1:726238086088:ios:443ec9a2481183e9a276fd"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "fit-and-healthy-a24e9",
+          "appId": "1:726238086088:android:88add68cc7dae9e7a276fd",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "fit-and-healthy-a24e9",
+          "configurations": {
+            "android": "1:726238086088:android:88add68cc7dae9e7a276fd",
+            "ios": "1:726238086088:ios:443ec9a2481183e9a276fd"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
