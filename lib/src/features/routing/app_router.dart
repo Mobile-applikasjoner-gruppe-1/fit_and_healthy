@@ -149,10 +149,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: LoginView.route,
         name: LoginView.routeName,
-        pageBuilder: (context, state) {
-          return CupertinoPage(
-            child: LoginView(),
-          );
+        builder: (context, state) {
+          return LoginView();
         },
       ),
       GoRoute(
