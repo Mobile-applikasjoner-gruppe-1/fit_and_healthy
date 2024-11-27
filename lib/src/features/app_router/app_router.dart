@@ -7,6 +7,7 @@ import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/measurement_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/pages/privacy_gdpr_policy_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
@@ -66,6 +67,7 @@ GoRouter appRouter(Ref ref) {
                     // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
                     // GoRoute(
                     //   path: WorkoutDetailView.route,
+                    //   name: WorkoutDetailView.routeName,
                     //   builder: (context, state) {
                     //     final workoutId = state.pathParameters['workoutId']!;
                     //     final workout = sampleWorkouts
@@ -101,7 +103,8 @@ GoRouter appRouter(Ref ref) {
                   //       return MealDetailScreen(
                   //         mealId: mealId,
                   //       );
-                  //     }),
+                  //     },
+                  // ),
                 ],
               ),
             ]),
@@ -130,6 +133,14 @@ GoRouter appRouter(Ref ref) {
                       path: GdprSettingsPage.route,
                       name: GdprSettingsPage.routeName,
                       builder: (context, state) => GdprSettingsPage(),
+                      routes: [
+                        GoRoute(
+                          path: PrivacyGdprPolicySettingsPage.route,
+                          name: PrivacyGdprPolicySettingsPage.routeName,
+                          builder: (context, state) =>
+                              PrivacyGdprPolicySettingsPage(),
+                        )
+                      ],
                     )
                   ]),
             ])

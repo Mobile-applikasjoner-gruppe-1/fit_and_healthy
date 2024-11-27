@@ -59,9 +59,14 @@ class MyApp extends ConsumerWidget {
             // Define a light and dark color theme. Then, read the user's
             // preferred ThemeMode (light, dark, or system default) from the
             // SettingsController to display the correct theme.
-            theme: snapshot.data!.themeMode == ThemeMode.dark
-                ? CupertinoThemeData(brightness: Brightness.dark)
-                : CupertinoThemeData(brightness: Brightness.light),
+            theme: CupertinoThemeData(
+              brightness: snapshot.data!.themeMode == ThemeMode.dark
+                  ? Brightness.dark
+                  : snapshot.data!.themeMode == ThemeMode.light
+                      ? Brightness.light
+                      : MediaQuery.platformBrightnessOf(context),
+              primaryColor: Colors.blue,
+            ),
             // darkTheme: ThemeData.dark(),
             // themeMode: snapshot.data!.themeMode,
 
