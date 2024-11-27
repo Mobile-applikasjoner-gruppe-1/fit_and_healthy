@@ -6,9 +6,9 @@ import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_item.dart
 void main() {
   // Create a mock Exercise object for testing
   final mockExercise = Exercise(
-    id: 1,
+    id: "1",
     exerciseInfoList: ExerciseInfoList(
-      id: 1,
+      id: "1",
       name: 'Bench Press',
       exerciseCategory: ExerciseCategory.chest,
       info: 'A strength training exercise for chest muscles.',
@@ -48,9 +48,9 @@ void main() {
     testWidgets('hides note when it is null', (WidgetTester tester) async {
       // Create a mock Exercise object without a note
       final exerciseWithoutNote = Exercise(
-        id: 2,
+        id: "2",
         exerciseInfoList: ExerciseInfoList(
-          id: 2,
+          id: "2",
           name: 'Squat',
           exerciseCategory: ExerciseCategory.legs,
           info: 'A compound exercise targeting the lower body.',
@@ -99,9 +99,9 @@ void main() {
     testWidgets('renders correctly with an empty set list', (WidgetTester tester) async {
       // Create a mock Exercise object with no sets
       final exerciseWithNoSets = Exercise(
-        id: 3,
+        id: "3",
         exerciseInfoList: ExerciseInfoList(
-          id: 3,
+          id: "3",
           name: 'Deadlift',
           exerciseCategory: ExerciseCategory.back,
           info: 'A compound exercise for back strength.',

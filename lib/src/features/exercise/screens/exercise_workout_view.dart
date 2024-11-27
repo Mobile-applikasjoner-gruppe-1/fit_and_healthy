@@ -37,7 +37,7 @@ class ExerciseView extends StatelessWidget {
    * - If the workout has an ID of 1, this method navigates to the route '/exercise/1'.
    */
   void selectWorkout(BuildContext context, Workout workout) {
-    String id = workout.id.toString(); 
+    String id = workout.id; 
     context.push('${ExerciseView.route}/${id}'); 
   }
 

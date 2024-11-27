@@ -44,9 +44,9 @@ class WorkoutDetailView extends StatelessWidget {
     }
 
     return workouts.firstWhere(
-      (workout) => workout.id == id,
+      (workout) => workout.id == workoutId,
       orElse: () {
-        throw Exception('Workout with id $id not found');
+        throw Exception('Workout with id $workoutId not found');
       },
     );
   }

@@ -7,14 +7,14 @@ void main() {
   group('ExerciseInfoList', () {
     test('ExerciseInfoList should be instantiated correctly', () {
       final exerciseInfo = ExerciseInfoList(
-        id: 1,
+        id: "1",
         name: 'Bench Press',
         exerciseCategory: ExerciseCategory.chest,
         info: 'A strength training exercise for chest muscles.',
       );
 
       try {
-        expect(exerciseInfo.id, 1);
+        expect(exerciseInfo.id, "1");
         expect(exerciseInfo.name, 'Bench Press');
         expect(exerciseInfo.exerciseCategory, ExerciseCategory.chest);
         expect(exerciseInfo.info, 'A strength training exercise for chest muscles.');
@@ -66,14 +66,14 @@ void main() {
   group('Exercise', () {
     test('Exercise should link ExerciseInfoList and sets correctly', () {
       final exerciseInfo = ExerciseInfoList(
-        id: 2,
+        id: "2",
         name: 'Squat',
         exerciseCategory: ExerciseCategory.legs,
         info: 'A compound exercise targeting the lower body.',
       );
 
       final exercise = Exercise(
-        id: 101,
+        id: "101",
         exerciseInfoList: exerciseInfo,
         sets: [
           ExerciseSet(repititions: 12, weight: 60.0),
@@ -83,7 +83,7 @@ void main() {
       );
 
       try {
-        expect(exercise.id, 101);
+        expect(exercise.id, "101");
         expect(exercise.exerciseInfoList.name, 'Squat');
         expect(exercise.sets.length, 2);
         expect(exercise.note, 'Focus on form');
@@ -98,9 +98,9 @@ void main() {
   group('Workout', () {
     test('Workout should handle multiple exercises', () {
       final exercise1 = Exercise(
-        id: 1,
+        id: "1",
         exerciseInfoList: ExerciseInfoList(
-          id: 1,
+          id: "1",
           name: 'Bench Press',
           exerciseCategory: ExerciseCategory.chest,
           info: 'A strength training exercise for chest muscles.',
@@ -111,9 +111,9 @@ void main() {
       );
 
       final exercise2 = Exercise(
-        id: 2,
+        id: "2",
         exerciseInfoList: ExerciseInfoList(
-          id: 2,
+          id: "2",
           name: 'Squat',
           exerciseCategory: ExerciseCategory.legs,
           info: 'A compound exercise targeting the lower body.',
@@ -124,7 +124,7 @@ void main() {
       );
 
       final workout = Workout(
-        id: 1,
+        id: "1",
         title: 'Leg Day',
         time: '1 hour',
         dateTime: DateTime.parse('2024-11-18'),
@@ -132,7 +132,7 @@ void main() {
       );
 
       try {
-        expect(workout.id, 1);
+        expect(workout.id, "1");
         expect(workout.title, 'Leg Day');
         expect(workout.time, '1 hour');
         expect(workout.dateTime, DateTime.parse('2024-11-18'));
