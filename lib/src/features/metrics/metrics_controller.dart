@@ -19,21 +19,20 @@ class MetricsController extends _$MetricsController {
     final authRepository = ref.read(firebaseAuthRepositoryProvider);
     _userRepository = UserRepository(authRepository);
     _weightRepository = WeightRepository(authRepository);
-    //_metricsService = MetricsService();
+
     final userData = await _userRepository.getUser();
     final weightHistory = await _weightRepository.getWeightHistory();
 
+    if (userData == null) throw Exception('UserModel not found');
+
     return {
       'weightHistory': weightHistory,
-      'height': userData?['height'] ?? 0.0,
-      'gender': userData?['gender'] ?? Gender.male,
-      'birthday': userData?['birthday'] != null
-          ? DateTime.parse(userData?['birthday'])
-          : null,
-      'weeklyWorkoutGoal': userData?['weeklyWorkoutGoal'] ?? 0,
-      'weightGoal': userData?['weightGoal'] ?? WeightGoal.maintain,
-      'intensityLevel':
-          userData?['activityLevel'] ?? ActivityLevel.moderatelyActive,
+      'height': userData.height,
+      'gender': userData.gender,
+      'birthday': userData.birthday,
+      'weeklyWorkoutGoal': userData.weeklyWorkoutGoal,
+      'weightGoal': userData.weightGoal,
+      'intensityLevel': userData.activityLevel,
     };
   }
 
@@ -81,8 +80,9 @@ class MetricsController extends _$MetricsController {
   Future<double> getHeight() async {
     final userData = await _userRepository.getUser();
 
-    if (userData != null && userData['height'] != null) {
-      return userData['height'] as double;
+    if (userData != null) {
+      print('Height: ' + userData.height.toString());
+      return userData.height;
     }
 
     throw Exception('Height not found for the user');
@@ -90,7 +90,12 @@ class MetricsController extends _$MetricsController {
 
   Future<void> updateHeight(double height) async {
     print('Updating height');
-    await _userRepository.updateUser({'height': height});
+
+    final userData = await _userRepository.getUser();
+    if (userData != null) {
+      final updatedUser = userData.copyWith(height: height);
+      await _userRepository.updateUser(updatedUser);
+    }
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -105,15 +110,19 @@ class MetricsController extends _$MetricsController {
   Future<Gender?> getGender() async {
     final userData = await _userRepository.getUser();
 
-    if (userData != null && userData['gender'] != null) {
-      return userData['gender'] as Gender;
+    if (userData != null) {
+      return userData.gender;
     }
 
     throw Exception('Gender not found for the user');
   }
 
   Future<void> updateGender(Gender gender) async {
-    await _userRepository.updateUser({'gender': gender});
+    final userData = await _userRepository.getUser();
+    if (userData != null) {
+      final updatedUser = userData.copyWith(gender: gender);
+      await _userRepository.updateUser(updatedUser);
+    }
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -128,15 +137,19 @@ class MetricsController extends _$MetricsController {
   Future<DateTime?> getBirthday() async {
     final userData = await _userRepository.getUser();
 
-    if (userData != null && userData['birthday'] != null) {
-      return userData['birthday'] as DateTime;
+    if (userData != null) {
+      return userData.birthday;
     }
 
     throw Exception('Birthday not found for the user');
   }
 
   Future<void> setBirthday(DateTime birthday) async {
-    await _userRepository.updateUser({'birthday': birthday});
+    final userData = await _userRepository.getUser();
+    if (userData != null) {
+      final updatedUser = userData.copyWith(birthday: birthday);
+      await _userRepository.updateUser(updatedUser);
+    }
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -149,7 +162,11 @@ class MetricsController extends _$MetricsController {
 
   // Handle the weekly workouts
   Future<void> updateWeeklyWorkoutGoal(int goal) async {
-    await _userRepository.updateUser({'weeklyWorkoutGoal': goal});
+    final userData = await _userRepository.getUser();
+    if (userData != null) {
+      final updatedUser = userData.copyWith(weeklyWorkoutGoal: goal);
+      await _userRepository.updateUser(updatedUser);
+    }
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -162,7 +179,11 @@ class MetricsController extends _$MetricsController {
 
   // Handle the weight goal
   Future<void> updateWeightGoal(WeightGoal? goal) async {
-    await _userRepository.updateUser({'weightGoal': goal});
+    final userData = await _userRepository.getUser();
+    if (userData != null) {
+      final updatedUser = userData.copyWith(weightGoal: goal);
+      await _userRepository.updateUser(updatedUser);
+    }
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -176,8 +197,8 @@ class MetricsController extends _$MetricsController {
   Future<WeightGoal?> getWeightGoal() async {
     final userData = await _userRepository.getUser();
 
-    if (userData != null && userData['weightGoal'] != null) {
-      return userData['weightGoal'] as WeightGoal;
+    if (userData != null) {
+      return userData.weightGoal;
     }
 
     throw Exception('Weight goal not found for the user');
@@ -185,7 +206,11 @@ class MetricsController extends _$MetricsController {
 
   // Handle the activity level
   Future<void> updateActivityLevel(ActivityLevel? level) async {
-    await _userRepository.updateUser({'activityLevel': level});
+    final userData = await _userRepository.getUser();
+    if (userData != null) {
+      final updatedUser = userData.copyWith(activityLevel: level);
+      await _userRepository.updateUser(updatedUser);
+    }
 
     final currentState = state.asData?.value;
     if (currentState != null) {
@@ -199,8 +224,8 @@ class MetricsController extends _$MetricsController {
   Future<ActivityLevel?> getActivityLevel() async {
     final userData = await _userRepository.getUser();
 
-    if (userData != null && userData['activityLevel'] != null) {
-      return userData['activityLevel'] as ActivityLevel;
+    if (userData != null) {
+      return userData.activityLevel;
     }
 
     throw Exception('Activity level not found for the user');
