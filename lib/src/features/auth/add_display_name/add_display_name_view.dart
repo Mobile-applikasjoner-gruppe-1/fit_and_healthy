@@ -59,6 +59,18 @@ class _AddDisplayNameViewState extends ConsumerState<AddDisplayNameView> {
             }
           });
         },
+        error: (error, stackTrace) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('An error occurred. Please try again.'),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+          });
+        },
         orElse: () {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();

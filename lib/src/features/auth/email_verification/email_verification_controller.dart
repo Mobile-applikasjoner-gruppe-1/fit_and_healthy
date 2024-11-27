@@ -14,6 +14,7 @@ class EmailVerificationController extends _$EmailVerificationController {
         .currentUser!
         .firebaseUser
         .emailVerified;
+
     if (isEmailVerified) {
       return EmailVerificationState(
         isEmailVerified: true,
@@ -33,34 +34,40 @@ class EmailVerificationController extends _$EmailVerificationController {
   }
 
   Future<void> verifyEmail() async {
-    EmailVerificationState previousState = await future;
-    if (previousState.nextEmailSend != null &&
-        previousState.nextEmailSend!.isAfter(DateTime.now())) {
-      return;
+    try {
+      EmailVerificationState previousState = await future;
+      if (previousState.nextEmailSend != null &&
+          previousState.nextEmailSend!.isAfter(DateTime.now())) {
+        return;
+      }
+
+      await _verifyEmail();
+
+      state = AsyncValue.data(
+          previousState.copyWith(lastEmailSent: DateTime.now()));
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     }
-
-    await _verifyEmail();
-
-    state =
-        AsyncValue.data(previousState.copyWith(lastEmailSent: DateTime.now()));
   }
 
   Future<void> confirmVerification() async {
-    await ref.read(firebaseAuthRepositoryProvider).verifyEmail();
+    try {
+      await ref.read(firebaseAuthRepositoryProvider).verifyEmail();
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 }
 
 class EmailVerificationState {
   DateTime? lastEmailSent;
   bool isEmailVerified = false;
-  bool error = false;
 
   DateTime? get nextEmailSend => lastEmailSent?.add(Duration(seconds: 60));
 
   EmailVerificationState({
-    required this.lastEmailSent,
+    this.lastEmailSent,
     this.isEmailVerified = false,
-    this.error = false,
   });
 
   EmailVerificationState copyWith({
@@ -71,7 +78,6 @@ class EmailVerificationState {
     return EmailVerificationState(
       lastEmailSent: lastEmailSent ?? this.lastEmailSent,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
-      error: error ?? this.error,
     );
   }
 }

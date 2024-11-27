@@ -27,16 +27,7 @@ class _EmailVerificationViewState extends ConsumerState<EmailVerificationView> {
       next.maybeWhen(
         data: (emailVerificationState) {
           SchedulerBinding.instance.addPostFrameCallback((_) {
-            if (emailVerificationState.error) {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('An error occurred. Please try again.'),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
-            } else if (emailVerificationState.isEmailVerified) {
+            if (emailVerificationState.isEmailVerified) {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
@@ -61,6 +52,18 @@ class _EmailVerificationViewState extends ConsumerState<EmailVerificationView> {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).clearSnackBars();
             }
+          });
+        },
+        error: (error, stackTrace) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('An error occurred. Please try again.'),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
           });
         },
         orElse: () {
