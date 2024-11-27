@@ -35,6 +35,10 @@ FutureOr<String?> appRouterRedirectHandler(
 
   final bool loggedInWithoutDisplayName =
       currentUser != null && currentUser.firebaseUser.displayName == null;
+  final bool loggedInWithDisplayName =
+      currentUser != null && currentUser.firebaseUser.displayName != null;
+  final bool isAddingDisplayName =
+      state.matchedLocation == AddDisplayNameView.route;
 
   if (loggedInWithoutDisplayName) {
     return AddDisplayNameView.route;
@@ -45,8 +49,10 @@ FutureOr<String?> appRouterRedirectHandler(
     return EmailVerificationView.route;
   }
 
-  // Redirect to the dashboard (main page) if the user is already logged in.
-  if ((isLoggedIn && isLoggingIn) || (isVerifiedEmail && isVerifyingEmail)) {
+  // Redirect to the dashboard (main page) if the user is already logged in, email is verified, and the user has a display name.
+  if ((isLoggedIn && isLoggingIn) ||
+      (isVerifiedEmail && isVerifyingEmail) ||
+      (loggedInWithDisplayName && isAddingDisplayName)) {
     return DashboardView.route;
   }
 
