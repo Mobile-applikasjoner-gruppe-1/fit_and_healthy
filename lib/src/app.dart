@@ -1,4 +1,4 @@
-import 'package:fit_and_healthy/src/features/app_router/app_router.dart';
+import 'package:fit_and_healthy/src/features/routing/app_router.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
