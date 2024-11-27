@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
  * a new workout session.
  */
 class AddExercise extends StatefulWidget {
-  const AddExercise({super.key, required this.workouts});
+  const AddExercise({super.key, required this.workouts, required this.workoutId});
 
   static const route = '/exercise/add-exercise';
   static const routeName = 'AddExercise';
   
   final List<Workout> workouts;
+  final String workoutId;
 
   @override
   State<AddExercise> createState() {
@@ -21,8 +22,8 @@ class AddExercise extends StatefulWidget {
 }
 
   class _AddExerciseState extends State<AddExercise> {
-
   late final List<String> exerciseNames;
+  Exercise? selectedExercise;
 
   @override
   void initState() {
@@ -34,6 +35,10 @@ class AddExercise extends StatefulWidget {
         .toList();
   }
 
+  _addExerciseToWorkout() {
+    // Logic to add workout
+  }
+  
   @override
   Widget build(BuildContext context) {
     Widget content = Center(
@@ -82,7 +87,7 @@ class AddExercise extends StatefulWidget {
         actions: [
           TextButton(
             onPressed: () {
-              // add exercise to workout
+              _addExerciseToWorkout();
             },
             child: const Text(
               'Add exercise',

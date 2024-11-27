@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_item.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 
 /**
  * The WorkoutDetailView widget displays detailed information about a single workout,
@@ -44,7 +43,7 @@ class WorkoutDetailView extends StatelessWidget {
       throw Exception('Invalid workout ID: $workoutId');
     }
 
-    return sampleWorkouts.firstWhere(
+    return workouts.firstWhere(
       (workout) => workout.id == id,
       orElse: () {
         throw Exception('Workout with id $id not found');

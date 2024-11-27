@@ -53,13 +53,15 @@ GoRouter appRouter = GoRouter(
                 path: 'add-workout',
                 name: 'AddWorkout',
                 builder: (context, state) =>
-                    AddWorkoutView(workouts: sampleWorkouts),
+                    AddWorkout(workouts: sampleWorkouts),
               ),
               GoRoute(
-                path: 'add-exercise',
+                path: 'add-exercise:id',
                 name: 'AddExercise',
-                builder: (context, state) =>
-                    AddExercise(workouts: sampleWorkouts),
+                builder: (context, state) {
+                  final workoutId = state.pathParameters['id']!;
+                  return AddExercise(workouts: sampleWorkouts, workoutId: workoutId);
+                }
               ),
                 GoRoute(
                   path: ':id',
