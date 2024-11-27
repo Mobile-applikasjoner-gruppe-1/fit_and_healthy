@@ -34,9 +34,10 @@ class LoginView extends ConsumerWidget {
                   child: Text(
                     'Sign up',
                     style: TextStyle(
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).textTheme.bodySmall!.color,
                       decoration: TextDecoration.underline,
-                      decorationColor: Theme.of(context).primaryColor,
+                      decorationColor:
+                          Theme.of(context).textTheme.bodySmall!.color,
                     ),
                   ),
                 ),

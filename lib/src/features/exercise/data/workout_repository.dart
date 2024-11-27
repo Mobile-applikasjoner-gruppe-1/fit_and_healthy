@@ -1,6 +1,6 @@
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fit_and_healthy/src/features/auth/app_user_model.dart';
+import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/exercise/data/exercise_repository.dart';
 
@@ -25,15 +25,15 @@ class WorkoutRepository {
     DateTime startOfDay = DateTime(date.year, date.month, date.day);
     DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-    final AppUser user = _authRepository.currentUser!;
+    final AuthUser user = _authRepository.currentUser!;
 
     QuerySnapshot<Workout> querySnapshot = await _firestore
         .collection('users')
-        .doc(user.firebaseUser!.uid)
+        .doc(user.firebaseUser.uid)
         .collection('workouts')
         .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
         .where('dateTime', isLessThanOrEqualTo: endOfDay)
-        .withConverter(
+        .withConverter<Workout>(
             fromFirestore: workoutConverter.fromFirestore,
             toFirestore: workoutConverter.toFirestore)
         .get();
@@ -48,7 +48,7 @@ class WorkoutRepository {
     CollectionReference workoutsRef = _firestore.collection('workouts');
 
     DocumentReference workoutRef = await workoutsRef
-        .withConverter(
+        .withConverter<Workout>(
             fromFirestore: workoutConverter.fromFirestore,
             toFirestore: workoutConverter.toFirestore)
         .add(workout);
@@ -64,7 +64,7 @@ class WorkoutRepository {
         _firestore.collection('workouts').doc(workout.id);
 
     await workoutRef
-        .withConverter(
+        .withConverter<Workout>(
             fromFirestore: workoutConverter.fromFirestore,
             toFirestore: workoutConverter.toFirestore)
         .set(workout);

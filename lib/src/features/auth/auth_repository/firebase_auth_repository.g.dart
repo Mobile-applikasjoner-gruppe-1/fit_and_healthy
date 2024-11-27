@@ -42,11 +42,11 @@ final firebaseAuthRepositoryProvider =
 // ignore: unused_element
 typedef FirebaseAuthRepositoryRef = ProviderRef<FirebaseAuthRepository>;
 String _$firebaseAuthStateChangeHash() =>
-    r'1af71ed788116b722276a1559f6e68c8393fbc3a';
+    r'484cf4636231cc3e06e5b56b5f865283f554e280';
 
 /// See also [firebaseAuthStateChange].
 @ProviderFor(firebaseAuthStateChange)
-final firebaseAuthStateChangeProvider = StreamProvider<AppUser?>.internal(
+final firebaseAuthStateChangeProvider = StreamProvider<AuthUser?>.internal(
   firebaseAuthStateChange,
   name: r'firebaseAuthStateChangeProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -58,6 +58,6 @@ final firebaseAuthStateChangeProvider = StreamProvider<AppUser?>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef FirebaseAuthStateChangeRef = StreamProviderRef<AppUser?>;
+typedef FirebaseAuthStateChangeRef = StreamProviderRef<AuthUser?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
