@@ -2,6 +2,7 @@ import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_controller/auth_controller.dart';
 import 'package:fit_and_healthy/src/features/auth/email_verification/email_verification_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EmailVerificationView extends ConsumerStatefulWidget {
@@ -22,6 +23,55 @@ class _EmailVerificationViewState extends ConsumerState<EmailVerificationView> {
     final emailVerificationControllerFuture =
         ref.watch(emailVerificationControllerProvider.future);
 
+    ref.listen(emailVerificationControllerProvider, (previous, next) {
+      next.maybeWhen(
+        data: (emailVerificationState) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            if (emailVerificationState.error) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('An error occurred. Please try again.'),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            } else if (emailVerificationState.isEmailVerified) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Email verified successfully.'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else if (emailVerificationState.lastEmailSent != null &&
+                emailVerificationState.lastEmailSent!
+                    .add(Duration(seconds: 5))
+                    .isAfter(DateTime.now())) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Verification email sent successfully.'),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+            }
+          });
+        },
+        orElse: () {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).clearSnackBars();
+          });
+        },
+      );
+    });
+
     return FutureBuilder(
       future: emailVerificationControllerFuture,
       builder: (context, snapshot) {
@@ -35,7 +85,7 @@ class _EmailVerificationViewState extends ConsumerState<EmailVerificationView> {
           );
         }
 
-        DateTime nextEmailSend = snapshot.data!.nextEmailSend;
+        DateTime? nextEmailSend = snapshot.data!.nextEmailSend;
 
         return Scaffold(
           appBar: AppBar(
@@ -72,8 +122,9 @@ class _EmailVerificationViewState extends ConsumerState<EmailVerificationView> {
                 SizedBox(height: gapSize),
                 StreamBuilder<int>(
                   stream: Stream.periodic(Duration(seconds: 1), (x) {
-                    final secondsUntilNextEmailSend =
-                        nextEmailSend.difference(DateTime.now()).inSeconds;
+                    final secondsUntilNextEmailSend = nextEmailSend == null
+                        ? 0
+                        : nextEmailSend.difference(DateTime.now()).inSeconds;
                     return secondsUntilNextEmailSend;
                   }).takeWhile((secondsUntilNextEmailSend) =>
                       secondsUntilNextEmailSend >= 0),

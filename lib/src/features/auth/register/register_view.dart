@@ -1,8 +1,10 @@
 import 'package:fit_and_healthy/src/common/styles/sizes.dart';
+import 'package:fit_and_healthy/src/features/auth/auth_controller/auth_controller.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_view.dart';
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_form_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,6 +16,52 @@ class RegisterView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(authControllerProvider, (previous, next) {
+      next.maybeWhen(
+        data: (authState) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            if (authState.isError) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('An error occurred. Please try again.'),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            } else if (authState.isLoading) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Registering...'),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              );
+            } else if (authState.isSuccess) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Registered successfully.'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+            }
+          });
+        },
+        orElse: () {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).clearSnackBars();
+          });
+        },
+      );
+    });
+
     return Scaffold(
       // appBar: AppBar(title: Text('Register'), centerTitle: true),
       body: AuthView(

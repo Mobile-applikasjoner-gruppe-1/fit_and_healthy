@@ -34,7 +34,8 @@ class EmailVerificationController extends _$EmailVerificationController {
 
   Future<void> verifyEmail() async {
     EmailVerificationState previousState = await future;
-    if (previousState.nextEmailSend.isAfter(DateTime.now())) {
+    if (previousState.nextEmailSend != null &&
+        previousState.nextEmailSend!.isAfter(DateTime.now())) {
       return;
     }
 
@@ -50,23 +51,27 @@ class EmailVerificationController extends _$EmailVerificationController {
 }
 
 class EmailVerificationState {
-  DateTime lastEmailSent = DateTime.now();
+  DateTime? lastEmailSent;
   bool isEmailVerified = false;
+  bool error = false;
 
-  DateTime get nextEmailSend => lastEmailSent.add(Duration(seconds: 60));
+  DateTime? get nextEmailSend => lastEmailSent?.add(Duration(seconds: 60));
 
   EmailVerificationState({
     required this.lastEmailSent,
     this.isEmailVerified = false,
+    this.error = false,
   });
 
   EmailVerificationState copyWith({
     DateTime? lastEmailSent,
     bool? isEmailVerified,
+    bool? error,
   }) {
     return EmailVerificationState(
       lastEmailSent: lastEmailSent ?? this.lastEmailSent,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+      error: error ?? this.error,
     );
   }
 }
