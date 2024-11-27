@@ -50,6 +50,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
               decoration: InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
+                floatingLabelBehavior: FloatingLabelBehavior.never,
               ),
               keyboardType: TextInputType.emailAddress,
               autofillHints: [AutofillHints.email],
