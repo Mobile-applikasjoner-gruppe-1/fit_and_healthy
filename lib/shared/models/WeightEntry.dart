@@ -1,11 +1,15 @@
 class WeightEntry {
-  final String? id; // Optional, will be set after Firestore creation
+  final String? id;
   final DateTime timestamp;
   final double weight;
 
-  WeightEntry({this.id, required this.timestamp, required this.weight});
+  WeightEntry({
+    this.id,
+    required this.timestamp,
+    required this.weight,
+  });
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'timestamp': timestamp.toIso8601String(),
@@ -13,7 +17,7 @@ class WeightEntry {
     };
   }
 
-  factory WeightEntry.fromMap(Map<String, dynamic> map, {String? id}) {
+  factory WeightEntry.fromFirestore(Map<String, dynamic> map, {String? id}) {
     return WeightEntry(
       id: id,
       timestamp: DateTime.parse(map['timestamp']),
