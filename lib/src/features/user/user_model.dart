@@ -21,29 +21,40 @@ class UserModel {
     required this.activityLevel,
   });
 
-  factory UserModel.fromFirestore(String id, Map<String, dynamic> data) {
-    return UserModel(
-      id: id,
-      height: (data['height'] ?? 170).toDouble(),
-      gender: Gender.values.firstWhere(
-        (g) => g.toString() == 'Gender.${data['gender'] ?? 'male'}',
-        orElse: () => Gender.male,
-      ),
-      birthday:
-          data['birthday'] != null ? DateTime.tryParse(data['birthday']) : null,
-      weeklyWorkoutGoal: data['weeklyWorkoutGoal'] ?? 3,
-      weightGoal: WeightGoal.values.firstWhere(
-        (w) => w.toString() == 'WeightGoal.${data['weightGoal'] ?? 'maintain'}',
-        orElse: () => WeightGoal.maintain,
-      ),
-      activityLevel: ActivityLevel.values.firstWhere(
-        (a) =>
-            a.toString() ==
-            'ActivityLevel.${data['activityLevel'] ?? 'moderatelyActive'}',
-        orElse: () => ActivityLevel.moderatelyActive,
-      ),
-    );
+  factory UserModel.fromFirestore(Map<String, dynamic> map, String id) {
+    if (map.isEmpty) {
+      throw Exception('Firestore data is empty for user ID: $id');
+    }
+
+    try {
+      return UserModel(
+        id: id,
+        height: (map['height'] ?? 170).toDouble(),
+        gender: Gender.values.firstWhere(
+          (g) => g.toString() == 'Gender.${map['gender'] ?? 'male'}',
+          orElse: () => Gender.male,
+        ),
+        birthday:
+            map['birthday'] != null ? DateTime.tryParse(map['birthday']) : null,
+        weeklyWorkoutGoal: map['weeklyWorkoutGoal'] ?? 3,
+        weightGoal: WeightGoal.values.firstWhere(
+          (w) =>
+              w.toString() == 'WeightGoal.${map['weightGoal'] ?? 'maintain'}',
+          orElse: () => WeightGoal.maintain,
+        ),
+        activityLevel: ActivityLevel.values.firstWhere(
+          (a) =>
+              a.toString() ==
+              'ActivityLevel.${map['activityLevel'] ?? 'moderatelyActive'}',
+          orElse: () => ActivityLevel.moderatelyActive,
+        ),
+      );
+    } catch (e) {
+      throw Exception(
+          'Failed to parse Firestore data for user ID: $id. Error: $e');
+    }
   }
+
   Map<String, dynamic> toFirestore() {
     return {
       'height': height,

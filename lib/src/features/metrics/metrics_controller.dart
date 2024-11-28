@@ -41,7 +41,7 @@ class MetricsController extends _$MetricsController {
   Future<void> updateUser({required String key, required dynamic value}) async {
     final currentUserMap = state.asData?.value;
 
-    print('Current user map: $currentUserMap'); // Add this to debug
+    print('Current user map: $currentUserMap'); // Debugging
 
     if (currentUserMap == null) return;
 
@@ -61,7 +61,7 @@ class MetricsController extends _$MetricsController {
         weeklyWorkoutGoal: currentUserMap['weeklyWorkoutGoal'],
         weightGoal: currentUserMap['weightGoal'],
         activityLevel:
-            currentUserMap['activityLevel'] ?? ActivityLevel.moderatelyActive,
+            currentUserMap['intensityLevel'] ?? ActivityLevel.moderatelyActive,
       );
 
       UserModel updatedUser;
@@ -92,8 +92,13 @@ class MetricsController extends _$MetricsController {
       // Update Firebase
       await _userRepository.updateUser(updatedUser);
 
-      // Invalidate the provider to fetch fresh data
-      ref.invalidate(metricsControllerProvider);
+      // Update the state locally to reflect the change
+      final updatedMap = {
+        ...currentUserMap,
+        key: value,
+      };
+
+      state = AsyncValue.data(updatedMap);
 
       print('Firebase and local state updated successfully.');
     } catch (e, stack) {

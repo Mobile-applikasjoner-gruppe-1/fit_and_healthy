@@ -4,8 +4,13 @@ import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/user/user_model.dart';
 
 final userConverter = (
-  fromFirestore: (snapshot, _) =>
-      UserModel.fromFirestore(snapshot.data(), snapshot.id),
+  fromFirestore: (DocumentSnapshot<Map<String, dynamic>> snapshot, _) {
+    final data = snapshot.data();
+    if (data == null) {
+      throw Exception('Firestore document is null for user ID: ${snapshot.id}');
+    }
+    return UserModel.fromFirestore(data, snapshot.id);
+  },
   toFirestore: (UserModel userModel, _) => userModel.toFirestore(),
 );
 
@@ -15,21 +20,26 @@ class UserRepository {
 
   UserRepository(this._authRepository);
 
-  Future<void> updateUser(UserModel user) async {
-    final AuthUser authUser = _authRepository.currentUser!;
+  DocumentReference<UserModel> _getUserModelDocument() {
+    final AuthUser user = _authRepository.currentUser!;
 
-    final userDoc =
-        _firestore.collection('users').doc(authUser.firebaseUser.uid);
-    print('Found collection');
-    await userDoc.set(user.toFirestore(), SetOptions(merge: false));
+    return _firestore
+        .collection('users')
+        .doc(user.firebaseUser.uid)
+        .withConverter<UserModel>(
+            fromFirestore: userConverter.fromFirestore,
+            toFirestore: userConverter.toFirestore);
+  }
+
+  Future<void> updateUser(UserModel user) async {
+    await _getUserModelDocument().set(user, SetOptions(merge: false));
   }
 
   Future<UserModel?> getUser() async {
-    final user = _authRepository.currentUser!;
-    final userDoc =
-        await _firestore.collection('users').doc(user.firebaseUser.uid).get();
+    final userDoc = await _getUserModelDocument().get();
+
     if (userDoc.exists) {
-      return UserModel.fromFirestore(userDoc.id, userDoc.data()!);
+      return userDoc.data();
     }
     return null;
   }
