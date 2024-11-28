@@ -14,6 +14,18 @@ class WeightRepository {
 
   WeightRepository(this._authRepository);
 
+  CollectionReference<WeightEntry> _getWeightEntryCollection() {
+    final AuthUser user = _authRepository.currentUser!;
+    return _firestore
+        .collection('users')
+        .doc(user.firebaseUser.uid)
+        .collection('weightEntry')
+        .withConverter<WeightEntry>(
+          fromFirestore: weightEntryConverter.fromFirestore,
+          toFirestore: weightEntryConverter.toFirestore,
+        );
+  }
+
   Future<String> addWeightEntry(WeightEntry entry) async {
     final AuthUser user = _authRepository.currentUser!;
 
@@ -32,17 +44,47 @@ class WeightRepository {
   }
 
   Future<List<WeightEntry>> getWeightHistory() async {
-    final AuthUser user = _authRepository.currentUser!;
+    final querySnapshot = await _getWeightEntryCollection().get();
 
-    QuerySnapshot<WeightEntry> querySnapshot = await _firestore
-        .collection('users')
-        .doc(user.firebaseUser.uid)
-        .collection('weightEntry')
-        .withConverter<WeightEntry>(
-            fromFirestore: weightEntryConverter.fromFirestore,
-            toFirestore: weightEntryConverter.toFirestore)
-        .get();
+    // QuerySnapshot<WeightEntry> querySnapshot = await _firestore
+    //     .collection('users')
+    //     .doc(user.firebaseUser.uid)
+    //     .collection('weightEntry')
+    //     .withConverter<WeightEntry>(
+    //         fromFirestore: weightEntryConverter.fromFirestore,
+    //         toFirestore: weightEntryConverter.toFirestore)
+    //     .get();
 
     return querySnapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  Future<WeightEntry?> getLatestWeightEntry() async {
+    final querySnapshot = await _getWeightEntryCollection()
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+    if (querySnapshot.docChanges.isNotEmpty) {
+      return querySnapshot.docs.first.data();
+    }
+    return null;
+  }
+
+  Future<List<WeightEntry>> getWeightHistoryDaysBack(int daysBack) async {
+    final DateTime targetDate =
+        DateTime.now().subtract(Duration(days: daysBack));
+    final querySnapshot = await _getWeightEntryCollection()
+        .where('timestamp',
+            isGreaterThanOrEqualTo: targetDate.toIso8601String())
+        .orderBy('timestamp', descending: true)
+        .get();
+    return querySnapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  Future<List<WeightEntry>> getWeightHistoryPastMonth() {
+    return getWeightHistoryDaysBack(30);
+  }
+
+  Future<List<WeightEntry>> getWeightHistoryPastYear() {
+    return getWeightHistoryDaysBack(365);
   }
 }

@@ -16,6 +16,8 @@ class MeasurementSettingsPage extends ConsumerWidget {
   static const route = '/measurement';
   static const routeName = 'Measurement Settings';
 
+  // TODO, Fetch data for 30 days, and if they want a year, fetch the rest!
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final metricState = ref.watch(metricsControllerProvider);

@@ -132,14 +132,18 @@ class MetricsController extends _$MetricsController {
   }
 
   Future<double?> getLatestWeight() async {
-    final weigthHistory = await _weightRepository.getWeightHistory();
+    final weigthHistory = await _weightRepository.getLatestWeightEntry();
 
-    if (weigthHistory.isNotEmpty) {
-      final latestEntry = weigthHistory
-          .reduce((a, b) => a.timestamp.isAfter(b.timestamp) ? a : b);
-      return latestEntry.weight;
-    }
-    return null;
+    if (weigthHistory == null) return null;
+    return weigthHistory.weight;
+  }
+
+  Future<List<WeightEntry>> getWeightEntryPastMonth() async {
+    return await _weightRepository.getWeightHistoryPastMonth();
+  }
+
+  Future<List<WeightEntry>> getWeightEntryPastyear() async {
+    return await _weightRepository.getWeightHistoryPastYear();
   }
 
   //Handle the height

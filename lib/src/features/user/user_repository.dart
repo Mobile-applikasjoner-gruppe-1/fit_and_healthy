@@ -3,6 +3,12 @@ import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_
 import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/user/user_model.dart';
 
+final userConverter = (
+  fromFirestore: (snapshot, _) =>
+      UserModel.fromFirestore(snapshot.data(), snapshot.id),
+  toFirestore: (UserModel userModel, _) => userModel.toFirestore(),
+);
+
 class UserRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuthRepository _authRepository;
@@ -10,9 +16,8 @@ class UserRepository {
   UserRepository(this._authRepository);
 
   Future<void> updateUser(UserModel user) async {
-    print('Updating user');
     final AuthUser authUser = _authRepository.currentUser!;
-    print(authUser.firebaseUser.uid);
+
     final userDoc =
         _firestore.collection('users').doc(authUser.firebaseUser.uid);
     print('Found collection');
