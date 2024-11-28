@@ -4,20 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ForgotPasswordView extends ConsumerStatefulWidget {
-  static const route = '/forgot-password';
-  static const routeName = 'Forgot Password';
+class AddDisplayNameView extends ConsumerStatefulWidget {
+  static const route = '/add-display-name';
+  static const routeName = 'Add Display Name';
 
-  const ForgotPasswordView({super.key});
+  const AddDisplayNameView({super.key});
 
   @override
-  _ForgotPasswordViewState createState() => _ForgotPasswordViewState();
+  _AddDisplayNameViewState createState() => _AddDisplayNameViewState();
 }
 
-class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
-  final TextEditingController _emailController = TextEditingController();
-
+class _AddDisplayNameViewState extends ConsumerState<AddDisplayNameView> {
   final double gapSize = Sizes.s200;
+
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Sending reset email...'),
+                  content: Text('Saving display name...'),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
               );
@@ -48,7 +49,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Reset email sent successfully.'),
+                  content: Text('Display name saved successfully.'),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -80,10 +81,8 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(ForgotPasswordView.routeName),
-        centerTitle: true,
-      ),
+      appBar:
+          AppBar(title: Text(AddDisplayNameView.routeName), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.only(
           left: Sizes.s200,
@@ -95,35 +94,71 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
           physics: ClampingScrollPhysics(),
           children: [
             Text(
-              'Enter the email address associated with your account and we will send you an email with instructions to reset your password.',
+              'Please enter your first and last name to complete your registration.',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: gapSize),
             Text(
-              'Email',
+              'First Name',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: Sizes.s100),
             TextFormField(
-              controller: _emailController,
+              controller: _firstNameController,
               decoration: InputDecoration(
-                labelText: 'Email',
+                labelText: 'First Name',
                 border: OutlineInputBorder(),
                 floatingLabelBehavior: FloatingLabelBehavior.never,
               ),
-              keyboardType: TextInputType.emailAddress,
-              autofillHints: [AutofillHints.email],
+              keyboardType: TextInputType.name,
+              autofillHints: [AutofillHints.givenName],
+            ),
+            SizedBox(height: gapSize),
+            Text(
+              'Last Name',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: Sizes.s100),
+            TextFormField(
+              controller: _lastNameController,
+              decoration: InputDecoration(
+                labelText: 'Last Name',
+                border: OutlineInputBorder(),
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+              ),
+              keyboardType: TextInputType.name,
+              autofillHints: [AutofillHints.familyName],
             ),
             SizedBox(height: gapSize),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  ref
-                      .read(authControllerProvider.notifier)
-                      .sendPasswordResetEmail(_emailController.text);
+                  ref.read(authControllerProvider.notifier).updateDisplayName(
+                        _firstNameController.text,
+                        _lastNameController.text,
+                      );
                 },
-                child: Text('Send Reset Email'),
+                child: Text('Save Display Name'),
+              ),
+            ),
+            SizedBox(height: gapSize),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                ref.read(authControllerProvider.notifier).signOut();
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: Sizes.s50),
+                child: Text(
+                  'Sign in with a different account',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryTextTheme.bodySmall!.color,
+                    decoration: TextDecoration.underline,
+                    decorationColor:
+                        Theme.of(context).primaryTextTheme.bodySmall!.color,
+                  ),
+                ),
               ),
             ),
           ],

@@ -43,15 +43,11 @@ class AuthController extends _$AuthController {
   Future<void> createUserWithEmailAndPassword({
     required String email,
     required String password,
-    required String firstName,
-    required String lastName,
   }) async {
     state = AsyncValue.data(AuthLoadingState.loading());
     try {
       final authRepository = ref.read(firebaseAuthRepositoryProvider);
       await authRepository.createUserWithEmailAndPassword(
-        firstName: firstName,
-        lastName: lastName,
         email: email,
         password: password,
       );
@@ -97,6 +93,17 @@ class AuthController extends _$AuthController {
     try {
       final authRepository = ref.read(firebaseAuthRepositoryProvider);
       await authRepository.sendPasswordResetEmail(email);
+      state = AsyncValue.data(AuthLoadingState.success());
+    } on Exception catch (e) {
+      state = AsyncValue.data(AuthLoadingState.error(e));
+    }
+  }
+
+  Future<void> updateDisplayName(String firstName, String lastName) async {
+    state = AsyncValue.data(AuthLoadingState.loading());
+    try {
+      final authRepository = ref.read(firebaseAuthRepositoryProvider);
+      await authRepository.updateDisplayName(firstName, lastName);
       state = AsyncValue.data(AuthLoadingState.success());
     } on Exception catch (e) {
       state = AsyncValue.data(AuthLoadingState.error(e));
