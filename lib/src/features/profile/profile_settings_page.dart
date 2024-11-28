@@ -24,6 +24,14 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     final metricsState = ref.watch(metricsControllerProvider);
     final theme = Theme.of(context);
 
+    if (metricsState is AsyncLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (metricsState is AsyncError) {
+      return Center(child: Text('Error: ${metricsState.error}'));
+    }
+
     final height = metricsState.asData?.value['height'].toInt() ?? 170;
     final gender = metricsState.asData?.value['gender'] ?? Gender.male;
     final birthday = metricsState.asData?.value['birthday'];
@@ -192,7 +200,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         if (newHeight != null) {
           await ref
               .read(metricsControllerProvider.notifier)
-              .updateHeight(newHeight);
+              .updateUser(key: 'height', value: newHeight);
         }
       },
     );

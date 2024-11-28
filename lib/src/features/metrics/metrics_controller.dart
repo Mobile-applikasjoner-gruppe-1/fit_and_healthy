@@ -3,6 +3,7 @@ import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/src/features/user/user_model.dart';
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 import 'package:fit_and_healthy/src/features/user/weight_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -26,6 +27,7 @@ class MetricsController extends _$MetricsController {
     if (userData == null) throw Exception('UserModel not found');
 
     return {
+      'id': userData.id,
       'weightHistory': weightHistory,
       'height': userData.height,
       'gender': userData.gender,
@@ -34,6 +36,70 @@ class MetricsController extends _$MetricsController {
       'weightGoal': userData.weightGoal,
       'intensityLevel': userData.activityLevel,
     };
+  }
+
+  Future<void> updateUser({required String key, required dynamic value}) async {
+    final currentUserMap = state.asData?.value;
+
+    print('Current user map: $currentUserMap'); // Add this to debug
+
+    if (currentUserMap == null) return;
+
+    try {
+      // Ensure the 'id' field is properly assigned
+      final userId = currentUserMap['id'];
+      if (userId == null || userId is! String) {
+        throw Exception("Invalid or missing user ID");
+      }
+
+      // Create a UserModel using the current map and updated field
+      final currentUser = UserModel(
+        id: userId,
+        height: currentUserMap['height'],
+        gender: currentUserMap['gender'],
+        birthday: currentUserMap['birthday'],
+        weeklyWorkoutGoal: currentUserMap['weeklyWorkoutGoal'],
+        weightGoal: currentUserMap['weightGoal'],
+        activityLevel:
+            currentUserMap['activityLevel'] ?? ActivityLevel.moderatelyActive,
+      );
+
+      UserModel updatedUser;
+      switch (key) {
+        case 'height':
+          updatedUser = currentUser.copyWith(height: value as double);
+          break;
+        case 'gender':
+          updatedUser = currentUser.copyWith(gender: value as Gender);
+          break;
+        case 'birthday':
+          updatedUser = currentUser.copyWith(birthday: value as DateTime?);
+          break;
+        case 'weeklyWorkoutGoal':
+          updatedUser = currentUser.copyWith(weeklyWorkoutGoal: value as int);
+          break;
+        case 'weightGoal':
+          updatedUser = currentUser.copyWith(weightGoal: value as WeightGoal);
+          break;
+        case 'activityLevel':
+          updatedUser =
+              currentUser.copyWith(activityLevel: value as ActivityLevel);
+          break;
+        default:
+          throw Exception('Unsupported key: $key');
+      }
+
+      // Update Firebase
+      await _userRepository.updateUser(updatedUser);
+
+      // Invalidate the provider to fetch fresh data
+      ref.invalidate(metricsControllerProvider);
+
+      print('Firebase and local state updated successfully.');
+    } catch (e, stack) {
+      print('Failed to update Firebase: $e');
+      print(stack);
+    }
   }
 
   Future<void> addWeightEntry(double weight, DateTime date) async {
