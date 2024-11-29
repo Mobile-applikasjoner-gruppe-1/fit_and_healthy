@@ -9,7 +9,7 @@ void main() {
 
   group('Meal Nutrition Calculation', () {
     test('Add food items by barcode and calculate total nutrition', () async {
-      final meal = Meal(name: 'Dinner');
+      final meal = Meal(name: 'Dinner', timestamp: DateTime.now(), id: '1');
 
       // List of test items with their barcodes and desired grams
       final testItems = [

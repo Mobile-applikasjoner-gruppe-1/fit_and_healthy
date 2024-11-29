@@ -17,7 +17,7 @@ void main() {
         'fiber': 2.0,
         'carbs': 20.0,
       });
-      final meal = Meal(name: 'Breakfast');
+      final meal = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
       foodItem.setGrams(100);
       meal.addFoodItem(foodItem); // Add food item to meal
 
@@ -32,8 +32,8 @@ void main() {
     test('Removing a Meal', () {
       // Arrange
       final mealHolder = MealHolder(date: DateTime.now());
-      final meal1 = Meal(name: 'Breakfast');
-      final meal2 = Meal(name: 'Lunch');
+      final meal1 = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
+      final meal2 = Meal(name: 'Lunch', timestamp: DateTime.now(), id: '3');
       mealHolder.addMeal(meal1);
       mealHolder.addMeal(meal2);
 
@@ -76,10 +76,10 @@ void main() {
         'fiber': 9.0,
         'carbs': 40.0,
       });
-      final meal1 = Meal(name: 'Breakfast');
+      final meal1 = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
       foodItem1.setGrams(100);
       meal1.addFoodItem(foodItem1);
-      final meal2 = Meal(name: 'Lunch');
+      final meal2 = Meal(name: 'Lunch', timestamp: DateTime.now(), id: '3');
       foodItem2.setGrams(200);
       foodItem3.setGrams(50);
       meal2.addFoodItem(foodItem2);
@@ -114,7 +114,7 @@ void main() {
         'carbs': 20.0,
       });
       foodItem.setGrams(100);
-      final meal = Meal(name: 'Breakfast');
+      final meal = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
       meal.addFoodItem(foodItem);
       mealHolder.addMeal(meal);
 

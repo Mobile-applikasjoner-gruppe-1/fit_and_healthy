@@ -1,6 +1,7 @@
 import 'mealHolderClass.dart';
 import 'mealClass.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'meal_controller.g.dart';
 
@@ -15,7 +16,8 @@ class MealController extends _$MealController {
 
   /// Adds a meal to the MealHolder
   void addMeal(String name) async {
-    final newMeal = Meal(name: name);
+    final newMeal =
+        Meal(name: name, timestamp: DateTime.now(), id: Uuid().v4());
     final previousState = await future;
     newMeal.addChangeNotifier(() {
       calculateTotalNutrition();
