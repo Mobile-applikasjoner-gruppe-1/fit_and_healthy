@@ -1,6 +1,6 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/fooditem.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealClass.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealHolderClass.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal_holder.dart';
 import 'package:flutter_test/flutter_test.dart'; // Import Flutter's testing library
 
 void main() {
@@ -17,8 +17,9 @@ void main() {
         'fiber': 2.0,
         'carbs': 20.0,
       });
-      final meal = Meal(name: 'Breakfast');
-      meal.addFoodItem(foodItem, 100); // Add food item to meal
+      final meal = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
+      foodItem.setGrams(100);
+      meal.addFoodItem(foodItem); // Add food item to meal
 
       // Act
       mealHolder.addMeal(meal);
@@ -31,8 +32,8 @@ void main() {
     test('Removing a Meal', () {
       // Arrange
       final mealHolder = MealHolder(date: DateTime.now());
-      final meal1 = Meal(name: 'Breakfast');
-      final meal2 = Meal(name: 'Lunch');
+      final meal1 = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
+      final meal2 = Meal(name: 'Lunch', timestamp: DateTime.now(), id: '3');
       mealHolder.addMeal(meal1);
       mealHolder.addMeal(meal2);
 
@@ -75,17 +76,21 @@ void main() {
         'fiber': 9.0,
         'carbs': 40.0,
       });
-      final meal1 = Meal(name: 'Breakfast');
-      meal1.addFoodItem(foodItem1, 100);
-      final meal2 = Meal(name: 'Lunch');
-      meal2.addFoodItem(foodItem2, 200);
-      meal2.addFoodItem(foodItem3, 50);
+      final meal1 = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
+      foodItem1.setGrams(100);
+      meal1.addFoodItem(foodItem1);
+      final meal2 = Meal(name: 'Lunch', timestamp: DateTime.now(), id: '3');
+      foodItem2.setGrams(200);
+      foodItem3.setGrams(50);
+      meal2.addFoodItem(foodItem2);
+      meal2.addFoodItem(foodItem3);
 
       mealHolder.addMeal(meal1);
       mealHolder.addMeal(meal2);
 
       // Act
-      final totalNutrition = mealHolder.calculateTotalNutrition();
+      mealHolder.calculateTotalNutrition();
+      final totalNutrition = mealHolder.totalNutrition;
 
       // Assert
       expect(totalNutrition['calories'], 550.0);
@@ -108,8 +113,9 @@ void main() {
         'fiber': 2.0,
         'carbs': 20.0,
       });
-      final meal = Meal(name: 'Breakfast');
-      meal.addFoodItem(foodItem, 100);
+      foodItem.setGrams(100);
+      final meal = Meal(name: 'Breakfast', timestamp: DateTime.now(), id: '2');
+      meal.addFoodItem(foodItem);
       mealHolder.addMeal(meal);
 
       // Act

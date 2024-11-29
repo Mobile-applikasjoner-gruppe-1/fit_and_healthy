@@ -1,5 +1,5 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/fooditem.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/openFoodApi.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
+import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -8,7 +8,8 @@ void main() {
   group('OpenFoodApi', () {
     test('searchProductsByName returns a list of FoodItems', () async {
       final results = await api.searchProductsByName('Kalkunfilet Naturell');
-      final foodItems = results.map((json) => FoodItem.fromJson(json)).toList();
+      final foodItems =
+          results.map((json) => FoodItem.fromFoodFactsJson(json)).toList();
 
       expect(foodItems.isNotEmpty, true);
       expect(foodItems.first.name.isNotEmpty, true);
@@ -22,7 +23,7 @@ void main() {
       final result = await api.fetchProductByBarcode(barcode);
 
       if (result != null) {
-        final foodItem = FoodItem.fromJson(result);
+        final foodItem = FoodItem.fromFoodFactsJson(result);
         expect(foodItem.name.isNotEmpty, true);
         expect(foodItem.nutritionInfo.isNotEmpty, true);
         print('Test passed: fetchProductByBarcode returned a valid product');
