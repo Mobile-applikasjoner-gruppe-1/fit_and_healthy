@@ -59,19 +59,14 @@ class FirebaseAuthRepository {
   }
 
   Future<void> createUserWithEmailAndPassword({
-    required String firstName,
-    required String lastName,
     required String email,
     required String password,
   }) async {
-    final creds = await _firebaseAuth.createUserWithEmailAndPassword(
+    // final creds =
+    await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    await creds.user?.updateDisplayName('$firstName $lastName');
-
-    // Doing this when the user is sent to the email verification page instead
-    // await creds.user?.sendEmailVerification();
   }
 
   Future<void> signInWithProvider(SupportedAuthProvider provider) async {
@@ -141,6 +136,23 @@ class FirebaseAuthRepository {
     await user.reload();
 
     if (user.emailVerified) {
+      await user.getIdToken(true);
+    }
+  }
+
+  Future<void> updateDisplayName(String firstName, String lastName) async {
+    if (_firebaseAuth.currentUser == null) {
+      throw Exception('No user is currently signed in');
+    }
+
+    User user = _firebaseAuth.currentUser!;
+    String newDisplayName = '$firstName $lastName';
+
+    await user.updateDisplayName(newDisplayName);
+
+    await user.reload();
+
+    if (user.displayName == newDisplayName) {
       await user.getIdToken(true);
     }
   }

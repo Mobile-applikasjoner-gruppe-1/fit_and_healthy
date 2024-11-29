@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/features/auth/add_display_name/add_display_name_view.dart';
 import 'package:fit_and_healthy/src/features/auth/email_verification/email_verification_view.dart';
 import 'package:fit_and_healthy/src/features/routing/app_router_redirect.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
@@ -148,10 +149,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: LoginView.route,
         name: LoginView.routeName,
-        pageBuilder: (context, state) {
-          return CupertinoPage(
-            child: LoginView(),
-          );
+        builder: (context, state) {
+          return LoginView();
         },
       ),
       GoRoute(
@@ -173,6 +172,13 @@ GoRouter appRouter(Ref ref) {
         name: EmailVerificationView.routeName,
         builder: (context, state) {
           return EmailVerificationView();
+        },
+      ),
+      GoRoute(
+        path: AddDisplayNameView.route,
+        name: AddDisplayNameView.routeName,
+        builder: (context, state) {
+          return AddDisplayNameView();
         },
       ),
     ],
