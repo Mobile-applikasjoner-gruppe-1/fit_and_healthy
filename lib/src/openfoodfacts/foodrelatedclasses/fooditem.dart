@@ -1,3 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+enum NutritionInfoKey {
+  calories,
+  protein,
+  fat,
+  sugars,
+  fiber,
+  carbs,
+}
+
 class FoodItem {
   final String name;
   final String barcode;
@@ -51,12 +62,16 @@ class FoodItem {
       allergens: json['allergens'],
       servingSize: json['serving_size'],
       nutritionInfo: {
-        'calories': (nutriments['energy-kcal_100g'] ?? 0).toDouble(),
-        'protein': (nutriments['proteins_100g'] ?? 0).toDouble(),
-        'fat': (nutriments['fat_100g'] ?? 0).toDouble(),
-        'sugars': (nutriments['sugars_100g'] ?? 0).toDouble(),
-        'fiber': (nutriments['fiber_100g'] ?? 0).toDouble(),
-        'carbs': (nutriments['carbohydrates_100g'] ?? 0).toDouble(),
+        NutritionInfoKey.calories.name:
+            (nutriments['energy-kcal_100g'] ?? 0).toDouble(),
+        NutritionInfoKey.protein.name:
+            (nutriments['proteins_100g'] ?? 0).toDouble(),
+        NutritionInfoKey.fat.name: (nutriments['fat_100g'] ?? 0).toDouble(),
+        NutritionInfoKey.sugars.name:
+            (nutriments['sugars_100g'] ?? 0).toDouble(),
+        NutritionInfoKey.fiber.name: (nutriments['fiber_100g'] ?? 0).toDouble(),
+        NutritionInfoKey.carbs.name:
+            (nutriments['carbohydrates_100g'] ?? 0).toDouble(),
       },
       grams: json['grams'],
     );
@@ -92,12 +107,110 @@ class FoodItem {
 
   Map<String, double> calculateNutrition() {
     return {
-      'calories': nutritionInfo['calories']! * _grams / 100,
-      'protein': nutritionInfo['protein']! * _grams / 100,
-      'fat': nutritionInfo['fat']! * _grams / 100,
-      'sugars': nutritionInfo['sugars']! * _grams / 100,
-      'fiber': nutritionInfo['fiber']! * _grams / 100,
-      'carbs': nutritionInfo['carbs']! * _grams / 100,
+      NutritionInfoKey.calories.name:
+          nutritionInfo[NutritionInfoKey.calories.name]! * _grams / 100,
+      NutritionInfoKey.protein.name:
+          nutritionInfo[NutritionInfoKey.protein.name]! * _grams / 100,
+      NutritionInfoKey.fat.name:
+          nutritionInfo[NutritionInfoKey.fat.name]! * _grams / 100,
+      NutritionInfoKey.sugars.name:
+          nutritionInfo[NutritionInfoKey.sugars.name]! * _grams / 100,
+      NutritionInfoKey.fiber.name:
+          nutritionInfo[NutritionInfoKey.fiber.name]! * _grams / 100,
+      NutritionInfoKey.carbs.name:
+          nutritionInfo[NutritionInfoKey.carbs.name]! * _grams / 100,
+    };
+  }
+
+  static Map<String, double> nutritionInfoFromDynamic(dynamic data) {
+    if (data == null) {
+      throw Exception('nutritionInfo data is null');
+    }
+
+    if (data is Map<String, dynamic>) {
+      return data.map((key, value) {
+        if (NutritionInfoKey.values.contains(key) && value is num) {
+          return MapEntry(key.toString(), value.toDouble());
+        } else {
+          throw Exception('Invalid nutritionInfo data');
+        }
+      });
+    } else {
+      throw Exception('Invalid nutritionInfo data');
+    }
+  }
+
+  factory FoodItem.fromFirebase(
+      DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    final data = snapshot.data();
+    if (data == null) {
+      throw Exception('Document data is null');
+    }
+
+    final name = data['name'];
+    final barcode = data['barcode'];
+    final imageUrl = data['imageUrl'];
+    final ingredients = data['ingredients'];
+    final allergens = data['allergens'];
+    final servingSize = data['servingSize'];
+    final grams = data['grams'];
+
+    if (name == null || !name is String || (name as String).isEmpty) {
+      throw Exception('Invalid name');
+    }
+
+    if (barcode == null || !barcode is String || (barcode as String).isEmpty) {
+      throw Exception('Invalid barcode');
+    }
+
+    if (imageUrl != null &&
+        (!imageUrl is String || (imageUrl as String).isEmpty)) {
+      throw Exception('Invalid imageUrl');
+    }
+
+    if (ingredients != null &&
+        (!ingredients is String || (ingredients as String).isEmpty)) {
+      throw Exception('Invalid ingredients');
+    }
+
+    if (allergens != null &&
+        (!allergens is String || (allergens as String).isEmpty)) {
+      throw Exception('Invalid allergens');
+    }
+
+    if (servingSize != null &&
+        (!servingSize is String || (servingSize as String).isEmpty)) {
+      throw Exception('Invalid servingSize');
+    }
+
+    if (grams == null || !grams is double || (grams as double) <= 0) {
+      throw Exception('Invalid grams');
+    }
+
+    final nutritionInfo = nutritionInfoFromDynamic(data['nutritionInfo']);
+
+    return FoodItem(
+      name: name,
+      barcode: barcode,
+      imageUrl: imageUrl,
+      ingredients: ingredients,
+      allergens: allergens,
+      servingSize: servingSize,
+      nutritionInfo: nutritionInfo,
+      grams: grams,
+    );
+  }
+
+  Map<String, dynamic> toFirebase() {
+    return {
+      'name': name,
+      'barcode': barcode,
+      'imageUrl': imageUrl,
+      'ingredients': ingredients,
+      'allergens': allergens,
+      'servingSize': servingSize,
+      'nutritionInfo': nutritionInfo,
+      'grams': _grams,
     };
   }
 }

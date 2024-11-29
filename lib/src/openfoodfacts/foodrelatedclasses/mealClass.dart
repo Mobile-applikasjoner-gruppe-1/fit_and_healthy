@@ -1,15 +1,15 @@
-import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'fooditem.dart'; // For unique ID generation
 
 class Meal {
   final String id; // Unique identifier for the meal
   final String name; // Name of the meal
+  final DateTime timestamp; // Time for the meal
   final List<FoodItem> _items = []; // Food items in the meal
   final List<Function> changeNotifiers = [];
 
-  Meal({required this.name})
-      : id = Uuid().v4(); // Generate a unique ID using the uuid package
+  Meal({required this.name, required this.timestamp, required this.id});
 
   void addChangeNotifier(Function notifier) {
     changeNotifiers.add(notifier);
@@ -86,11 +86,49 @@ class Meal {
 
   // Factory constructor to create Meal from JSON
   factory Meal.fromJson(Map<String, dynamic> json) {
-    final meal = Meal(name: json['name']);
+    final meal = Meal(
+        name: json['name'],
+        timestamp: DateTime.parse(json['timestamp']),
+        id: json['id']);
     for (var item in json['items']) {
       final foodItem = FoodItem.fromFoodFactsJson(item['foodItem']);
       meal.addFoodItem(foodItem);
     }
     return meal;
+  }
+
+  Map<String, dynamic> toFirebase() {
+    return {
+      'name': name,
+      'timestamp': Timestamp.fromDate(timestamp),
+    };
+  }
+
+  factory Meal.fromFirebase(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    final data = snapshot.data();
+    if (data == null) {
+      throw Exception('Document data is null for document ID: ${snapshot.id}');
+    }
+
+    final name = data['name'];
+    final timestamp = data['timestamp'];
+
+    if (name == null || timestamp == null) {
+      throw Exception('Document data is missing required fields');
+    }
+
+    if (!name is String) {
+      throw Exception('Name is not a string');
+    }
+
+    if (!timestamp is Timestamp) {
+      throw Exception('Timestamp is not a Timestamp');
+    }
+
+    return Meal(
+      name: name,
+      timestamp: timestamp.toDate(),
+      id: snapshot.id,
+    );
   }
 }
