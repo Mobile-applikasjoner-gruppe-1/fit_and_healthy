@@ -1,4 +1,6 @@
-import 'package:fit_and_healthy/src/features/app_router/app_router_redirect.dart';
+import 'package:fit_and_healthy/src/features/auth/add_display_name/add_display_name_view.dart';
+import 'package:fit_and_healthy/src/features/auth/email_verification/email_verification_view.dart';
+import 'package:fit_and_healthy/src/features/routing/app_router_redirect.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_password_view.dart';
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
@@ -37,8 +39,7 @@ GoRouter appRouter(Ref ref) {
   final firebaseAuthRepository = ref.watch(firebaseAuthRepositoryProvider);
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    refreshListenable:
-        StreamListenable(firebaseAuthRepository.authStateChanges()),
+    refreshListenable: StreamListenable(firebaseAuthRepository.userChanges()),
     redirect: (context, state) =>
         appRouterRedirectHandler(context, state, firebaseAuthRepository),
     routes: [
@@ -154,10 +155,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: LoginView.route,
         name: LoginView.routeName,
-        pageBuilder: (context, state) {
-          return CupertinoPage(
-            child: LoginView(),
-          );
+        builder: (context, state) {
+          return LoginView();
         },
       ),
       GoRoute(
@@ -172,6 +171,20 @@ GoRouter appRouter(Ref ref) {
         name: ForgotPasswordView.routeName,
         builder: (context, state) {
           return ForgotPasswordView();
+        },
+      ),
+      GoRoute(
+        path: EmailVerificationView.route,
+        name: EmailVerificationView.routeName,
+        builder: (context, state) {
+          return EmailVerificationView();
+        },
+      ),
+      GoRoute(
+        path: AddDisplayNameView.route,
+        name: AddDisplayNameView.routeName,
+        builder: (context, state) {
+          return AddDisplayNameView();
         },
       ),
     ],

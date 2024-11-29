@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fit_and_healthy/src/features/auth/app_user_model.dart';
+import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -19,27 +19,30 @@ FirebaseAuthRepository firebaseAuthRepository(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-Stream<AppUser?> firebaseAuthStateChange(Ref ref) {
+Stream<AuthUser?> firebaseAuthStateChange(Ref ref) {
   final auth = ref.watch(firebaseAuthRepositoryProvider);
-  return auth.authStateChanges();
+  return auth.userChanges();
 }
 
 class FirebaseAuthRepository {
   FirebaseAuthRepository(this._firebaseAuth);
 
   final FirebaseAuth _firebaseAuth;
+  AuthUser? _authUser = null;
 
-  DateTime? emailVerificationLastSent;
+  Stream<AuthUser?> userChanges() {
+    return _firebaseAuth.userChanges().map((user) {
+      if (user == null) {
+        _authUser = null;
+        return null;
+      }
 
-  AppUser? _convertUser(User? user) {
-    return user == null ? null : AppUser.fromFirebaseUser(user);
+      _authUser = AuthUser(firebaseUser: user);
+      return _authUser;
+    });
   }
 
-  Stream<AppUser?> authStateChanges() {
-    return _firebaseAuth.authStateChanges().map(_convertUser);
-  }
-
-  AppUser? get currentUser => _convertUser(_firebaseAuth.currentUser);
+  AuthUser? get currentUser => _authUser;
 
   Future<void> signInWithEmailAndPassword({
     required String email,
@@ -56,17 +59,14 @@ class FirebaseAuthRepository {
   }
 
   Future<void> createUserWithEmailAndPassword({
-    required String firstName,
-    required String lastName,
     required String email,
     required String password,
   }) async {
-    final creds = await _firebaseAuth.createUserWithEmailAndPassword(
+    // final creds =
+    await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    await creds.user?.updateDisplayName('$firstName $lastName');
-    await creds.user?.sendEmailVerification();
   }
 
   Future<void> signInWithProvider(SupportedAuthProvider provider) async {
@@ -115,13 +115,45 @@ class FirebaseAuthRepository {
       throw Exception('User was created without email verification');
     }
 
-    if (emailVerificationLastSent != null &&
-        DateTime.now().difference(emailVerificationLastSent!) <
-            Duration(seconds: 30)) {
-      throw Exception('Email verification already sent');
+    await _firebaseAuth.currentUser!.sendEmailVerification();
+  }
+
+  Future<void> verifyEmail() async {
+    if (_firebaseAuth.currentUser == null) {
+      throw Exception('No user is currently signed in');
     }
 
-    await _firebaseAuth.currentUser?.sendEmailVerification();
-    emailVerificationLastSent = DateTime.now();
+    User user = _firebaseAuth.currentUser!;
+
+    if (user.emailVerified) {
+      throw Exception('Email is already verified');
+    }
+
+    if (user.email == null || user.email!.isEmpty) {
+      throw Exception('User was created without email verification');
+    }
+
+    await user.reload();
+
+    if (user.emailVerified) {
+      await user.getIdToken(true);
+    }
+  }
+
+  Future<void> updateDisplayName(String firstName, String lastName) async {
+    if (_firebaseAuth.currentUser == null) {
+      throw Exception('No user is currently signed in');
+    }
+
+    User user = _firebaseAuth.currentUser!;
+    String newDisplayName = '$firstName $lastName';
+
+    await user.updateDisplayName(newDisplayName);
+
+    await user.reload();
+
+    if (user.displayName == newDisplayName) {
+      await user.getIdToken(true);
+    }
   }
 }

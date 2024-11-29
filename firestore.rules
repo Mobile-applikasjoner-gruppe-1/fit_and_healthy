@@ -1,0 +1,116 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      function isUserWithGivenId() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isValidUserCreate() {
+        // Add your validation logic for creating a user here
+        // return request.resource.data.keys().hasAll([]) &&
+        return true;
+      }
+
+      function isValidUserUpdate() {
+        // Add your validation logic for updating a user here
+        return true;
+      }
+
+      allow read: if isUserWithGivenId();
+      allow create: if isUserWithGivenId() && isValidUserCreate();
+      allow update: if isUserWithGivenId() && isValidUserUpdate();
+      allow delete: if isUserWithGivenId();
+    
+      match /workouts/{workoutId} {
+        function isValidWorkoutCreate() {
+          // Add your validation logic for creating a workout here
+          return true;
+        }
+
+        function isValidWorkoutUpdate() {
+          // Add your validation logic for updating a workout here
+          return true;
+        }
+        
+        allow read: if isUserWithGivenId();
+        allow create: if isUserWithGivenId() && isValidWorkoutCreate();
+        allow update: if isUserWithGivenId() && isValidWorkoutUpdate();
+        allow delete: if isUserWithGivenId();
+        
+        match /exercises/{exerciseId} {
+          function isValidExerciseCreate() {
+            // Add your validation logic for creating an exercise here
+            return true;
+          }
+
+          function isValidExerciseUpdate() {
+            // Add your validation logic for updating an exercise here
+            return true;
+          }
+
+          allow read: if isUserWithGivenId();
+          allow create: if isUserWithGivenId() && isValidExerciseCreate();
+          allow update: if isUserWithGivenId() && isValidExerciseUpdate();
+          allow delete: if isUserWithGivenId();
+        }
+      }
+
+      match /meals/{mealId} {
+        function isValidMealCreate() {
+          // Add your validation logic for creating a meal here
+          return true;
+        }
+
+        function isValidMealUpdate() {
+          // Add your validation logic for updating a meal here
+          return true;
+        }
+
+        allow read: if isUserWithGivenId();
+        allow create: if isUserWithGivenId() && isValidMealCreate();
+        allow update: if isUserWithGivenId() && isValidMealUpdate();
+        allow delete: if isUserWithGivenId();
+        
+        match /items/{itemId} {
+          function isValidMealItemCreate() {
+            // Add your validation logic for creating an item here
+            return true;
+          }
+
+          function isValidMealItemUpdate() {
+            // Add your validation logic for updating an item here
+            return true;
+          }
+
+          allow read: if isUserWithGivenId();
+          allow create: if isUserWithGivenId() && isValidMealItemCreate();
+          allow update: if isUserWithGivenId() && isValidMealItemUpdate();
+          allow delete: if isUserWithGivenId();
+        }
+      }
+
+      match /weightEntry/{weightEntryId} {
+        function isValidWeightEntryCreate() {
+          // Add your validation logic for creating a weight entry here
+          return true;
+        }
+
+        function isValidWeightEntryUpdate() {
+          // Add your validation logic for updating a weight entry here
+          return true;
+        }
+
+        allow read: if isUserWithGivenId();
+        allow create: if isUserWithGivenId() && isValidWeightEntryCreate();
+        allow update: if isUserWithGivenId() && isValidWeightEntryUpdate();
+        allow delete: if isUserWithGivenId();
+      }
+    }
+  }
+}
+
+// function isEmailAndEmailVerified(request) {
+//  return request.auth.token.email != null && request.auth.token.email_verified;
+// }

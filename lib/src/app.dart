@@ -1,10 +1,12 @@
-import 'package:fit_and_healthy/src/features/app_router/app_router.dart';
+import 'package:fit_and_healthy/src/features/routing/app_router.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 /// The Widget that configures your application.
 class MyApp extends ConsumerWidget {
@@ -59,13 +61,25 @@ class MyApp extends ConsumerWidget {
             // Define a light and dark color theme. Then, read the user's
             // preferred ThemeMode (light, dark, or system default) from the
             // SettingsController to display the correct theme.
-            theme: snapshot.data!.themeMode == ThemeMode.dark
-                ? CupertinoThemeData(brightness: Brightness.dark)
-                : CupertinoThemeData(brightness: Brightness.light),
+            theme: CupertinoThemeData(
+              brightness: snapshot.data!.themeMode == ThemeMode.dark
+                  ? Brightness.dark
+                  : snapshot.data!.themeMode == ThemeMode.light
+                      ? Brightness.light
+                      : MediaQuery.platformBrightnessOf(context),
+              primaryColor: Colors.blue,
+            ),
             // darkTheme: ThemeData.dark(),
             // themeMode: snapshot.data!.themeMode,
 
             routerConfig: appRouter,
+
+            builder: (context, child) {
+              return ScaffoldMessenger(
+                key: scaffoldMessengerKey,
+                child: child!,
+              );
+            },
           );
         });
   }
