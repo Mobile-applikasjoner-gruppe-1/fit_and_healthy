@@ -1,11 +1,10 @@
 // NutritionScreen.dart
 
+import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_search_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_creation_screen.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'fooditemwidgets/foodSearchScreen.dart';
-import 'mealCreationScreen.dart';
 
 class NutritionScreen extends StatelessWidget {
   static const route = '/nutrition';

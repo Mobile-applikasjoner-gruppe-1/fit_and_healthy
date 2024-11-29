@@ -1,10 +1,9 @@
 // FoodSearchScreen.dart
+import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
+import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_item_widget.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
-
-import '../foodrelatedclasses/fooditem.dart';
-import '../openFoodApi.dart';
-import 'fooditemwidget.dart';
 
 class FoodSearchScreen extends StatefulWidget {
   static const route = '/search';

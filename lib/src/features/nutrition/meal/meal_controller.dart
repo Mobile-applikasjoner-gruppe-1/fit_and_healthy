@@ -1,5 +1,5 @@
-import 'mealHolderClass.dart';
-import 'mealClass.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal_holder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 

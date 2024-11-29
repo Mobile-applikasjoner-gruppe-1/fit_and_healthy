@@ -1,6 +1,5 @@
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
 import 'package:uuid/uuid.dart';
-
-import 'mealClass.dart'; // Import for unique ID generation
 
 /// remember change the date part
 

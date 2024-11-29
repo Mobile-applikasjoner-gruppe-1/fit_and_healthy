@@ -13,9 +13,9 @@ import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_pag
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/fooditemwidgets/foodSearchScreen.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/mealCreationScreen.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/nutritionScreen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_search_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_creation_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/nutrition_screen.dart';
 import 'package:fit_and_healthy/src/utils/stream_listenable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

@@ -1,6 +1,6 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/fooditem.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealClass.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealHolderClass.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal_holder.dart';
 import 'package:flutter_test/flutter_test.dart'; // Import Flutter's testing library
 
 void main() {

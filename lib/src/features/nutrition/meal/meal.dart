@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'fooditem.dart'; // For unique ID generation
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 
 class Meal {
   final String id; // Unique identifier for the meal

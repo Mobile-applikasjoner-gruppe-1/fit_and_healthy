@@ -1,4 +1,4 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/fooditem.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:flutter/material.dart';
 
 /// food widget that shows the product

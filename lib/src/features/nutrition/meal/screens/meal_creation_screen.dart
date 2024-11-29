@@ -1,7 +1,7 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/meal_controller.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal_controller.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'mealDetailScreen.dart';
 
 class MealListScreen extends ConsumerWidget {
   static const route = '/create-meal';

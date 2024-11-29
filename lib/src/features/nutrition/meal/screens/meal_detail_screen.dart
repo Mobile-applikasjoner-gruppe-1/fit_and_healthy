@@ -1,8 +1,7 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealClass.dart';
+import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:flutter/material.dart';
-
-import 'foodrelatedclasses/fooditem.dart';
-import 'openFoodApi.dart';
 
 class MealDetailScreen extends StatefulWidget {
   final Meal meal;

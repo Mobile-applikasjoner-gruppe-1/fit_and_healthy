@@ -1,5 +1,5 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/fooditem.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/openFoodApi.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
+import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

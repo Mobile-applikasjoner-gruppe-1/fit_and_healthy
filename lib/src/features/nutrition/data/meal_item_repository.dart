@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/fooditem.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 
 final mealItemConverter = (
   fromFirestore: (snapshot, _) => FoodItem.fromFirebase(snapshot),
