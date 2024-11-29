@@ -32,9 +32,15 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
       return Center(child: Text('Error: ${metricsState.error}'));
     }
 
-    final height = metricsState.asData?.value['height'].toInt() ?? 170;
-    final gender = metricsState.asData?.value['gender'] ?? Gender.male;
-    final birthday = metricsState.asData?.value['birthday'];
+    final data = metricsState.value;
+
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
+
+    final height = data.height;
+    final gender = data.gender;
+    final birthday = data.birthday;
 
     return NestedScaffold(
       appBar: AppBar(
@@ -173,7 +179,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
   Widget _buildEditableHeightField(
     BuildContext contex,
     WidgetRef ref,
-    int height,
+    double height,
   ) {
     final theme = Theme.of(context);
 

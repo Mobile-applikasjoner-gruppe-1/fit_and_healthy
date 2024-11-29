@@ -5,11 +5,11 @@ import 'package:fit_and_healthy/src/features/user/user_model.dart';
 
 final userConverter = (
   fromFirestore: (DocumentSnapshot<Map<String, dynamic>> snapshot, _) {
-    final data = snapshot.data();
-    if (data == null) {
-      throw Exception('Firestore document is null for user ID: ${snapshot.id}');
+    if (!snapshot.exists) {
+      throw Exception(
+          'Firestore document does not exist for user ID: ${snapshot.id}');
     }
-    return UserModel.fromFirestore(data, snapshot.id);
+    return UserModel.fromFirestore(snapshot.data()!, snapshot.id);
   },
   toFirestore: (UserModel userModel, _) => userModel.toFirestore(),
 );

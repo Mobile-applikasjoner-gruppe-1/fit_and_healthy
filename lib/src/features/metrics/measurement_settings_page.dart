@@ -30,9 +30,12 @@ class MeasurementSettingsPage extends ConsumerWidget {
     }
 
     final data = metricState.value;
-    final weightHistory = (data!['weightHistory'] as List<dynamic>)
-        .map((e) => e as WeightEntry)
-        .toList();
+
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
+
+    final weightHistory = data.weightHistory;
     final filter = ref.watch(chartFilterProvider);
     final filteredEntries = _filterEntries(weightHistory, filter);
 

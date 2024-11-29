@@ -3,6 +3,7 @@ import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/src/features/metrics/metric_state.dart';
 import 'package:fit_and_healthy/src/features/user/user_model.dart';
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 import 'package:fit_and_healthy/src/features/user/weight_repository.dart';
@@ -11,12 +12,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'metrics_controller.g.dart';
 
 @riverpod
-class MetricsController extends _$MetricsController {
+class MetricsController extends AutoDisposeAsyncNotifier<MetricsState> {
   late final UserRepository _userRepository;
   late final WeightRepository _weightRepository;
 
   @override
-  Future<Map<String, dynamic>> build() async {
+  Future<MetricsState> build() async {
     final authRepository = ref.read(firebaseAuthRepositoryProvider);
     _userRepository = UserRepository(authRepository);
     _weightRepository = WeightRepository(authRepository);
@@ -26,64 +27,54 @@ class MetricsController extends _$MetricsController {
 
     if (userData == null) throw Exception('UserModel not found');
 
-    return {
-      'id': userData.id,
-      'weightHistory': weightHistory,
-      'height': userData.height,
-      'gender': userData.gender,
-      'birthday': userData.birthday,
-      'weeklyWorkoutGoal': userData.weeklyWorkoutGoal,
-      'weightGoal': userData.weightGoal,
-      'intensityLevel': userData.activityLevel,
-    };
+    return MetricsState(
+      id: userData.id,
+      weightHistory: weightHistory,
+      height: userData.height,
+      gender: userData.gender,
+      birthday: userData.birthday,
+      weeklyWorkoutGoal: userData.weeklyWorkoutGoal,
+      weightGoal: userData.weightGoal,
+      activityLevel: userData.activityLevel,
+    );
   }
 
   Future<void> updateUser({required String key, required dynamic value}) async {
-    final currentUserMap = state.asData?.value;
+    final currentState = state.asData?.value;
 
-    print('Current user map: $currentUserMap'); // Debugging
+    print('Current user map: $currentState'); // Debugging
 
-    if (currentUserMap == null) return;
+    if (currentState == null) return;
 
     try {
-      // Ensure the 'id' field is properly assigned
-      final userId = currentUserMap['id'];
-      if (userId == null || userId is! String) {
-        throw Exception("Invalid or missing user ID");
-      }
-
-      // Create a UserModel using the current map and updated field
-      final currentUser = UserModel(
-        id: userId,
-        height: currentUserMap['height'],
-        gender: currentUserMap['gender'],
-        birthday: currentUserMap['birthday'],
-        weeklyWorkoutGoal: currentUserMap['weeklyWorkoutGoal'],
-        weightGoal: currentUserMap['weightGoal'],
-        activityLevel:
-            currentUserMap['intensityLevel'] ?? ActivityLevel.moderatelyActive,
+      UserModel updatedUser = UserModel(
+        id: currentState.id,
+        height: currentState.height,
+        gender: currentState.gender,
+        weeklyWorkoutGoal: currentState.weeklyWorkoutGoal,
+        weightGoal: currentState.weightGoal,
+        activityLevel: currentState.activityLevel,
       );
 
-      UserModel updatedUser;
       switch (key) {
         case 'height':
-          updatedUser = currentUser.copyWith(height: value as double);
+          updatedUser = updatedUser.copyWith(height: value as double);
           break;
         case 'gender':
-          updatedUser = currentUser.copyWith(gender: value as Gender);
+          updatedUser = updatedUser.copyWith(gender: value as Gender);
           break;
         case 'birthday':
-          updatedUser = currentUser.copyWith(birthday: value as DateTime?);
+          updatedUser = updatedUser.copyWith(birthday: value as DateTime?);
           break;
         case 'weeklyWorkoutGoal':
-          updatedUser = currentUser.copyWith(weeklyWorkoutGoal: value as int);
+          updatedUser = updatedUser.copyWith(weeklyWorkoutGoal: value as int);
           break;
         case 'weightGoal':
-          updatedUser = currentUser.copyWith(weightGoal: value as WeightGoal);
+          updatedUser = updatedUser.copyWith(weightGoal: value as WeightGoal);
           break;
         case 'activityLevel':
           updatedUser =
-              currentUser.copyWith(activityLevel: value as ActivityLevel);
+              updatedUser.copyWith(activityLevel: value as ActivityLevel);
           break;
         default:
           throw Exception('Unsupported key: $key');
@@ -92,13 +83,20 @@ class MetricsController extends _$MetricsController {
       // Update Firebase
       await _userRepository.updateUser(updatedUser);
 
-      // Update the state locally to reflect the change
-      final updatedMap = {
-        ...currentUserMap,
-        key: value,
-      };
-
-      state = AsyncValue.data(updatedMap);
+      state = AsyncValue.data(currentState.copyWith(
+        height: key == 'height' ? value as double : currentState.height,
+        gender: key == 'gender' ? value as Gender : currentState.gender,
+        birthday:
+            key == 'birthday' ? value as DateTime? : currentState.birthday,
+        weeklyWorkoutGoal: key == 'weeklyWorkoutGoal'
+            ? value as int
+            : currentState.weeklyWorkoutGoal,
+        weightGoal:
+            key == 'weightGoal' ? value as WeightGoal : currentState.weightGoal,
+        activityLevel: key == 'activityLevel'
+            ? value as ActivityLevel
+            : currentState.activityLevel,
+      ));
 
       print('Firebase and local state updated successfully.');
     } catch (e, stack) {
@@ -108,31 +106,29 @@ class MetricsController extends _$MetricsController {
   }
 
   Future<void> addWeightEntry(double weight, DateTime date) async {
-    final entry = WeightEntry(timestamp: date, weight: weight);
-    await _weightRepository.addWeightEntry(entry);
+    final entry = NewWeightEntry(timestamp: date, weight: weight);
+    final weightEntry = await _weightRepository.addWeightEntry(entry);
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'weightHistory': [...currentState['weightHistory'], entry]
+      state = AsyncValue.data(currentState.copyWith(
+        weightHistory: [...currentState.weightHistory, weightEntry]
           ..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
-      });
+      ));
     }
   }
 
   // Handle the weight
   Future<void> addWeight(double weight) async {
-    final entry = WeightEntry(timestamp: DateTime.now(), weight: weight);
-    await _weightRepository.addWeightEntry(entry);
+    final entry = NewWeightEntry(timestamp: DateTime.now(), weight: weight);
+    final weightEntry = await _weightRepository.addWeightEntry(entry);
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'weightHistory': [...currentState['weightHistory'], entry]
+      state = AsyncValue.data(currentState.copyWith(
+        weightHistory: [...currentState.weightHistory, weightEntry]
           ..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
-      });
+      ));
     }
   }
 
@@ -174,10 +170,7 @@ class MetricsController extends _$MetricsController {
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'height': height,
-      });
+      state = AsyncValue.data(currentState.copyWith(height: height));
     }
   }
 
@@ -201,10 +194,7 @@ class MetricsController extends _$MetricsController {
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'gender': gender,
-      });
+      state = AsyncValue.data(currentState.copyWith(gender: gender));
     }
   }
 
@@ -228,10 +218,7 @@ class MetricsController extends _$MetricsController {
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'birthday': birthday,
-      });
+      state = AsyncValue.data(currentState.copyWith(birthday: birthday));
     }
   }
 
@@ -245,10 +232,7 @@ class MetricsController extends _$MetricsController {
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'weeklyWorkoutGoal': goal,
-      });
+      state = AsyncValue.data(currentState.copyWith(weeklyWorkoutGoal: goal));
     }
   }
 
@@ -262,10 +246,7 @@ class MetricsController extends _$MetricsController {
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'weightGoal': goal,
-      });
+      state = AsyncValue.data(currentState.copyWith(weightGoal: goal));
     }
   }
 
@@ -289,10 +270,7 @@ class MetricsController extends _$MetricsController {
 
     final currentState = state.asData?.value;
     if (currentState != null) {
-      state = AsyncValue.data({
-        ...currentState,
-        'activityLevel': level,
-      });
+      state = AsyncValue.data(currentState.copyWith(activityLevel: level));
     }
   }
 

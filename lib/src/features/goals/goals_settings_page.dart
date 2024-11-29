@@ -23,19 +23,21 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
   Widget build(BuildContext context) {
     final metricsState = ref.watch(metricsControllerProvider);
 
-    final height = metricsState.asData?.value['height']?.toInt() ?? 180;
-    final birthday = metricsState.asData?.value['birthday'];
-    final gender = metricsState.asData?.value['gender'] ?? Gender.male;
-    final activityLevel = metricsState.asData?.value['activityLevel'] ??
-        ActivityLevel.lightlyActive;
-    final weightGoal =
-        metricsState.asData?.value['weightGoal'] ?? WeightGoal.maintain;
+    final data = metricsState.value;
 
-    final weeklyWorkoutGoal =
-        metricsState.asData?.value['weeklyWorkoutGoal'] ?? 3;
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
 
-    final description =
-        weightGoal is WeightGoal ? weightGoal.description : 'No Data';
+    final height = data.height;
+    final birthday = data.birthday;
+    final gender = data.gender;
+    final activityLevel = data.activityLevel;
+    final weightGoal = data.weightGoal;
+    final weeklyWorkoutGoal = data.weeklyWorkoutGoal;
+
+    final description = weightGoal.description;
+    //weightGoal is WeightGoal ? weightGoal.description : 'No Data';
 
     return NestedScaffold(
       appBar: AppBar(
@@ -234,7 +236,7 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
   }
 
   void _showCalorieCalculatorModal(
-    int height,
+    double height,
     DateTime? birthday,
     Gender? gender,
     ActivityLevel? activityLevel,

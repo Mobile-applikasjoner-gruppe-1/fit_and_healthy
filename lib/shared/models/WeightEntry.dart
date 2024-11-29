@@ -1,27 +1,51 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class WeightEntry {
-  final String? id;
+  final String id;
   final DateTime timestamp;
   final double weight;
 
   WeightEntry({
-    this.id,
+    required this.id,
     required this.timestamp,
     required this.weight,
   });
 
   Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
-      'timestamp': timestamp.toIso8601String(),
+      'timestamp': Timestamp.fromDate(timestamp),
       'weight': weight,
     };
   }
 
-  factory WeightEntry.fromFirestore(Map<String, dynamic> map, {String? id}) {
+  factory WeightEntry.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data();
+    if (data == null) {
+      throw Exception(
+          'Document data is null for WeightEntry with ID: ${doc.id}');
+    }
     return WeightEntry(
-      id: id,
-      timestamp: DateTime.parse(map['timestamp']),
-      weight: map['weight'],
+      id: doc.id,
+      timestamp: (data['timestamp'] as Timestamp).toDate(),
+      weight: (data['weight'] as num).toDouble(),
     );
+  }
+}
+
+class NewWeightEntry {
+  final DateTime timestamp;
+  final double weight;
+
+  NewWeightEntry({
+    required this.timestamp,
+    required this.weight,
+  });
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'timestamp': Timestamp.fromDate(timestamp),
+      'weight': weight,
+    };
   }
 }

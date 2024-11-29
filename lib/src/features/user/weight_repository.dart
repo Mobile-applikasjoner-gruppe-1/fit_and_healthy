@@ -4,7 +4,8 @@ import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_
 import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 
 final weightEntryConverter = (
-  fromFirestore: (snapshot, _) => WeightEntry.fromFirestore(snapshot.data()!),
+  fromFirestore: (DocumentSnapshot<Map<String, dynamic>> doc, _) =>
+      WeightEntry.fromFirestore(doc),
   toFirestore: (WeightEntry weightEntry, _) => weightEntry.toFirestore(),
 );
 
@@ -26,34 +27,28 @@ class WeightRepository {
         );
   }
 
-  Future<String> addWeightEntry(WeightEntry entry) async {
-    final AuthUser user = _authRepository.currentUser!;
+  Future<WeightEntry> addWeightEntry(NewWeightEntry entry) async {
+    final weightEntrysRef = _getWeightEntryCollection();
 
-    CollectionReference weightEntrysRef = _firestore
-        .collection('users')
-        .doc(user.firebaseUser.uid)
-        .collection('weightEntry')
-        .withConverter<WeightEntry>(
-          fromFirestore: weightEntryConverter.fromFirestore,
-          toFirestore: weightEntryConverter.toFirestore,
-        );
+    // Use the `add` method to generate the ID and add the entry
+    final docRef = await weightEntrysRef.add(
+      WeightEntry(
+        id: '', // Placeholder ID, Firestore will generate a new one
+        timestamp: entry.timestamp,
+        weight: entry.weight,
+      ),
+    );
 
-    DocumentReference weightEntryRef = await weightEntrysRef.add(entry);
-
-    return weightEntryRef.id;
+    // Fetch the document ID and return a complete WeightEntry
+    return WeightEntry(
+      id: docRef.id,
+      timestamp: entry.timestamp,
+      weight: entry.weight,
+    );
   }
 
   Future<List<WeightEntry>> getWeightHistory() async {
     final querySnapshot = await _getWeightEntryCollection().get();
-
-    // QuerySnapshot<WeightEntry> querySnapshot = await _firestore
-    //     .collection('users')
-    //     .doc(user.firebaseUser.uid)
-    //     .collection('weightEntry')
-    //     .withConverter<WeightEntry>(
-    //         fromFirestore: weightEntryConverter.fromFirestore,
-    //         toFirestore: weightEntryConverter.toFirestore)
-    //     .get();
 
     return querySnapshot.docs.map((doc) => doc.data()).toList();
   }
@@ -63,7 +58,7 @@ class WeightRepository {
         .orderBy('timestamp', descending: true)
         .limit(1)
         .get();
-    if (querySnapshot.docChanges.isNotEmpty) {
+    if (querySnapshot.docs.isNotEmpty) {
       return querySnapshot.docs.first.data();
     }
     return null;
@@ -74,7 +69,7 @@ class WeightRepository {
         DateTime.now().subtract(Duration(days: daysBack));
     final querySnapshot = await _getWeightEntryCollection()
         .where('timestamp',
-            isGreaterThanOrEqualTo: targetDate.toIso8601String())
+            isGreaterThanOrEqualTo: Timestamp.fromDate(targetDate))
         .orderBy('timestamp', descending: true)
         .get();
     return querySnapshot.docs.map((doc) => doc.data()).toList();

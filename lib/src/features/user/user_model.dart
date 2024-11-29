@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
 import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
+import 'package:fit_and_healthy/src/features/metrics/metric_state.dart';
 
 class UserModel {
   final String id;
@@ -34,8 +37,10 @@ class UserModel {
           (g) => g.toString() == 'Gender.${map['gender'] ?? 'male'}',
           orElse: () => Gender.male,
         ),
-        birthday:
-            map['birthday'] != null ? DateTime.tryParse(map['birthday']) : null,
+        birthday: map['birthday'] != null
+            ? (map['birthday'] as Timestamp)
+                .toDate() // Convert Timestamp to DateTime
+            : null,
         weeklyWorkoutGoal: map['weeklyWorkoutGoal'] ?? 3,
         weightGoal: WeightGoal.values.firstWhere(
           (w) =>
@@ -59,7 +64,7 @@ class UserModel {
     return {
       'height': height,
       'gender': gender.toString().split('.').last,
-      'birthday': birthday?.toIso8601String(),
+      'birthday': birthday != null ? Timestamp.fromDate(birthday!) : null,
       'weeklyWorkoutGoal': weeklyWorkoutGoal,
       'weightGoal': weightGoal.toString().split('.').last,
       'activityLevel': activityLevel.toString().split('.').last,
@@ -82,6 +87,21 @@ class UserModel {
       weeklyWorkoutGoal: weeklyWorkoutGoal ?? this.weeklyWorkoutGoal,
       weightGoal: weightGoal ?? this.weightGoal,
       activityLevel: activityLevel ?? this.activityLevel,
+    );
+  }
+}
+
+extension UserModelToMetricsState on UserModel {
+  MetricsState toMetricsState(List<WeightEntry> weightHistory) {
+    return MetricsState(
+      id: id,
+      weightHistory: weightHistory,
+      height: height,
+      gender: gender,
+      birthday: birthday,
+      weeklyWorkoutGoal: weeklyWorkoutGoal,
+      weightGoal: weightGoal,
+      activityLevel: activityLevel,
     );
   }
 }
