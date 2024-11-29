@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_providers/auth_providers.dart';
+import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,14 +33,18 @@ class FirebaseAuthRepository {
 
   Stream<AuthUser?> userChanges() {
     return _firebaseAuth.userChanges().map((user) {
-      if (user == null) {
-        _authUser = null;
-        return null;
-      }
-
-      _authUser = AuthUser(firebaseUser: user);
-      return _authUser;
+      return _updateAuthUser(user);
     });
+  }
+
+  AuthUser? _updateAuthUser(User? user) {
+    if (user == null) {
+      _authUser = null;
+      return null;
+    }
+
+    _authUser = AuthUser(firebaseUser: user);
+    return _authUser;
   }
 
   AuthUser? get currentUser => _authUser;
@@ -48,10 +53,14 @@ class FirebaseAuthRepository {
     required String email,
     required String password,
   }) async {
+    // final creds =
     await _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    // TODO: Check if we need to run _updateAuthUser with the user from the creds here
+    await updateAppUserFromDB();
   }
 
   Future<void> signOut() async {
@@ -67,6 +76,9 @@ class FirebaseAuthRepository {
       email: email,
       password: password,
     );
+
+    // TODO: Check if we need to run _updateAuthUser with the user from the creds here
+    await updateAppUserFromDB();
   }
 
   Future<void> signInWithProvider(SupportedAuthProvider provider) async {
@@ -83,7 +95,11 @@ class FirebaseAuthRepository {
           idToken: googleAuth?.idToken,
         );
 
+        // final creds =
         await _firebaseAuth.signInWithCredential(credential);
+
+        // TODO: Check if we need to run _updateAuthUser with the user from the creds here
+        await updateAppUserFromDB();
         break;
       default:
         throw UnimplementedError(
@@ -141,11 +157,12 @@ class FirebaseAuthRepository {
   }
 
   Future<void> updateDisplayName(String firstName, String lastName) async {
-    if (_firebaseAuth.currentUser == null) {
+    User? user = _firebaseAuth.currentUser;
+
+    if (user == null) {
       throw Exception('No user is currently signed in');
     }
 
-    User user = _firebaseAuth.currentUser!;
     String newDisplayName = '$firstName $lastName';
 
     await user.updateDisplayName(newDisplayName);
@@ -155,5 +172,17 @@ class FirebaseAuthRepository {
     if (user.displayName == newDisplayName) {
       await user.getIdToken(true);
     }
+  }
+
+  Future<void> updateAppUserFromDB() async {
+    if (_authUser == null) {
+      return;
+    }
+
+    final UserRepository userRepo = UserRepository(this);
+
+    final appUser = await userRepo.getUser();
+
+    _authUser = _authUser!.copyOf(appUser: appUser);
   }
 }

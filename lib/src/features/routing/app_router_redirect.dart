@@ -40,6 +40,11 @@ FutureOr<String?> appRouterRedirectHandler(
   final bool isAddingDisplayName =
       state.matchedLocation == AddDisplayNameView.route;
 
+  final bool isLoggedInWithoutData = isLoggedIn && currentUser.appUser == null;
+  final bool isLoggedInWithData = isLoggedIn && currentUser.appUser != null;
+  // TODO: Replace 'temp' with the route of the page where the user is supposed to add data.
+  final bool isAddingData = state.matchedLocation == 'temp';
+
   if (loggedInWithoutDisplayName) {
     return AddDisplayNameView.route;
   }
@@ -49,10 +54,15 @@ FutureOr<String?> appRouterRedirectHandler(
     return EmailVerificationView.route;
   }
 
+  if (isLoggedInWithoutData && !isAddingData) {
+    // TODO: Return the route of the page where the user is supposed to add data.
+  }
+
   // Redirect to the dashboard (main page) if the user is already logged in, email is verified, and the user has a display name.
   if ((isLoggedIn && isLoggingIn) ||
       (isVerifiedEmail && isVerifyingEmail) ||
-      (loggedInWithDisplayName && isAddingDisplayName)) {
+      (loggedInWithDisplayName && isAddingDisplayName) ||
+      (isLoggedInWithData && isAddingData)) {
     return DashboardView.route;
   }
 
