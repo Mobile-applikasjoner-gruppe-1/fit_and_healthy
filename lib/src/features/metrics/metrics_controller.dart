@@ -105,34 +105,26 @@ class MetricsController extends AutoDisposeAsyncNotifier<MetricsState> {
     }
   }
 
-  Future<void> updateAllMetrics({
-    required double height,
-    required double weight,
-    required Gender gender,
-    required DateTime birthday,
-    required WeightGoal weightGoal,
-    required ActivityLevel activityLevel,
-  }) async {
+  Future<void> updateAllMetrics(MetricsState metricstate) async {
     final userData = await _userRepository.getUser();
 
     if (userData != null) {
       final updatedUser = userData.copyWith(
-        height: height,
-        gender: gender,
-        birthday: birthday,
-        weeklyWorkoutGoal: userData.weeklyWorkoutGoal, // Retain existing value
-        weightGoal: weightGoal,
-        activityLevel: activityLevel,
+        height: metricstate.height,
+        gender: metricstate.gender,
+        birthday: metricstate.birthday,
+        weeklyWorkoutGoal:
+            metricstate.weeklyWorkoutGoal, // Retain existing value
+        weightGoal: metricstate.weightGoal,
+        activityLevel: metricstate.activityLevel,
       );
 
-      await _userRepository.updateUser(updatedUser);
-
-      final weightEntry = NewWeightEntry(
-        timestamp: DateTime.now(),
-        weight: weight,
+      final firstWeight = metricstate.weightHistory.first;
+      final newWeightEntry = NewWeightEntry(
+        timestamp: firstWeight.timestamp,
+        weight: firstWeight.weight,
       );
-
-      await _weightRepository.addWeightEntry(weightEntry);
+      await _weightRepository.addWeightEntry(newWeightEntry);
 
       // Update state
       final updatedState = MetricsState(

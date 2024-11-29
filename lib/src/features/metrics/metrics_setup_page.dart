@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,30 +6,44 @@ import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
+import 'package:fit_and_healthy/src/features/metrics/metric_state.dart';
 import 'package:go_router/go_router.dart';
 
-class MetricsSetupPage extends ConsumerStatefulWidget {
+class MetricsSetupPage extends ConsumerWidget {
   const MetricsSetupPage({super.key});
 
   static const route = '/setup-metrics';
   static const routeName = 'Setup Metrics';
 
   @override
-  _MetricsSetupPageState createState() => _MetricsSetupPageState();
-}
-
-class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
-  final _formKey = GlobalKey<FormState>();
-  double? _height;
-  double? _weight;
-  Gender? _gender = Gender.male;
-  DateTime? _birthday;
-  WeightGoal? _weightGoal = WeightGoal.maintain;
-  ActivityLevel? _activityLevel = ActivityLevel.moderatelyActive;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final metricsController = ref.read(metricsControllerProvider.notifier);
+    final metricsState = ref.watch(metricsControllerProvider).valueOrNull;
+
+    // Initialize values from the current state or default values
+    final initialState = metricsState ??
+        MetricsState(
+          id: '',
+          height: 170.0,
+          weightHistory: [],
+          gender: Gender.male,
+          birthday: DateTime(2000, 1, 1),
+          weeklyWorkoutGoal: 3,
+          weightGoal: WeightGoal.maintain,
+          activityLevel: ActivityLevel.moderatelyActive,
+        );
+
+    final _formKey = GlobalKey<FormState>();
+    final heightController =
+        TextEditingController(text: initialState.height.toString());
+    final weightController = TextEditingController(
+        text: initialState.weightHistory.isNotEmpty
+            ? initialState.weightHistory.last.weight.toString()
+            : '');
+    Gender? gender = initialState.gender;
+    DateTime? birthday = initialState.birthday;
+    WeightGoal? weightGoal = initialState.weightGoal;
+    ActivityLevel? activityLevel = initialState.activityLevel;
 
     return Scaffold(
       appBar: AppBar(
@@ -42,6 +57,7 @@ class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
             children: [
               // Height Input
               TextFormField(
+                controller: heightController,
                 decoration: const InputDecoration(
                   labelText: 'Height (cm)',
                   border: OutlineInputBorder(),
@@ -54,14 +70,12 @@ class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
                   }
                   return null;
                 },
-                onSaved: (value) {
-                  _height = double.tryParse(value ?? '');
-                },
               ),
               const SizedBox(height: 16),
 
               // Weight Input
               TextFormField(
+                controller: weightController,
                 decoration: const InputDecoration(
                   labelText: 'Weight (kg)',
                   border: OutlineInputBorder(),
@@ -74,30 +88,27 @@ class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
                   }
                   return null;
                 },
-                onSaved: (value) {
-                  _weight = double.tryParse(value ?? '');
-                },
               ),
               const SizedBox(height: 16),
 
               // Gender Input
               DropdownButtonFormField<Gender>(
-                value: _gender,
+                value: gender,
                 decoration: const InputDecoration(
                   labelText: 'Gender',
                   border: OutlineInputBorder(),
                 ),
                 items: Gender.values
                     .map(
-                      (gender) => DropdownMenuItem(
-                        value: gender,
-                        child: Text(gender.toString().split('.').last),
+                      (g) => DropdownMenuItem(
+                        value: g,
+                        child: Text(g.toString().split('.').last),
                       ),
                     )
                     .toList(),
-                onChanged: (value) => setState(() {
-                  _gender = value;
-                }),
+                onChanged: (value) {
+                  gender = value;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -105,22 +116,20 @@ class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
               TextFormField(
                 readOnly: true,
                 decoration: InputDecoration(
-                  labelText: _birthday == null
+                  labelText: birthday == null
                       ? 'Select Birthday'
-                      : 'Birthday: ${_birthday!.day}/${_birthday!.month}/${_birthday!.year}',
+                      : 'Birthday: ${birthday.day}/${birthday.month}/${birthday.year}',
                   border: const OutlineInputBorder(),
                 ),
                 onTap: () async {
                   final selectedDate = await showDatePicker(
                     context: context,
-                    initialDate: DateTime(2000),
+                    initialDate: birthday ?? DateTime(2000),
                     firstDate: DateTime(1900),
                     lastDate: DateTime.now(),
                   );
                   if (selectedDate != null) {
-                    setState(() {
-                      _birthday = selectedDate;
-                    });
+                    birthday = selectedDate;
                   }
                 },
               ),
@@ -128,7 +137,7 @@ class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
 
               // Weight Goal
               DropdownButtonFormField<WeightGoal>(
-                value: _weightGoal,
+                value: weightGoal,
                 decoration: const InputDecoration(
                   labelText: 'Weight Goal',
                   border: OutlineInputBorder(),
@@ -141,15 +150,15 @@ class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
                       ),
                     )
                     .toList(),
-                onChanged: (value) => setState(() {
-                  _weightGoal = value;
-                }),
+                onChanged: (value) {
+                  weightGoal = value;
+                },
               ),
               const SizedBox(height: 16),
 
               // Activity Level
               DropdownButtonFormField<ActivityLevel>(
-                value: _activityLevel,
+                value: activityLevel,
                 decoration: const InputDecoration(
                   labelText: 'Activity Level',
                   border: OutlineInputBorder(),
@@ -162,27 +171,36 @@ class _MetricsSetupPageState extends ConsumerState<MetricsSetupPage> {
                       ),
                     )
                     .toList(),
-                onChanged: (value) => setState(() {
-                  _activityLevel = value;
-                }),
+                onChanged: (value) {
+                  activityLevel = value;
+                },
               ),
               const SizedBox(height: 16),
 
               // Save Button
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
-                    _formKey.currentState?.save();
+                    final height = double.tryParse(heightController.text)!;
+                    final weight = double.tryParse(weightController.text)!;
 
-                    metricsController.updateAllMetrics(
-                      height: _height!,
-                      weight: _weight!,
-                      gender: _gender!,
-                      birthday: _birthday!,
-                      weightGoal: _weightGoal!,
-                      activityLevel: _activityLevel!,
+                    final updatedMetrics = MetricsState(
+                      id: initialState.id,
+                      height: height,
+                      weightHistory: initialState.weightHistory
+                        ..add(WeightEntry(
+                          id: '',
+                          timestamp: DateTime.now(),
+                          weight: weight,
+                        )),
+                      gender: gender!,
+                      birthday: birthday!,
+                      weeklyWorkoutGoal: initialState.weeklyWorkoutGoal,
+                      weightGoal: weightGoal!,
+                      activityLevel: activityLevel!,
                     );
 
+                    await metricsController.updateAllMetrics(updatedMetrics);
                     context.pushNamed(DashboardView.routeName);
                   }
                 },
