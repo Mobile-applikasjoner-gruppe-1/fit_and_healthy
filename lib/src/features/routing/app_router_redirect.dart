@@ -8,6 +8,7 @@ import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_passwor
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_view.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_setup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,6 +64,7 @@ FutureOr<String?> appRouterRedirectHandler(
   // Redirect to the page where the user is supposed to add data if the user is logged in but required data is not added.
   if (isLoggedInWithoutData && !isAddingData) {
     // TODO: Return the route of the page where the user is supposed to add data.
+    return MetricsSetupPage.route;
   }
 
   // Redirect to the dashboard (main page) if the user is already logged in, email is verified, display name is set and required data is added.

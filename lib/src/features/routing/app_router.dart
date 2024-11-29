@@ -1,5 +1,6 @@
 import 'package:fit_and_healthy/src/features/auth/add_display_name/add_display_name_view.dart';
 import 'package:fit_and_healthy/src/features/auth/email_verification/email_verification_view.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_setup_page.dart';
 import 'package:fit_and_healthy/src/features/routing/app_router_redirect.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_password_view.dart';
@@ -179,6 +180,13 @@ GoRouter appRouter(Ref ref) {
         name: AddDisplayNameView.routeName,
         builder: (context, state) {
           return AddDisplayNameView();
+        },
+      ),
+      GoRoute(
+        path: MetricsSetupPage.route,
+        name: MetricsSetupPage.routeName,
+        builder: (context, state) {
+          return MetricsSetupPage();
         },
       ),
     ],
