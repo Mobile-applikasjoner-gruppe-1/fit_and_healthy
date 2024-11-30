@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';
@@ -77,7 +77,7 @@ class WeightRepository {
 
   Future<WeightEntry?> getLatestWeightEntry() async {
     final querySnapshot = await _getWeightEntryCollection()
-        .orderBy(WeightEntryField.timestamp.toString(), descending: true)
+        .orderBy(WeightEntryField.timestamp.toShortString(), descending: true)
         .limit(1)
         .get();
     if (querySnapshot.docs.isNotEmpty) {
@@ -90,9 +90,9 @@ class WeightRepository {
     final DateTime targetDate =
         DateTime.now().subtract(Duration(days: daysBack));
     final querySnapshot = await _getWeightEntryCollection()
-        .where(WeightEntryField.timestamp.toString(),
+        .where(WeightEntryField.timestamp.toShortString(),
             isGreaterThanOrEqualTo: Timestamp.fromDate(targetDate))
-        .orderBy(WeightEntryField.timestamp.toString(), descending: true)
+        .orderBy(WeightEntryField.timestamp.toShortString(), descending: true)
         .get();
     return querySnapshot.docs.map((doc) => doc.data()).toList();
   }

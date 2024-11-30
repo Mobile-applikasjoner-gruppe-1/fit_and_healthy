@@ -1,4 +1,4 @@
-import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/shared/models/activity_level.dart';

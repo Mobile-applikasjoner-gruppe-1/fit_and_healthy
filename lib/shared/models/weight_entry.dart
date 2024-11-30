@@ -5,6 +5,12 @@ enum WeightEntryField {
   weight,
 }
 
+extension WeightEntryFieldExtension on WeightEntryField {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+}
+
 class WeightEntry {
   final String id;
   final DateTime timestamp;
@@ -25,9 +31,9 @@ class WeightEntry {
     }
     return WeightEntry(
       id: doc.id,
-      timestamp:
-          (data[WeightEntryField.timestamp.toString()] as Timestamp).toDate(),
-      weight: (data[WeightEntryField.weight.toString()] as num).toDouble(),
+      timestamp: (data[WeightEntryField.timestamp.toShortString()] as Timestamp)
+          .toDate(),
+      weight: (data[WeightEntryField.weight.toShortString()] as num).toDouble(),
     );
   }
 }
@@ -55,8 +61,8 @@ class NewWeightEntry {
 
   Map<String, dynamic> toFirestore() {
     return {
-      WeightEntryField.timestamp.toString(): Timestamp.fromDate(timestamp),
-      WeightEntryField.weight.toString(): weight,
+      WeightEntryField.timestamp.toShortString(): Timestamp.fromDate(timestamp),
+      WeightEntryField.weight.toShortString(): weight,
     };
   }
 }

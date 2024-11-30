@@ -75,7 +75,7 @@ class UserRepository {
     }
 
     await _getUserRef().update({
-      UserField.activityLevel.toString():
+      UserField.activityLevel.toShortString():
           ActivityLevelExtension.toFirestore(activityLevel)
     });
   }
@@ -85,7 +85,7 @@ class UserRepository {
       throw Exception('Invalid height');
     }
 
-    await _getUserRef().update({UserField.height.toString(): height});
+    await _getUserRef().update({UserField.height.toShortString(): height});
   }
 
   Future<void> updateGender(Gender gender) async {
@@ -93,8 +93,9 @@ class UserRepository {
       throw Exception('Invalid gender');
     }
 
-    await _getUserRef().update(
-        {UserField.gender.toString(): GenderExtension.toFirestore(gender)});
+    await _getUserRef().update({
+      UserField.gender.toShortString(): GenderExtension.toFirestore(gender)
+    });
   }
 
   Future<void> updateBirthday(DateTime birthday) {
@@ -104,7 +105,8 @@ class UserRepository {
 
     final timestamp = Timestamp.fromDate(birthday);
 
-    return _getUserRef().update({UserField.birthday.toString(): timestamp});
+    return _getUserRef()
+        .update({UserField.birthday.toShortString(): timestamp});
   }
 
   Future<void> updateWeeklyWorkoutGoal(int goal) {
@@ -113,7 +115,7 @@ class UserRepository {
     }
 
     return _getUserRef().update({
-      UserField.weeklyWorkoutGoal.toString(): goal,
+      UserField.weeklyWorkoutGoal.toShortString(): goal,
     });
   }
 
@@ -123,7 +125,8 @@ class UserRepository {
     }
 
     return _getUserRef().update({
-      UserField.weightGoal.toString(): WeightGoalExtension.toFirestore(goal)
+      UserField.weightGoal.toShortString():
+          WeightGoalExtension.toFirestore(goal)
     });
   }
 }

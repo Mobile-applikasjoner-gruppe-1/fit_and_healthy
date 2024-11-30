@@ -2,7 +2,7 @@ import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
-import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/src/features/metrics/metric_state.dart';
 import 'package:fit_and_healthy/src/features/user/user_model.dart';
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';

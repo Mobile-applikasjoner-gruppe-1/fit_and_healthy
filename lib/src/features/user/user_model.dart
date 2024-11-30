@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/shared/models/activity_level.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
@@ -12,6 +12,12 @@ enum UserField {
   weeklyWorkoutGoal,
   weightGoal,
   activityLevel,
+}
+
+extension UserFieldExtension on UserField {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
 }
 
 class User {
@@ -78,26 +84,28 @@ class User {
 
     return User(
       id: id,
-      height: (map[UserField.height.toString()] as num).toDouble(),
+      height: (map[UserField.height.toShortString()] as num).toDouble(),
       gender: GenderExtension.fromFirestore(
-          map[UserField.gender.toString()] as String),
-      birthday: (map[UserField.birthday.toString()] as Timestamp).toDate(),
-      weeklyWorkoutGoal: map[UserField.weeklyWorkoutGoal.toString()] as int,
+          map[UserField.gender.toShortString()] as String),
+      birthday: (map[UserField.birthday.toShortString()] as Timestamp).toDate(),
+      weeklyWorkoutGoal:
+          map[UserField.weeklyWorkoutGoal.toShortString()] as int,
       weightGoal: WeightGoalExtension.fromFirestore(
-          map[UserField.weightGoal.toString()] as String),
+          map[UserField.weightGoal.toShortString()] as String),
       activityLevel: ActivityLevelExtension.fromFirestore(
-          map[UserField.activityLevel.toString()] as String),
+          map[UserField.activityLevel.toShortString()] as String),
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      UserField.height.toString(): height,
-      UserField.gender.toString(): gender.toString().split('.').last,
-      UserField.birthday.toString(): Timestamp.fromDate(birthday),
-      UserField.weeklyWorkoutGoal.toString(): weeklyWorkoutGoal,
-      UserField.weightGoal.toString(): weightGoal.toString().split('.').last,
-      UserField.activityLevel.toString():
+      UserField.height.toShortString(): height,
+      UserField.gender.toShortString(): gender.toString().split('.').last,
+      UserField.birthday.toShortString(): Timestamp.fromDate(birthday),
+      UserField.weeklyWorkoutGoal.toShortString(): weeklyWorkoutGoal,
+      UserField.weightGoal.toShortString():
+          weightGoal.toString().split('.').last,
+      UserField.activityLevel.toShortString():
           ActivityLevelExtension.toFirestore(activityLevel),
     };
   }
