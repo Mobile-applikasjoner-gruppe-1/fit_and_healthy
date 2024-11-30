@@ -214,12 +214,22 @@ class MeasurementSettingsPage extends ConsumerWidget {
                 const SizedBox(height: 16),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final double? weight =
                           double.tryParse(weightController.text);
                       if (weight != null) {
-                        metricsController.addWeightEntry(weight, selectedDate);
-                        Navigator.of(context).pop();
+                        try {
+                          await metricsController.addWeightEntry(
+                              weight, selectedDate);
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please enter valid values.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

@@ -37,6 +37,18 @@ class NewWeightEntry {
   final DateTime timestamp;
   final double weight;
 
+  static bool isValidWeight(double? weight) {
+    return weight != null && weight > 0 && weight <= 500;
+  }
+
+  static bool isValidTimestamp(DateTime? timestamp) {
+    return timestamp != null && timestamp.isBefore(DateTime.now());
+  }
+
+  static bool isValidNewWeightEntry(NewWeightEntry entry) {
+    return isValidWeight(entry.weight) && isValidTimestamp(entry.timestamp);
+  }
+
   NewWeightEntry({
     required this.timestamp,
     required this.weight,

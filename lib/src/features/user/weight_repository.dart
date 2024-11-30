@@ -28,18 +28,19 @@ class WeightRepository {
   }
 
   Future<WeightEntry> addWeightEntry(NewWeightEntry entry) async {
+    if (!NewWeightEntry.isValidNewWeightEntry(entry)) {
+      throw Exception('Invalid weigth entry provided!');
+    }
     final weightEntrysRef = _getWeightEntryCollection();
 
-    // Use the `add` method to generate the ID and add the entry
     final docRef = await weightEntrysRef.add(
       WeightEntry(
-        id: '', // Placeholder ID, Firestore will generate a new one
+        id: '',
         timestamp: entry.timestamp,
         weight: entry.weight,
       ),
     );
 
-    // Fetch the document ID and return a complete WeightEntry
     return WeightEntry(
       id: docRef.id,
       timestamp: entry.timestamp,

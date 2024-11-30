@@ -143,37 +143,45 @@ class MetricsController extends AutoDisposeAsyncNotifier<MetricsState> {
   }
 
   Future<void> addWeightEntry(double weight, DateTime date) async {
-    final entry = NewWeightEntry(timestamp: date, weight: weight);
-    final weightEntry = await _weightRepository.addWeightEntry(entry);
+    try {
+      final entry = NewWeightEntry(timestamp: date, weight: weight);
+      final weightEntry = await _weightRepository.addWeightEntry(entry);
 
-    final currentState = state.asData?.value;
-    if (currentState != null) {
-      state = AsyncValue.data(currentState.copyWith(
-        weightHistory: [...currentState.weightHistory, weightEntry]
-          ..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
-      ));
+      final currentState = state.asData?.value;
+      if (currentState != null) {
+        state = AsyncValue.data(currentState.copyWith(
+          weightHistory: [...currentState.weightHistory, weightEntry]
+            ..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
+        ));
+      }
+    } catch (e) {
+      throw Exception("Failed to add weight entry: $e");
     }
   }
 
   // Handle the weight
   Future<void> addWeight(double weight) async {
-    final entry = NewWeightEntry(timestamp: DateTime.now(), weight: weight);
-    final weightEntry = await _weightRepository.addWeightEntry(entry);
+    try {
+      final entry = NewWeightEntry(timestamp: DateTime.now(), weight: weight);
+      final weightEntry = await _weightRepository.addWeightEntry(entry);
 
-    final currentState = state.asData?.value;
-    if (currentState != null) {
-      state = AsyncValue.data(currentState.copyWith(
-        weightHistory: [...currentState.weightHistory, weightEntry]
-          ..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
-      ));
+      final currentState = state.asData?.value;
+      if (currentState != null) {
+        state = AsyncValue.data(currentState.copyWith(
+          weightHistory: [...currentState.weightHistory, weightEntry]
+            ..sort((a, b) => a.timestamp.compareTo(b.timestamp)),
+        ));
+      }
+    } catch (e) {
+      throw Exception("Failed to add weight entry: $e");
     }
   }
 
-  Future<double?> getLatestWeight() async {
+  Future<WeightEntry?> getLatestWeight() async {
     final weigthHistory = await _weightRepository.getLatestWeightEntry();
 
     if (weigthHistory == null) return null;
-    return weigthHistory.weight;
+    return weigthHistory;
   }
 
   Future<List<WeightEntry>> getWeightEntryPastMonth() async {

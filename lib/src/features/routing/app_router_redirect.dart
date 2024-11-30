@@ -64,7 +64,7 @@ FutureOr<String?> appRouterRedirectHandler(
   // Redirect to the page where the user is supposed to add data if the user is logged in but required data is not added.
   if (isLoggedInWithoutData && !isAddingData) {
     // TODO: Return the route of the page where the user is supposed to add data.
-    return MetricsSetupPage.route;
+    //return MetricsSetupPage.route;
   }
 
   // Redirect to the dashboard (main page) if the user is already logged in, email is verified, display name is set and required data is added.
