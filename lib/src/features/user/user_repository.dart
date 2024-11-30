@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fit_and_healthy/shared/models/activity_level.dart';
+import 'package:fit_and_healthy/shared/models/gender.dart';
+import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/user/user_model.dart';
@@ -9,64 +12,122 @@ final userConverter = (
       throw Exception(
           'Firestore document does not exist for user ID: ${snapshot.id}');
     }
-    return UserModel.fromFirestore(snapshot.data()!, snapshot.id);
+    return User.fromFirestore(snapshot.data()!, snapshot.id);
   },
-  toFirestore: (UserModel userModel, _) => userModel.toFirestore(),
+  toFirestore: (User userModel, _) => userModel.toFirestore(),
 );
 
 class UserRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuthRepository _authRepository;
 
-  UserRepository(this._authRepository);
+  static String collectionName = 'users';
 
-  DocumentReference<UserModel> _getUserModelDocument() {
+  late DocumentReference<User> _userRef;
+
+  UserRepository(this._authRepository) {
+    _userRef = _getUserRef();
+  }
+
+  DocumentReference<User> _getUserRef() {
     final AuthUser user = _authRepository.currentUser!;
 
     return _firestore
-        .collection('users')
+        .collection(collectionName)
         .doc(user.firebaseUser.uid)
-        .withConverter<UserModel>(
+        .withConverter<User>(
             fromFirestore: userConverter.fromFirestore,
             toFirestore: userConverter.toFirestore);
   }
 
-  Future<void> updateUser(UserModel user) async {
-    try {
-      if (!UserModel.isValidUserModel(user)) {
-        throw Exception('Invalid UserModel Provider.');
-      }
-      await _getUserModelDocument().set(user, SetOptions(merge: false));
-    } catch (e) {
-      throw Exception('Failed to update the user in Firestore');
+  Future<void> updateUser(User user) async {
+    if (!User.isValidUserModel(user)) {
+      throw Exception('Invalid UserModel');
     }
+    await _userRef.set(user);
   }
 
-  Future<UserModel?> getUser() async {
-    try {
-      final userDoc = await _getUserModelDocument().get();
-      if (userDoc.exists) {
-        final userModel = userDoc.data();
-        if (userModel == null || !UserModel.isValidUserModel(userModel)) {
-          throw Exception("Invalid UserModel retrieved from Firestore");
-        }
-        return userModel;
+  Future<User?> getUser() async {
+    final userDoc = await _userRef.get();
+    if (userDoc.exists) {
+      final userModel = userDoc.data();
+      if (userModel == null || !User.isValidUserModel(userModel)) {
+        throw Exception("Invalid UserModel retrieved from Firestore");
       }
-      return null;
-    } catch (e) {
-      throw Exception("Failed to fetch user from Firestore: $e");
+      return userModel;
     }
+    return null;
   }
 
-  Future<void> createUser(UserModel user) async {
-    try {
-      if (!UserModel.isValidUserModel(user)) {
-        throw Exception("Invalid UserModel provided. Validation failed.");
-      }
-
-      await _getUserModelDocument().set(user);
-    } catch (e) {
-      throw Exception("Failed to create user in Firestore: $e");
+  Future<void> createUser(User user) async {
+    if (!User.isValidUserModel(user)) {
+      throw Exception("Invalid UserModel provided. Validation failed.");
     }
+
+    final userDoc = await _userRef.get();
+
+    if (userDoc.exists) {
+      throw Exception('User already exists');
+    }
+
+    await _userRef.set(user);
+  }
+
+  Future<void> updateActivityLevel(ActivityLevel activityLevel) async {
+    if (!User.isValidActivityLevel(activityLevel)) {
+      throw Exception('Invalid Activity Level');
+    }
+
+    await _userRef.update({
+      UserField.activityLevel.toString():
+          ActivityLevelExtension.toFirestore(activityLevel)
+    });
+  }
+
+  Future<void> updateHeight(double height) async {
+    if (!User.isValidHeight(height)) {
+      throw Exception('Invalid height');
+    }
+
+    await _userRef.update({UserField.height.toString(): height});
+  }
+
+  Future<void> updateGender(Gender gender) async {
+    if (!User.isValidGender(gender)) {
+      throw Exception('Invalid gender');
+    }
+
+    await _userRef.update(
+        {UserField.gender.toString(): GenderExtension.toFirestore(gender)});
+  }
+
+  Future<void> updateBirthday(DateTime birthday) {
+    if (!User.isValidBirthday(birthday)) {
+      throw Exception('Invalid birthday');
+    }
+
+    final timestamp = Timestamp.fromDate(birthday);
+
+    return _userRef.update({UserField.birthday.toString(): timestamp});
+  }
+
+  Future<void> updateWeeklyWorkoutGoal(int goal) {
+    if (!User.isValidWeeklyWorkoutGoal(goal)) {
+      throw Exception('Invalid weekly workout goal');
+    }
+
+    return _userRef.update({
+      UserField.weeklyWorkoutGoal.toString(): goal,
+    });
+  }
+
+  Future<void> updateWeightGoal(WeightGoal goal) {
+    if (!User.isValidWeightGoal(goal)) {
+      throw Exception('Invalid weight goal');
+    }
+
+    return _userRef.update({
+      UserField.weightGoal.toString(): WeightGoalExtension.toFirestore(goal)
+    });
   }
 }

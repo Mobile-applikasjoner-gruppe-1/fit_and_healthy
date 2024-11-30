@@ -5,7 +5,16 @@ import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/metrics/metric_state.dart';
 
-class UserModel {
+enum UserField {
+  height,
+  gender,
+  birthday,
+  weeklyWorkoutGoal,
+  weightGoal,
+  activityLevel,
+}
+
+class User {
   final String id;
   final double height;
   final Gender gender;
@@ -14,7 +23,7 @@ class UserModel {
   final WeightGoal weightGoal;
   final ActivityLevel activityLevel;
 
-  UserModel({
+  User({
     required this.id,
     required this.height,
     required this.gender,
@@ -34,7 +43,9 @@ class UserModel {
   }
 
   static bool isValidBirthday(DateTime? birthday) {
-    return birthday != null && birthday.isBefore(DateTime.now());
+    return birthday != null &&
+        birthday.isBefore(DateTime.now()) &&
+        birthday.year > 1900;
   }
 
   static bool isValidWeeklyWorkoutGoal(int? weeklyWorkoutGoal) {
@@ -47,11 +58,11 @@ class UserModel {
     return weightGoal != null;
   }
 
-  static bool isValidActivityLevel(ActivityLevel? activityLevel) {
+  static bool isValidActivityLevel(activityLevel) {
     return activityLevel != null;
   }
 
-  static bool isValidUserModel(UserModel userModel) {
+  static bool isValidUserModel(User userModel) {
     return isValidHeight(userModel.height) &&
         isValidGender(userModel.gender) &&
         isValidBirthday(userModel.birthday) &&
@@ -60,48 +71,38 @@ class UserModel {
         isValidActivityLevel(userModel.activityLevel);
   }
 
-  factory UserModel.fromFirestore(Map<String, dynamic> map, String id) {
+  factory User.fromFirestore(Map<String, dynamic> map, String id) {
     if (map.isEmpty) {
       throw Exception('Firestore data is empty for user ID: $id');
     }
 
-    try {
-      return UserModel(
-        id: id,
-        height: (map['height']).toDouble(),
-        gender: Gender.values.firstWhere(
-          (g) => g.toString() == 'Gender.${map['gender']}',
-          orElse: () => Gender.male,
-        ),
-        birthday: (map['birthday'] as Timestamp).toDate(),
-        weeklyWorkoutGoal: map['weeklyWorkoutGoal'],
-        weightGoal: WeightGoal.values.firstWhere(
-          (w) => w.toString() == 'WeightGoal.${map['weightGoal']}',
-          orElse: () => WeightGoal.maintain,
-        ),
-        activityLevel: ActivityLevel.values.firstWhere(
-          (a) => a.toString() == 'ActivityLevel.${map['activityLevel']}',
-          orElse: () => ActivityLevel.moderatelyActive,
-        ),
-      );
-    } catch (e) {
-      throw Exception(
-          'Failed to parse Firestore data for user ID: $id. Error: $e');
-    }
+    return User(
+      id: id,
+      height: (map[UserField.height.toString()] as num).toDouble(),
+      gender: GenderExtension.fromFirestore(
+          map[UserField.gender.toString()] as String),
+      birthday: (map[UserField.birthday.toString()] as Timestamp).toDate(),
+      weeklyWorkoutGoal: map[UserField.weeklyWorkoutGoal.toString()] as int,
+      weightGoal: WeightGoalExtension.fromFirestore(
+          map[UserField.weightGoal.toString()] as String),
+      activityLevel: ActivityLevelExtension.fromFirestore(
+          map[UserField.activityLevel.toString()] as String),
+    );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'height': height,
-      'gender': gender.toString().split('.').last,
-      'birthday': Timestamp.fromDate(birthday),
-      'weeklyWorkoutGoal': weeklyWorkoutGoal,
-      'weightGoal': weightGoal.toString().split('.').last,
-      'activityLevel': activityLevel.toString().split('.').last,
+      UserField.height.toString(): height,
+      UserField.gender.toString(): gender.toString().split('.').last,
+      UserField.birthday.toString(): Timestamp.fromDate(birthday),
+      UserField.weeklyWorkoutGoal.toString(): weeklyWorkoutGoal,
+      UserField.weightGoal.toString(): weightGoal.toString().split('.').last,
+      UserField.activityLevel.toString():
+          ActivityLevelExtension.toFirestore(activityLevel),
     };
   }
 
-  UserModel copyWith({
+  User copyWith({
     double? height,
     Gender? gender,
     DateTime? birthday,
@@ -109,7 +110,7 @@ class UserModel {
     WeightGoal? weightGoal,
     ActivityLevel? activityLevel,
   }) {
-    return UserModel(
+    return User(
       id: id,
       height: height ?? this.height,
       gender: gender ?? this.gender,
@@ -121,10 +122,9 @@ class UserModel {
   }
 }
 
-extension UserModelToMetricsState on UserModel {
+extension UserModelToMetricsState on User {
   MetricsState toMetricsState(List<WeightEntry> weightHistory) {
     return MetricsState(
-      id: id,
       weightHistory: weightHistory,
       height: height,
       gender: gender,

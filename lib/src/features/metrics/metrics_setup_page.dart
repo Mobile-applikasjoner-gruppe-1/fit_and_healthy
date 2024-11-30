@@ -1,5 +1,4 @@
 import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
-import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/shared/models/activity_level.dart';
@@ -7,7 +6,6 @@ import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:fit_and_healthy/src/features/metrics/metric_state.dart';
-import 'package:go_router/go_router.dart';
 
 class MetricsSetupPage extends ConsumerWidget {
   const MetricsSetupPage({super.key});
@@ -23,7 +21,6 @@ class MetricsSetupPage extends ConsumerWidget {
     // Initialize values from the current state or default values
     final initialState = metricsState ??
         MetricsState(
-          id: '',
           height: 170.0,
           weightHistory: [],
           gender: Gender.male,
@@ -40,10 +37,10 @@ class MetricsSetupPage extends ConsumerWidget {
         text: initialState.weightHistory.isNotEmpty
             ? initialState.weightHistory.last.weight.toString()
             : '');
-    Gender? gender = initialState.gender;
-    DateTime? birthday = initialState.birthday;
-    WeightGoal? weightGoal = initialState.weightGoal;
-    ActivityLevel? activityLevel = initialState.activityLevel;
+    Gender gender = initialState.gender;
+    DateTime birthday = initialState.birthday;
+    WeightGoal weightGoal = initialState.weightGoal;
+    ActivityLevel activityLevel = initialState.activityLevel;
 
     return Scaffold(
       appBar: AppBar(
@@ -107,7 +104,9 @@ class MetricsSetupPage extends ConsumerWidget {
                     )
                     .toList(),
                 onChanged: (value) {
-                  gender = value;
+                  if (value != null) {
+                    gender = value;
+                  }
                 },
               ),
               const SizedBox(height: 16),
@@ -116,15 +115,14 @@ class MetricsSetupPage extends ConsumerWidget {
               TextFormField(
                 readOnly: true,
                 decoration: InputDecoration(
-                  labelText: birthday == null
-                      ? 'Select Birthday'
-                      : 'Birthday: ${birthday.day}/${birthday.month}/${birthday.year}',
+                  labelText:
+                      'Birthday: ${birthday.day}/${birthday.month}/${birthday.year}',
                   border: const OutlineInputBorder(),
                 ),
                 onTap: () async {
                   final selectedDate = await showDatePicker(
                     context: context,
-                    initialDate: birthday ?? DateTime(2000),
+                    initialDate: birthday,
                     firstDate: DateTime(1900),
                     lastDate: DateTime.now(),
                   );
@@ -151,7 +149,9 @@ class MetricsSetupPage extends ConsumerWidget {
                     )
                     .toList(),
                 onChanged: (value) {
-                  weightGoal = value;
+                  if (value != null) {
+                    weightGoal = value;
+                  }
                 },
               ),
               const SizedBox(height: 16),
@@ -172,7 +172,9 @@ class MetricsSetupPage extends ConsumerWidget {
                     )
                     .toList(),
                 onChanged: (value) {
-                  activityLevel = value;
+                  if (value != null) {
+                    activityLevel = value;
+                  }
                 },
               ),
               const SizedBox(height: 16),
@@ -185,7 +187,6 @@ class MetricsSetupPage extends ConsumerWidget {
                     final weight = double.tryParse(weightController.text)!;
 
                     final updatedMetrics = MetricsState(
-                      id: initialState.id,
                       height: height,
                       weightHistory: initialState.weightHistory
                         ..add(WeightEntry(
@@ -193,15 +194,15 @@ class MetricsSetupPage extends ConsumerWidget {
                           timestamp: DateTime.now(),
                           weight: weight,
                         )),
-                      gender: gender!,
-                      birthday: birthday!,
+                      gender: gender,
+                      birthday: birthday,
                       weeklyWorkoutGoal: initialState.weeklyWorkoutGoal,
-                      weightGoal: weightGoal!,
-                      activityLevel: activityLevel!,
+                      weightGoal: weightGoal,
+                      activityLevel: activityLevel,
                     );
 
-                    await metricsController.updateAllMetrics(updatedMetrics);
-                    context.pushNamed(DashboardView.routeName);
+                    await metricsController.addAllMetrics(updatedMetrics);
+                    await metricsController.reloadAuthUserDataFromDB();
                   }
                 },
                 child: const Text('Save Metrics'),

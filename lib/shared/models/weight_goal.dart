@@ -5,7 +5,7 @@ enum WeightGoal {
 }
 
 // Extension for descriptions
-extension WeightGoalDescription on WeightGoal {
+extension WeightGoalExtension on WeightGoal {
   String get description {
     switch (this) {
       case WeightGoal.gain:
@@ -15,5 +15,16 @@ extension WeightGoalDescription on WeightGoal {
       case WeightGoal.lose:
         return 'Lose Weight';
     }
+  }
+
+  static String toFirestore(WeightGoal weightGoal) {
+    return weightGoal.toString().split('.').last;
+  }
+
+  static WeightGoal fromFirestore(String weightGoal) {
+    return WeightGoal.values.firstWhere(
+      (w) => w.toString() == 'WeightGoal.${weightGoal}',
+      orElse: () => WeightGoal.maintain,
+    );
   }
 }

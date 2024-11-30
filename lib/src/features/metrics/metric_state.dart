@@ -4,17 +4,15 @@ import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 
 class MetricsState {
-  final String id;
   final List<WeightEntry> weightHistory;
   final double height;
   final Gender gender;
-  final DateTime? birthday;
+  final DateTime birthday;
   final int weeklyWorkoutGoal;
   final WeightGoal weightGoal;
   final ActivityLevel activityLevel;
 
   MetricsState({
-    required this.id,
     required this.weightHistory,
     required this.height,
     required this.gender,
@@ -34,7 +32,6 @@ class MetricsState {
     ActivityLevel? activityLevel,
   }) {
     return MetricsState(
-      id: id,
       weightHistory: weightHistory ?? this.weightHistory,
       height: height ?? this.height,
       gender: gender ?? this.gender,

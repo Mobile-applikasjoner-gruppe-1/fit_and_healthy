@@ -48,8 +48,7 @@ FutureOr<String?> appRouterRedirectHandler(
   // Checks for user data.
   final bool isLoggedInWithoutData = isLoggedIn && currentUser.appUser == null;
   final bool isLoggedInWithData = isLoggedIn && currentUser.appUser != null;
-  // TODO: Replace 'temp' with the route of the page where the user is supposed to add data.
-  final bool isAddingData = state.matchedLocation == 'temp';
+  final bool isAddingData = state.matchedLocation == MetricsSetupPage.route;
 
   // Redirect to the add display name page if the user is logged in but the display name is not set.
   if (loggedInWithoutDisplayName) {
@@ -63,8 +62,7 @@ FutureOr<String?> appRouterRedirectHandler(
 
   // Redirect to the page where the user is supposed to add data if the user is logged in but required data is not added.
   if (isLoggedInWithoutData && !isAddingData) {
-    // TODO: Return the route of the page where the user is supposed to add data.
-    //return MetricsSetupPage.route;
+    return MetricsSetupPage.route;
   }
 
   // Redirect to the dashboard (main page) if the user is already logged in, email is verified, display name is set and required data is added.

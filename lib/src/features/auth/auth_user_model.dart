@@ -8,11 +8,11 @@ class AuthUser {
   });
 
   final FirebaseAuth.User firebaseUser;
-  final UserModel? appUser;
+  final User? appUser;
 
   AuthUser copyOf({
     FirebaseAuth.User? firebaseUser,
-    UserModel? appUser,
+    User? appUser,
   }) {
     return AuthUser(
       firebaseUser: firebaseUser ?? this.firebaseUser,

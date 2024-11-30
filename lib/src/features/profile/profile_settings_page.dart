@@ -206,7 +206,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         if (newHeight != null) {
           await ref
               .read(metricsControllerProvider.notifier)
-              .updateUser(key: 'height', value: newHeight);
+              .updateHeight(newHeight);
         }
       },
     );

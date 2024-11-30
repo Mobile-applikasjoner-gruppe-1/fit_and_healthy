@@ -221,7 +221,7 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                     if (selectedGoal != null) {
                       ref
                           .read(metricsControllerProvider.notifier)
-                          .updateWeightGoal(selectedGoal);
+                          .updateWeightGoal(selectedGoal!);
                     }
                     Navigator.of(context).pop();
                   },
@@ -391,7 +391,7 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                                   .addWeight(weight);
                               await ref
                                   .read(metricsControllerProvider.notifier)
-                                  .updateActivityLevel(selectedActivityLevel);
+                                  .updateActivityLevel(selectedActivityLevel!);
                               final calories =
                                   CalorieCalculator.calculateCalories(
                                 weight,

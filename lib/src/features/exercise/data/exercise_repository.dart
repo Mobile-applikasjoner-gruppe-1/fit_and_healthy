@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
+import 'package:fit_and_healthy/src/features/exercise/data/workout_repository.dart';
+import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 
 final exerciseConverter = (
   fromFirestore: (snapshot, _) => Exercise.fromFirebase(snapshot.data()!),
-  toFirestore: (Exercise exercise, _) => exercise.toFirebase(),
+  toFirestore: (Exercise exercise, _) => exercise.toFirestore(),
 );
 
 /// Repository for handling exercise data.
@@ -16,23 +18,29 @@ class ExerciseRepository {
   final FirebaseAuthRepository _authRepository;
   final String _workoutId;
 
+  static String collectionName = 'exercises';
+
   ExerciseRepository(this._authRepository, this._workoutId);
 
-  /// Returns a list of all exercises for the given workout.
-  Future<List<Exercise>> getAllExercises() async {
+  CollectionReference<Exercise> _getExerciseCollection() {
     final AuthUser user = _authRepository.currentUser!;
 
-    QuerySnapshot<Exercise> querySnapshot = await _firestore
-        .collection('users')
+    return _firestore
+        .collection(UserRepository.collectionName)
         .doc(user.firebaseUser.uid)
-        .collection('workouts')
+        .collection(WorkoutRepository.collectionName)
         .doc(_workoutId)
-        .collection('exercises')
+        .collection(collectionName)
         .withConverter<Exercise>(
           fromFirestore: exerciseConverter.fromFirestore,
           toFirestore: exerciseConverter.toFirestore,
-        )
-        .get();
+        );
+  }
+
+  /// Returns a list of all exercises for the given workout.
+  Future<List<Exercise>> getAllExercises() async {
+    QuerySnapshot<Exercise> querySnapshot =
+        await _getExerciseCollection().get();
 
     return querySnapshot.docs.map((doc) => doc.data()).toList();
   }

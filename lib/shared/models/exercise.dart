@@ -50,7 +50,7 @@ class ExerciseInfoList {
     );
   }
 
-  Map<String, dynamic> toFirebase() {
+  Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'name': name,
@@ -105,7 +105,7 @@ class Exercise {
     );
   }
 
-  Map<String, dynamic> toFirebase() {
+  Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'name': exerciseInfoList.name,
@@ -171,13 +171,13 @@ class Workout {
     );
   }
 
-  Map<String, dynamic> toFirebase() {
+  Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'title': title,
       'time': time,
       'dateTime': dateTime,
-      'exercises': exercises.map((e) => e.toFirebase()).toList(),
+      'exercises': exercises.map((e) => e.toFirestore()).toList(),
     };
   }
 }

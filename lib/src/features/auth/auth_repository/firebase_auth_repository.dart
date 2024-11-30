@@ -43,7 +43,11 @@ class FirebaseAuthRepository {
       return null;
     }
 
-    _authUser = AuthUser(firebaseUser: user);
+    if (_authUser != null) {
+      _authUser = _authUser!.copyOf(firebaseUser: user);
+    } else {
+      _authUser = AuthUser(firebaseUser: user);
+    }
     return _authUser;
   }
 
@@ -184,5 +188,8 @@ class FirebaseAuthRepository {
     final appUser = await userRepo.getUser();
 
     _authUser = _authUser!.copyOf(appUser: appUser);
+
+    // Refresh the token to force refresh of firebase auth
+    await _authUser!.firebaseUser.getIdToken(true);
   }
 }

@@ -36,4 +36,15 @@ extension ActivityLevelExtension on ActivityLevel {
         return 1.9;
     }
   }
+
+  static String toFirestore(ActivityLevel activityLevel) {
+    return activityLevel.toString().split('.').last;
+  }
+
+  static ActivityLevel fromFirestore(String activityLevel) {
+    return ActivityLevel.values.firstWhere(
+      (a) => a.toString() == 'ActivityLevelEnum.$activityLevel',
+      orElse: () => ActivityLevel.moderatelyActive,
+    );
+  }
 }

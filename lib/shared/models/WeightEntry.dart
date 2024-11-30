@@ -1,5 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+enum WeightEntryField {
+  timestamp,
+  weight,
+}
+
 class WeightEntry {
   final String id;
   final DateTime timestamp;
@@ -11,13 +16,6 @@ class WeightEntry {
     required this.weight,
   });
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'timestamp': Timestamp.fromDate(timestamp),
-      'weight': weight,
-    };
-  }
-
   factory WeightEntry.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data();
@@ -27,8 +25,9 @@ class WeightEntry {
     }
     return WeightEntry(
       id: doc.id,
-      timestamp: (data['timestamp'] as Timestamp).toDate(),
-      weight: (data['weight'] as num).toDouble(),
+      timestamp:
+          (data[WeightEntryField.timestamp.toString()] as Timestamp).toDate(),
+      weight: (data[WeightEntryField.weight.toString()] as num).toDouble(),
     );
   }
 }
@@ -56,8 +55,8 @@ class NewWeightEntry {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'timestamp': Timestamp.fromDate(timestamp),
-      'weight': weight,
+      WeightEntryField.timestamp.toString(): Timestamp.fromDate(timestamp),
+      WeightEntryField.weight.toString(): weight,
     };
   }
 }
