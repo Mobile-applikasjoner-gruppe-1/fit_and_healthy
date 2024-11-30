@@ -31,6 +31,8 @@ class FirebaseAuthRepository {
   final FirebaseAuth _firebaseAuth;
   AuthUser? _authUser = null;
 
+  bool _hasGottenUser = false;
+
   Stream<AuthUser?> userChanges() {
     return _firebaseAuth.userChanges().map((user) {
       return _updateAuthUser(user);
@@ -48,6 +50,10 @@ class FirebaseAuthRepository {
     } else {
       _authUser = AuthUser(firebaseUser: user);
     }
+    if (!_hasGottenUser) {
+      updateAppUserFromDB();
+    }
+
     return _authUser;
   }
 
@@ -188,6 +194,8 @@ class FirebaseAuthRepository {
     final appUser = await userRepo.getUser();
 
     _authUser = _authUser!.copyOf(appUser: appUser);
+
+    _hasGottenUser = true;
 
     // Refresh the token to force refresh of firebase auth
     await _authUser!.firebaseUser.getIdToken(true);
