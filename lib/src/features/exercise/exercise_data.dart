@@ -101,6 +101,10 @@ const List<Exercise> sampleExercises = [
   ),
 ];
 
+final List<Workout> emptyWorkouts = [
+
+];
+
 final List<Workout> sampleWorkouts = [
   Workout(
     id: '1',
