@@ -51,6 +51,7 @@ class MetricsController extends AutoDisposeAsyncNotifier<MetricsState> {
         id: currentState.id,
         height: currentState.height,
         gender: currentState.gender,
+        birthday: currentState.birthday!,
         weeklyWorkoutGoal: currentState.weeklyWorkoutGoal,
         weightGoal: currentState.weightGoal,
         activityLevel: currentState.activityLevel,
@@ -197,7 +198,6 @@ class MetricsController extends AutoDisposeAsyncNotifier<MetricsState> {
     final userData = await _userRepository.getUser();
 
     if (userData != null) {
-      print('Height: ' + userData.height.toString());
       return userData.height;
     }
 
@@ -205,17 +205,21 @@ class MetricsController extends AutoDisposeAsyncNotifier<MetricsState> {
   }
 
   Future<void> updateHeight(double height) async {
-    print('Updating height');
-
-    final userData = await _userRepository.getUser();
-    if (userData != null) {
+    try {
+      if (!UserModel.isValidHeight(height)) {
+        throw Exception('Height must be between 20 to 300 cm.');
+      }
+      final userData = await _userRepository.getUser();
+      if (userData == null) throw Exception('User Data is empty');
       final updatedUser = userData.copyWith(height: height);
       await _userRepository.updateUser(updatedUser);
-    }
 
-    final currentState = state.asData?.value;
-    if (currentState != null) {
-      state = AsyncValue.data(currentState.copyWith(height: height));
+      final currentState = state.asData?.value;
+      if (currentState != null) {
+        state = AsyncValue.data(currentState.copyWith(height: height));
+      }
+    } catch (e) {
+      throw Exception('Failed to update height.');
     }
   }
 

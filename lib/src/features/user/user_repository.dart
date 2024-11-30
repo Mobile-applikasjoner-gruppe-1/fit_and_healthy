@@ -32,15 +32,41 @@ class UserRepository {
   }
 
   Future<void> updateUser(UserModel user) async {
-    await _getUserModelDocument().set(user, SetOptions(merge: false));
+    try {
+      if (!UserModel.isValidUserModel(user)) {
+        throw Exception('Invalid UserModel Provider.');
+      }
+      await _getUserModelDocument().set(user, SetOptions(merge: false));
+    } catch (e) {
+      throw Exception('Failed to update the user in Firestore');
+    }
   }
 
   Future<UserModel?> getUser() async {
-    final userDoc = await _getUserModelDocument().get();
-
-    if (userDoc.exists) {
-      return userDoc.data();
+    try {
+      final userDoc = await _getUserModelDocument().get();
+      if (userDoc.exists) {
+        final userModel = userDoc.data();
+        if (userModel == null || !UserModel.isValidUserModel(userModel)) {
+          throw Exception("Invalid UserModel retrieved from Firestore");
+        }
+        return userModel;
+      }
+      return null;
+    } catch (e) {
+      throw Exception("Failed to fetch user from Firestore: $e");
     }
-    return null;
+  }
+
+  Future<void> createUser(UserModel user) async {
+    try {
+      if (!UserModel.isValidUserModel(user)) {
+        throw Exception("Invalid UserModel provided. Validation failed.");
+      }
+
+      await _getUserModelDocument().set(user);
+    } catch (e) {
+      throw Exception("Failed to create user in Firestore: $e");
+    }
   }
 }

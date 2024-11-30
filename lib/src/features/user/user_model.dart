@@ -9,7 +9,7 @@ class UserModel {
   final String id;
   final double height;
   final Gender gender;
-  final DateTime? birthday;
+  final DateTime birthday;
   final int weeklyWorkoutGoal;
   final WeightGoal weightGoal;
   final ActivityLevel activityLevel;
@@ -18,11 +18,47 @@ class UserModel {
     required this.id,
     required this.height,
     required this.gender,
-    this.birthday,
+    required this.birthday,
     required this.weeklyWorkoutGoal,
     required this.weightGoal,
     required this.activityLevel,
   });
+
+  static bool isValidHeight(double? height) {
+    if (height == 0 || height! <= 20 || height > 300) return false;
+    return true;
+  }
+
+  static bool isValidGender(Gender? gender) {
+    return gender != null;
+  }
+
+  static bool isValidBirthday(DateTime? birthday) {
+    return birthday != null && birthday.isBefore(DateTime.now());
+  }
+
+  static bool isValidWeeklyWorkoutGoal(int? weeklyWorkoutGoal) {
+    return weeklyWorkoutGoal != null &&
+        weeklyWorkoutGoal >= 0 &&
+        weeklyWorkoutGoal <= 28;
+  }
+
+  static bool isValidWeightGoal(WeightGoal? weightGoal) {
+    return weightGoal != null;
+  }
+
+  static bool isValidActivityLevel(ActivityLevel? activityLevel) {
+    return activityLevel != null;
+  }
+
+  static bool isValidUserModel(UserModel userModel) {
+    return isValidHeight(userModel.height) &&
+        isValidGender(userModel.gender) &&
+        isValidBirthday(userModel.birthday) &&
+        isValidWeeklyWorkoutGoal(userModel.weeklyWorkoutGoal) &&
+        isValidWeightGoal(userModel.weightGoal) &&
+        isValidActivityLevel(userModel.activityLevel);
+  }
 
   factory UserModel.fromFirestore(Map<String, dynamic> map, String id) {
     if (map.isEmpty) {
@@ -32,25 +68,19 @@ class UserModel {
     try {
       return UserModel(
         id: id,
-        height: (map['height'] ?? 170).toDouble(),
+        height: (map['height']).toDouble(),
         gender: Gender.values.firstWhere(
-          (g) => g.toString() == 'Gender.${map['gender'] ?? 'male'}',
+          (g) => g.toString() == 'Gender.${map['gender']}',
           orElse: () => Gender.male,
         ),
-        birthday: map['birthday'] != null
-            ? (map['birthday'] as Timestamp)
-                .toDate() // Convert Timestamp to DateTime
-            : null,
-        weeklyWorkoutGoal: map['weeklyWorkoutGoal'] ?? 3,
+        birthday: (map['birthday'] as Timestamp).toDate(),
+        weeklyWorkoutGoal: map['weeklyWorkoutGoal'],
         weightGoal: WeightGoal.values.firstWhere(
-          (w) =>
-              w.toString() == 'WeightGoal.${map['weightGoal'] ?? 'maintain'}',
+          (w) => w.toString() == 'WeightGoal.${map['weightGoal']}',
           orElse: () => WeightGoal.maintain,
         ),
         activityLevel: ActivityLevel.values.firstWhere(
-          (a) =>
-              a.toString() ==
-              'ActivityLevel.${map['activityLevel'] ?? 'moderatelyActive'}',
+          (a) => a.toString() == 'ActivityLevel.${map['activityLevel']}',
           orElse: () => ActivityLevel.moderatelyActive,
         ),
       );
@@ -64,7 +94,7 @@ class UserModel {
     return {
       'height': height,
       'gender': gender.toString().split('.').last,
-      'birthday': birthday != null ? Timestamp.fromDate(birthday!) : null,
+      'birthday': Timestamp.fromDate(birthday),
       'weeklyWorkoutGoal': weeklyWorkoutGoal,
       'weightGoal': weightGoal.toString().split('.').last,
       'activityLevel': activityLevel.toString().split('.').last,
