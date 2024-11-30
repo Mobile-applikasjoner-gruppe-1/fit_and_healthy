@@ -1,8 +1,8 @@
 import 'package:fit_and_healthy/src/features/auth/auth_controller/auth_controller.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/measurement_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
+import 'package:fit_and_healthy/src/features/gdpr_policy/gdpr_settings_page.dart';
+import 'package:fit_and_healthy/src/features/goals/goals_settings_page.dart';
+import 'package:fit_and_healthy/src/features/metrics/measurement_settings_page.dart';
+import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_appbar.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';

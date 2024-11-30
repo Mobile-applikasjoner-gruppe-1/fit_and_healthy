@@ -1,6 +1,6 @@
 import 'package:fit_and_healthy/src/common/styles/sizes.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/privacy_gdpr_policy_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
+import 'package:fit_and_healthy/src/features/gdpr_policy/privacy_gdpr_policy_settings_page.dart';
+import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
