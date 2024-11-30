@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 
 class WeightChart extends StatelessWidget {
   final List<WeightEntry> entries;

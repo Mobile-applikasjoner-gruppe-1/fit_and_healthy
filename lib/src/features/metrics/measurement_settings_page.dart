@@ -1,10 +1,10 @@
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
+import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
+import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/weight_chart.dart';
 
-// Providers
-final weightEntriesProvider = StateProvider<List<WeightEntry>>((ref) => []);
 final chartFilterProvider =
     StateProvider<ChartFilter>((ref) => ChartFilter.all);
 
@@ -16,15 +16,30 @@ class MeasurementSettingsPage extends ConsumerWidget {
   static const route = '/measurement';
   static const routeName = 'Measurement Settings';
 
+  // TODO, Fetch data for 30 days, and if they want a year, fetch the rest!
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weightEntries = ref.watch(weightEntriesProvider);
+    final metricState = ref.watch(metricsControllerProvider);
+    final metricsController = ref.read(metricsControllerProvider.notifier);
+
+    if (metricState is AsyncLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (metricState is AsyncError) {
+      return Center(child: Text('Error: ${metricState.error}'));
+    }
+
+    final data = metricState.value;
+
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
+
+    final weightHistory = data.weightHistory;
     final filter = ref.watch(chartFilterProvider);
+    final filteredEntries = _filterEntries(weightHistory, filter);
 
-    // Filter entries based on the selected filter
-    final filteredEntries = _filterEntries(weightEntries, filter);
-
-    return Scaffold(
+    return NestedScaffold(
       appBar: AppBar(
         title: const Text("Measurement"),
       ),
@@ -49,9 +64,8 @@ class MeasurementSettingsPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 16),
-            // Chart with Max Height
             ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 300), // Set max height
+              constraints: const BoxConstraints(maxHeight: 300),
               child: WeightChart(entries: filteredEntries),
             ),
             const SizedBox(height: 16),
@@ -72,7 +86,7 @@ class MeasurementSettingsPage extends ConsumerWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _showAddWeightModal(context, ref);
+                  _showAddWeightModal(context, metricsController);
                 },
                 child: const Text('Add Weight'),
               ),
@@ -83,7 +97,6 @@ class MeasurementSettingsPage extends ConsumerWidget {
     );
   }
 
-  // Filter Button
   Widget _buildFilterButton(
     BuildContext context,
     WidgetRef ref,
@@ -108,29 +121,34 @@ class MeasurementSettingsPage extends ConsumerWidget {
     );
   }
 
-  // Filter Entries Based on Selected Filter
   List<WeightEntry> _filterEntries(
       List<WeightEntry> entries, ChartFilter filter) {
     final now = DateTime.now();
+    List<WeightEntry> filtered;
     switch (filter) {
       case ChartFilter.month:
-        return entries
+        filtered = entries
             .where((entry) =>
                 entry.timestamp.isAfter(now.subtract(const Duration(days: 30))))
             .toList();
+        break;
       case ChartFilter.year:
-        return entries
+        filtered = entries
             .where((entry) => entry.timestamp
                 .isAfter(now.subtract(const Duration(days: 365))))
             .toList();
+        break;
       case ChartFilter.all:
-        return entries;
+        filtered = entries;
+        break;
     }
+
+    filtered.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return filtered;
   }
 
-  // Show Modal Bottom Sheet
-  void _showAddWeightModal(BuildContext context, WidgetRef ref) {
-    final weightNotifier = ref.read(weightEntriesProvider.notifier);
+  void _showAddWeightModal(
+      BuildContext context, MetricsController metricsController) {
     final TextEditingController weightController = TextEditingController();
     DateTime selectedDate = DateTime.now();
 
@@ -181,8 +199,7 @@ class MeasurementSettingsPage extends ConsumerWidget {
                       context: context,
                       initialDate: selectedDate,
                       firstDate: DateTime(2000),
-                      lastDate:
-                          DateTime.now(), // Restrict to current or past dates
+                      lastDate: DateTime.now(),
                     );
                     if (pickedDate != null) {
                       setState(() {
@@ -197,23 +214,22 @@ class MeasurementSettingsPage extends ConsumerWidget {
                 const SizedBox(height: 16),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final double? weight =
                           double.tryParse(weightController.text);
                       if (weight != null) {
-                        weightNotifier.update((state) {
-                          final updatedState = [
-                            ...state,
-                            WeightEntry(
-                              timestamp: selectedDate,
-                              weight: weight,
+                        try {
+                          await metricsController.addWeightEntry(
+                              weight, selectedDate);
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please enter valid values.'),
+                              backgroundColor: Colors.red,
                             ),
-                          ];
-                          updatedState.sort((a, b) =>
-                              a.timestamp.compareTo(b.timestamp)); // Sort
-                          return updatedState;
-                        });
-                        Navigator.of(context).pop();
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
