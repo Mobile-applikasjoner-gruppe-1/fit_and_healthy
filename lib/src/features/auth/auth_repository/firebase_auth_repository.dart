@@ -42,6 +42,7 @@ class FirebaseAuthRepository {
   AuthUser? _updateAuthUser(User? user) {
     if (user == null) {
       _authUser = null;
+      _hasGottenUser = false;
       return null;
     }
 
