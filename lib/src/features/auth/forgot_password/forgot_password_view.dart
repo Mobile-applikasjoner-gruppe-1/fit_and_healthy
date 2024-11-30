@@ -1,6 +1,7 @@
 import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_controller/auth_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ForgotPasswordView extends ConsumerStatefulWidget {
@@ -20,6 +21,64 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(authControllerProvider, (previous, next) {
+      next.maybeWhen(
+        data: (authState) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            if (authState.isError) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('An error occurred. Please try again.'),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            } else if (authState.isLoading) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Sending reset email...'),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              );
+            } else if (authState.isSuccess) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Reset email sent successfully.'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
+            }
+          });
+        },
+        error: (error, stackTrace) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('An error occurred. Please try again.'),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+          });
+        },
+        orElse: () {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).clearSnackBars();
+          });
+        },
+      );
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(ForgotPasswordView.routeName),
@@ -50,6 +109,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
               decoration: InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
+                floatingLabelBehavior: FloatingLabelBehavior.never,
               ),
               keyboardType: TextInputType.emailAddress,
               autofillHints: [AutofillHints.email],

@@ -37,9 +37,9 @@ class _LoginFormViewState extends ConsumerState<LoginFormView> {
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  label: null,
                   labelText: 'Email',
                   border: OutlineInputBorder(),
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
                 ),
                 keyboardType: TextInputType.emailAddress,
                 autofillHints: [AutofillHints.email],
@@ -58,6 +58,7 @@ class _LoginFormViewState extends ConsumerState<LoginFormView> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
                 ),
                 keyboardType: TextInputType.visiblePassword,
                 autofillHints: [AutofillHints.password],
@@ -96,9 +97,9 @@ class _LoginFormViewState extends ConsumerState<LoginFormView> {
               child: Text(
                 'Forgot Password?',
                 style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).textTheme.bodySmall!.color,
                   decoration: TextDecoration.underline,
-                  decorationColor: Theme.of(context).primaryColor,
+                  decorationColor: Theme.of(context).textTheme.bodySmall!.color,
                 ),
               ),
             ),

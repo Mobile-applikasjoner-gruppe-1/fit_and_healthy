@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fit_and_healthy/src/features/auth/app_user_model.dart';
+import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_providers/auth_providers.dart';
+import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,36 +20,58 @@ FirebaseAuthRepository firebaseAuthRepository(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-Stream<AppUser?> firebaseAuthStateChange(Ref ref) {
+Stream<AuthUser?> firebaseAuthStateChange(Ref ref) {
   final auth = ref.watch(firebaseAuthRepositoryProvider);
-  return auth.authStateChanges();
+  return auth.userChanges();
 }
 
 class FirebaseAuthRepository {
   FirebaseAuthRepository(this._firebaseAuth);
 
   final FirebaseAuth _firebaseAuth;
+  AuthUser? _authUser = null;
 
-  DateTime? emailVerificationLastSent;
+  bool _hasGottenUser = false;
 
-  AppUser? _convertUser(User? user) {
-    return user == null ? null : AppUser.fromFirebaseUser(user);
+  Stream<AuthUser?> userChanges() {
+    return _firebaseAuth.userChanges().map((user) {
+      return _updateAuthUser(user);
+    });
   }
 
-  Stream<AppUser?> authStateChanges() {
-    return _firebaseAuth.authStateChanges().map(_convertUser);
+  AuthUser? _updateAuthUser(User? user) {
+    if (user == null) {
+      _authUser = null;
+      _hasGottenUser = false;
+      return null;
+    }
+
+    if (_authUser != null) {
+      _authUser = _authUser!.copyOf(firebaseUser: user);
+    } else {
+      _authUser = AuthUser(firebaseUser: user);
+    }
+    if (!_hasGottenUser) {
+      updateAppUserFromDB();
+    }
+
+    return _authUser;
   }
 
-  AppUser? get currentUser => _convertUser(_firebaseAuth.currentUser);
+  AuthUser? get currentUser => _authUser;
 
   Future<void> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
+    // final creds =
     await _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    // TODO: Check if we need to run _updateAuthUser with the user from the creds here
+    await updateAppUserFromDB();
   }
 
   Future<void> signOut() async {
@@ -56,17 +79,17 @@ class FirebaseAuthRepository {
   }
 
   Future<void> createUserWithEmailAndPassword({
-    required String firstName,
-    required String lastName,
     required String email,
     required String password,
   }) async {
-    final creds = await _firebaseAuth.createUserWithEmailAndPassword(
+    // final creds =
+    await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    await creds.user?.updateDisplayName('$firstName $lastName');
-    await creds.user?.sendEmailVerification();
+
+    // TODO: Check if we need to run _updateAuthUser with the user from the creds here
+    await updateAppUserFromDB();
   }
 
   Future<void> signInWithProvider(SupportedAuthProvider provider) async {
@@ -83,7 +106,11 @@ class FirebaseAuthRepository {
           idToken: googleAuth?.idToken,
         );
 
+        // final creds =
         await _firebaseAuth.signInWithCredential(credential);
+
+        // TODO: Check if we need to run _updateAuthUser with the user from the creds here
+        await updateAppUserFromDB();
         break;
       default:
         throw UnimplementedError(
@@ -115,13 +142,63 @@ class FirebaseAuthRepository {
       throw Exception('User was created without email verification');
     }
 
-    if (emailVerificationLastSent != null &&
-        DateTime.now().difference(emailVerificationLastSent!) <
-            Duration(seconds: 30)) {
-      throw Exception('Email verification already sent');
+    await _firebaseAuth.currentUser!.sendEmailVerification();
+  }
+
+  Future<void> verifyEmail() async {
+    if (_firebaseAuth.currentUser == null) {
+      throw Exception('No user is currently signed in');
     }
 
-    await _firebaseAuth.currentUser?.sendEmailVerification();
-    emailVerificationLastSent = DateTime.now();
+    User user = _firebaseAuth.currentUser!;
+
+    if (user.emailVerified) {
+      throw Exception('Email is already verified');
+    }
+
+    if (user.email == null || user.email!.isEmpty) {
+      throw Exception('User was created without email verification');
+    }
+
+    await user.reload();
+
+    if (user.emailVerified) {
+      await user.getIdToken(true);
+    }
+  }
+
+  Future<void> updateDisplayName(String firstName, String lastName) async {
+    User? user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw Exception('No user is currently signed in');
+    }
+
+    String newDisplayName = '$firstName $lastName';
+
+    await user.updateDisplayName(newDisplayName);
+
+    await user.reload();
+
+    if (user.displayName == newDisplayName) {
+      await user.getIdToken(true);
+    }
+  }
+
+  Future<void> updateAppUserFromDB() async {
+    if (_authUser == null) {
+      return;
+    }
+
+    final UserRepository userRepo = UserRepository(this);
+
+    final appUser = await userRepo.getUser();
+
+    _authUser = _authUser!.copyOf(appUser: appUser);
+
+    _hasGottenUser = true;
+
+    // Refresh the token to force refresh of firebase auth
+    await _authUser!.firebaseUser.getIdToken(true);
   }
 }

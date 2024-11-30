@@ -11,8 +11,6 @@ class RegisterFormView extends ConsumerStatefulWidget {
 }
 
 class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -29,42 +27,6 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'First Name',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: Sizes.s100),
-              TextFormField(
-                controller: _firstNameController,
-                decoration: InputDecoration(
-                  labelText: 'First Name',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.name,
-                autofillHints: [AutofillHints.givenName],
-              ),
-              SizedBox(height: gapSize),
-              Text(
-                'Last Name',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: Sizes.s100),
-              TextFormField(
-                controller: _lastNameController,
-                decoration: InputDecoration(
-                  labelText: 'Last Name',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.name,
-                autofillHints: [AutofillHints.familyName],
-              ),
-              SizedBox(height: gapSize),
-              Text(
                 'Email',
                 style: TextStyle(
                   fontSize: 16,
@@ -77,6 +39,7 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(),
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
                 ),
                 keyboardType: TextInputType.emailAddress,
                 autofillHints: [AutofillHints.email],
@@ -95,6 +58,7 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
                 ),
                 keyboardType: TextInputType.visiblePassword,
                 autofillHints: [AutofillHints.newPassword],
@@ -112,8 +76,6 @@ class _RegisterFormViewState extends ConsumerState<RegisterFormView> {
                 ref
                     .read(authControllerProvider.notifier)
                     .createUserWithEmailAndPassword(
-                      firstName: _firstNameController.text,
-                      lastName: _lastNameController.text,
                       email: _emailController.text,
                       password: _passwordController.text,
                     );

@@ -1,12 +1,13 @@
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fit_and_healthy/src/features/auth/app_user_model.dart';
+import 'package:fit_and_healthy/src/features/auth/auth_user_model.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/exercise/data/exercise_repository.dart';
+import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 
 final workoutConverter = (
   fromFirestore: (snapshot, _) => Workout.fromFirebase(snapshot.data()!),
-  toFirestore: (Workout workout, _) => workout.toFirebase(),
+  toFirestore: (Workout workout, _) => workout.toFirestore(),
 );
 
 /// Repository for handling workout data.
@@ -15,7 +16,22 @@ class WorkoutRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuthRepository _authRepository;
 
+  static String collectionName = 'workouts';
+
   WorkoutRepository(this._authRepository);
+
+  CollectionReference<Workout> _getWorkoutCollection() {
+    final AuthUser user = _authRepository.currentUser!;
+
+    return _firestore
+        .collection(UserRepository.collectionName)
+        .doc(user.firebaseUser.uid)
+        .collection(collectionName)
+        .withConverter<Workout>(
+          fromFirestore: workoutConverter.fromFirestore,
+          toFirestore: workoutConverter.toFirestore,
+        );
+  }
 
   /// Returns a list of all workouts for a given day.
   /// The date parameter is automatically converted to the start of the day.
@@ -25,15 +41,10 @@ class WorkoutRepository {
     DateTime startOfDay = DateTime(date.year, date.month, date.day);
     DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-    final AppUser user = _authRepository.currentUser!;
-
-    QuerySnapshot<Workout> querySnapshot = await _firestore
-        .collection('users')
-        .doc(user.firebaseUser!.uid)
-        .collection('workouts')
+    QuerySnapshot<Workout> querySnapshot = await _getWorkoutCollection()
         .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
         .where('dateTime', isLessThanOrEqualTo: endOfDay)
-        .withConverter(
+        .withConverter<Workout>(
             fromFirestore: workoutConverter.fromFirestore,
             toFirestore: workoutConverter.toFirestore)
         .get();
@@ -45,10 +56,10 @@ class WorkoutRepository {
   /// Auto generates an ID for the workout and returns it.
   /// Will throw an error if the workout is not added successfully.
   Future<String> addWorkout(Workout workout) async {
-    CollectionReference workoutsRef = _firestore.collection('workouts');
+    CollectionReference workoutsRef = _getWorkoutCollection();
 
     DocumentReference workoutRef = await workoutsRef
-        .withConverter(
+        .withConverter<Workout>(
             fromFirestore: workoutConverter.fromFirestore,
             toFirestore: workoutConverter.toFirestore)
         .add(workout);
@@ -60,11 +71,10 @@ class WorkoutRepository {
   /// Overwrites the existing workout with the new workout data.
   /// Will throw an error if the workout is not updated successfully.
   Future<void> updateWorkout(Workout workout) async {
-    DocumentReference workoutRef =
-        _firestore.collection('workouts').doc(workout.id);
+    DocumentReference workoutRef = _getWorkoutCollection().doc(workout.id);
 
     await workoutRef
-        .withConverter(
+        .withConverter<Workout>(
             fromFirestore: workoutConverter.fromFirestore,
             toFirestore: workoutConverter.toFirestore)
         .set(workout);
@@ -73,7 +83,7 @@ class WorkoutRepository {
   /// Deletes an existing workout from the database.
   /// Will throw an error if the workout is not deleted successfully.
   Future<void> deleteWorkout(String workoutId) async {
-    CollectionReference workoutsRef = _firestore.collection('workouts');
+    CollectionReference workoutsRef = _getWorkoutCollection();
 
     final ExerciseRepository _exerciseRepository =
         ExerciseRepository(_authRepository, workoutId);
