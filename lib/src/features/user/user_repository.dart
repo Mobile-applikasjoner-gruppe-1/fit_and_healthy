@@ -23,11 +23,7 @@ class UserRepository {
 
   static String collectionName = 'users';
 
-  late DocumentReference<User> _userRef;
-
-  UserRepository(this._authRepository) {
-    _userRef = _getUserRef();
-  }
+  UserRepository(this._authRepository);
 
   DocumentReference<User> _getUserRef() {
     final AuthUser user = _authRepository.currentUser!;
@@ -44,11 +40,11 @@ class UserRepository {
     if (!User.isValidUserModel(user)) {
       throw Exception('Invalid UserModel');
     }
-    await _userRef.set(user);
+    await _getUserRef().set(user);
   }
 
   Future<User?> getUser() async {
-    final userDoc = await _userRef.get();
+    final userDoc = await _getUserRef().get();
     if (userDoc.exists) {
       final userModel = userDoc.data();
       if (userModel == null || !User.isValidUserModel(userModel)) {
@@ -64,13 +60,13 @@ class UserRepository {
       throw Exception("Invalid UserModel provided. Validation failed.");
     }
 
-    final userDoc = await _userRef.get();
+    final userDoc = await _getUserRef().get();
 
     if (userDoc.exists) {
       throw Exception('User already exists');
     }
 
-    await _userRef.set(user);
+    await _getUserRef().set(user);
   }
 
   Future<void> updateActivityLevel(ActivityLevel activityLevel) async {
@@ -78,7 +74,7 @@ class UserRepository {
       throw Exception('Invalid Activity Level');
     }
 
-    await _userRef.update({
+    await _getUserRef().update({
       UserField.activityLevel.toString():
           ActivityLevelExtension.toFirestore(activityLevel)
     });
@@ -89,7 +85,7 @@ class UserRepository {
       throw Exception('Invalid height');
     }
 
-    await _userRef.update({UserField.height.toString(): height});
+    await _getUserRef().update({UserField.height.toString(): height});
   }
 
   Future<void> updateGender(Gender gender) async {
@@ -97,7 +93,7 @@ class UserRepository {
       throw Exception('Invalid gender');
     }
 
-    await _userRef.update(
+    await _getUserRef().update(
         {UserField.gender.toString(): GenderExtension.toFirestore(gender)});
   }
 
@@ -108,7 +104,7 @@ class UserRepository {
 
     final timestamp = Timestamp.fromDate(birthday);
 
-    return _userRef.update({UserField.birthday.toString(): timestamp});
+    return _getUserRef().update({UserField.birthday.toString(): timestamp});
   }
 
   Future<void> updateWeeklyWorkoutGoal(int goal) {
@@ -116,7 +112,7 @@ class UserRepository {
       throw Exception('Invalid weekly workout goal');
     }
 
-    return _userRef.update({
+    return _getUserRef().update({
       UserField.weeklyWorkoutGoal.toString(): goal,
     });
   }
@@ -126,7 +122,7 @@ class UserRepository {
       throw Exception('Invalid weight goal');
     }
 
-    return _userRef.update({
+    return _getUserRef().update({
       UserField.weightGoal.toString(): WeightGoalExtension.toFirestore(goal)
     });
   }

@@ -23,7 +23,7 @@ class WeightRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuthRepository _authRepository;
 
-  static String collectionName = 'weightEntry';
+  static String collectionName = 'weightEntries';
 
   WeightRepository(this._authRepository);
 
