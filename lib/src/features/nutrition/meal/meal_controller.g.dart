@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'auth_controller.dart';
+part of 'meal_controller.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authControllerHash() => r'a3bb61ae7b244738fdfdd0042e1338f500d5a519';
+String _$mealControllerHash() => r'4c1307f3da706138d3aa6e9888e14d0ec7a9e703';
 
-/// See also [AuthController].
-@ProviderFor(AuthController)
-final authControllerProvider =
-    AutoDisposeAsyncNotifierProvider<AuthController, AuthLoadingState>.internal(
-  AuthController.new,
-  name: r'authControllerProvider',
+/// See also [MealController].
+@ProviderFor(MealController)
+final mealControllerProvider =
+    AutoDisposeAsyncNotifierProvider<MealController, MealHolder>.internal(
+  MealController.new,
+  name: r'mealControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$authControllerHash,
+      : _$mealControllerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$AuthController = AutoDisposeAsyncNotifier<AuthLoadingState>;
+typedef _$MealController = AutoDisposeAsyncNotifier<MealHolder>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

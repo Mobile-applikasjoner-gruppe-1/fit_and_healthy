@@ -1,28 +1,46 @@
+import 'package:fit_and_healthy/shared/widgets/fields/height_editor.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/src/common/styles/sizes.dart';
+import 'package:fit_and_healthy/shared/models/gender.dart';
 
-final genderProvider = StateProvider<Gender>((ref) => Gender.male);
-final heightProvider = StateProvider<String>((ref) => '170 cm');
-
-enum Gender { male, female }
-
-class ProfileSettingsPage extends ConsumerWidget {
+class ProfileSettingsPage extends ConsumerStatefulWidget {
   const ProfileSettingsPage({super.key});
 
   static const route = '/profile';
   static const routeName = 'Profile';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _ProfileSettingsPageState createState() => _ProfileSettingsPageState();
+}
+
+class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
+  @override
+  Widget build(BuildContext context) {
     final settingsState = ref.watch(settingsControllerProvider).value;
-
-    final selectedGender = ref.watch(genderProvider);
-    final height = ref.watch(heightProvider);
-
+    final metricsState = ref.watch(metricsControllerProvider);
     final theme = Theme.of(context);
+
+    if (metricsState is AsyncLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (metricsState is AsyncError) {
+      return Center(child: Text('Error: ${metricsState.error}'));
+    }
+
+    final data = metricsState.value;
+
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
+
+    final height = data.height;
+    final gender = data.gender;
+    final birthday = data.birthday;
 
     return NestedScaffold(
       appBar: AppBar(
@@ -85,17 +103,11 @@ class ProfileSettingsPage extends ConsumerWidget {
                     ref: ref,
                   ),
                   _buildDivider(),
-                  _buildEditableGenderField(
-                    context,
-                    ref,
-                    selectedGender: selectedGender,
-                  ),
+                  _buildEditableGenderField(context, ref, gender),
                   _buildDivider(),
-                  _buildEditableHeightField(
-                    context,
-                    ref,
-                    height: height,
-                  ),
+                  _buildEditableHeightField(context, ref, height),
+                  _buildDivider(),
+                  _buildEditableBirthdayField(context, ref, birthday),
                 ],
               ),
             ),
@@ -139,9 +151,9 @@ class ProfileSettingsPage extends ConsumerWidget {
 
   Widget _buildEditableGenderField(
     BuildContext context,
-    WidgetRef ref, {
-    required Gender selectedGender,
-  }) {
+    WidgetRef ref,
+    Gender gender,
+  ) {
     final theme = Theme.of(context);
 
     return ListTile(
@@ -151,7 +163,7 @@ class ProfileSettingsPage extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            selectedGender == Gender.male ? 'Male' : 'Female',
+            gender == Gender.male ? 'Male' : 'Female',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(width: Sizes.s100),
@@ -159,20 +171,16 @@ class ProfileSettingsPage extends ConsumerWidget {
         ],
       ),
       onTap: () {
-        _showGenderEditDialog(
-          context,
-          ref,
-          selectedGender: selectedGender,
-        );
+        _showGenderEditDialog(context, ref, gender);
       },
     );
   }
 
   Widget _buildEditableHeightField(
-    BuildContext context,
-    WidgetRef ref, {
-    required String height,
-  }) {
+    BuildContext contex,
+    WidgetRef ref,
+    double height,
+  ) {
     final theme = Theme.of(context);
 
     return ListTile(
@@ -182,7 +190,42 @@ class ProfileSettingsPage extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            height,
+            height.toString(),
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(width: Sizes.s100),
+          const Icon(Icons.chevron_right),
+        ],
+      ),
+      onTap: () async {
+        //_showHeightEditDialog(context, ref, height);
+        final newHeight = await HeightEditor.showDialogForHeight(
+          context,
+          height.toDouble(),
+        );
+        if (newHeight != null) {
+          await ref
+              .read(metricsControllerProvider.notifier)
+              .updateHeight(newHeight);
+        }
+      },
+    );
+  }
+
+  Widget _buildEditableBirthdayField(
+      BuildContext context, WidgetRef ref, DateTime? birthday) {
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: Icon(Icons.cake, color: theme.colorScheme.primary),
+      title: const Text('Birthday'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            birthday != null
+                ? '${birthday.day}/${birthday.month}/${birthday.year}'
+                : 'Set Birthday',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(width: Sizes.s100),
@@ -190,11 +233,7 @@ class ProfileSettingsPage extends ConsumerWidget {
         ],
       ),
       onTap: () {
-        _showHeightEditDialog(
-          context,
-          ref,
-          height: height,
-        );
+        _showBirthdayEditDialog(context, ref, birthday);
       },
     );
   }
@@ -205,11 +244,9 @@ class ProfileSettingsPage extends ConsumerWidget {
 
   void _showGenderEditDialog(
     BuildContext context,
-    WidgetRef ref, {
-    required Gender selectedGender,
-  }) {
-    final genderNotifier = ref.read(genderProvider.notifier);
-
+    WidgetRef ref,
+    Gender currentGender,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
@@ -221,10 +258,12 @@ class ProfileSettingsPage extends ConsumerWidget {
               return RadioListTile<Gender>(
                 title: Text(gender == Gender.male ? 'Male' : 'Female'),
                 value: gender,
-                groupValue: selectedGender,
-                onChanged: (newGender) {
+                groupValue: currentGender,
+                onChanged: (newGender) async {
                   if (newGender != null) {
-                    genderNotifier.state = newGender;
+                    await ref
+                        .read(metricsControllerProvider.notifier)
+                        .updateGender(newGender);
                     Navigator.of(context).pop();
                   }
                 },
@@ -236,53 +275,30 @@ class ProfileSettingsPage extends ConsumerWidget {
     );
   }
 
-  void _showHeightEditDialog(
-    BuildContext context,
-    WidgetRef ref, {
-    required String height,
-  }) {
-    final heightNotifier = ref.read(heightProvider.notifier);
-    final TextEditingController controller =
-        TextEditingController(text: height.replaceAll(' cm', ''));
-
+  void _showBirthdayEditDialog(
+      BuildContext context, WidgetRef ref, DateTime? birthday) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit Height'),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Height (cm)',
-              border: OutlineInputBorder(),
-            ),
-            // TODO: Add input validation
-            // TODO: Add save on keyboard done(?)
+          title: const Text('Edit Birthday'),
+          content: ElevatedButton(
+            onPressed: () async {
+              final selectedDate = await showDatePicker(
+                context: context,
+                initialDate: birthday ?? DateTime(2000),
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+              );
+              if (selectedDate != null) {
+                await ref
+                    .read(metricsControllerProvider.notifier)
+                    .setBirthday(selectedDate);
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Select Birthday'),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final int? newHeight = int.tryParse(controller.text);
-                if (newHeight != null) {
-                  heightNotifier.state = '$newHeight cm';
-                  Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid number.'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
         );
       },
     );

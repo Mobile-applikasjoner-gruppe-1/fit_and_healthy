@@ -91,7 +91,7 @@ service cloud.firestore {
         }
       }
 
-      match /weightEntry/{weightEntryId} {
+      match /weightEntries/{weightEntryId} {
         function isValidWeightEntryCreate() {
           // Add your validation logic for creating a weight entry here
           return true;

@@ -1,23 +1,24 @@
 import 'package:fit_and_healthy/src/features/auth/add_display_name/add_display_name_view.dart';
 import 'package:fit_and_healthy/src/features/auth/email_verification/email_verification_view.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_setup_page.dart';
 import 'package:fit_and_healthy/src/features/routing/app_router_redirect.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_password_view.dart';
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_view.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/gdpr_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/goals_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/measurement_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/privacy_gdpr_policy_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/profile_settings_page.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/widget_settings_page.dart';
+import 'package:fit_and_healthy/src/features/gdpr_policy/gdpr_settings_page.dart';
+import 'package:fit_and_healthy/src/features/goals/goals_settings_page.dart';
+import 'package:fit_and_healthy/src/features/metrics/measurement_settings_page.dart';
+import 'package:fit_and_healthy/src/features/gdpr_policy/privacy_gdpr_policy_settings_page.dart';
+import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
+import 'package:fit_and_healthy/src/features/settings/settings_widget_page.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/fooditemwidgets/foodSearchScreen.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/mealCreationScreen.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/nutritionScreen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_search_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_creation_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/nutrition_screen.dart';
 import 'package:fit_and_healthy/src/utils/stream_listenable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -185,6 +186,13 @@ GoRouter appRouter(Ref ref) {
         name: AddDisplayNameView.routeName,
         builder: (context, state) {
           return AddDisplayNameView();
+        },
+      ),
+      GoRoute(
+        path: MetricsSetupPage.route,
+        name: MetricsSetupPage.routeName,
+        builder: (context, state) {
+          return MetricsSetupPage();
         },
       ),
     ],

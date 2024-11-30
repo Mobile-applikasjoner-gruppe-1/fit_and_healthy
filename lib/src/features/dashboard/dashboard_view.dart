@@ -1,5 +1,5 @@
 import 'package:fit_and_healthy/shared/utils/card_provider.dart';
-import 'package:fit_and_healthy/src/features/settings/pages/widget_settings_page.dart';
+import 'package:fit_and_healthy/src/features/settings/settings_widget_page.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

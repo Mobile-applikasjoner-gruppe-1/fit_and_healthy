@@ -1,6 +1,6 @@
+import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/weight_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_and_healthy/shared/models/WeightEntry.dart';
 
 class CardWeight extends StatelessWidget {
   final List<WeightEntry> entries;

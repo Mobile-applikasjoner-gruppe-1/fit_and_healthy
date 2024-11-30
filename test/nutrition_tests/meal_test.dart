@@ -1,6 +1,6 @@
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/fooditem.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/foodrelatedclasses/mealClass.dart';
-import 'package:fit_and_healthy/src/openfoodfacts/openFoodApi.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// This class uses real world data, used print statement because values can change by producers of products
@@ -9,7 +9,7 @@ void main() {
 
   group('Meal Nutrition Calculation', () {
     test('Add food items by barcode and calculate total nutrition', () async {
-      final meal = Meal(name: 'Dinner');
+      final meal = Meal(name: 'Dinner', timestamp: DateTime.now(), id: '1');
 
       // List of test items with their barcodes and desired grams
       final testItems = [
@@ -32,8 +32,8 @@ void main() {
         // Fetch the FoodItem by barcode using OpenFoodApi
         final result = await api.fetchProductByBarcode(barcode);
         if (result != null) {
-          final foodItem = FoodItem.fromJson(result);
-          meal.addFoodItem(foodItem, grams);
+          final foodItem = FoodItem.fromFoodFactsJson(result);
+          meal.addFoodItem(foodItem);
           print('Added ${foodItem.name} (${grams}g) to the meal.');
         } else {
           print('No food item found for barcode: $barcode');
