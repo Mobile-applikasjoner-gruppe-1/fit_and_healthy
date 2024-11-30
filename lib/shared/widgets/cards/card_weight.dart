@@ -1,14 +1,20 @@
 import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/weight_chart.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CardWeight extends StatelessWidget {
-  final List<WeightEntry> entries;
-
-  const CardWeight({Key? key, required this.entries}) : super(key: key);
+class CardWeight extends ConsumerWidget {
+  const CardWeight({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final metricsState = ref.watch(metricsControllerProvider);
+    final List<WeightEntry> weightEntries = metricsState.maybeWhen(
+      data: (metrics) => metrics.weightHistory.cast<WeightEntry>(),
+      orElse: () => [],
+    );
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -50,7 +56,7 @@ class CardWeight extends StatelessWidget {
             // Chart
             SizedBox(
               height: 100, // Fixed height for chart
-              child: WeightChart(entries: entries), // Reuse WeightChart
+              child: WeightChart(entries: weightEntries), // Reuse WeightChart
             ),
           ],
         ),
