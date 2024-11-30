@@ -4,6 +4,7 @@ import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_ite
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class FoodSearchScreen extends StatefulWidget {
   static const route = '/search';
@@ -20,12 +21,29 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
   // Method to search for products
   Future<void> _searchProducts(String query) async {
-    final api = OpenFoodApi(); // Assuming you have the API set up
+    final api = OpenFoodApi();
     final results = await api.searchProductsByName(query);
     setState(() {
       _searchResults =
           results.map((json) => FoodItem.fromFoodFactsJson(json)).toList();
     });
+  }
+
+  // Method to fetch product by barcode and add to search results
+  Future<void> _searchProductByBarcode(String barcode) async {
+    final api = OpenFoodApi();
+    try {
+      final product = await api.fetchProductByBarcode(barcode);
+      if (product != null) {
+        setState(() {
+          _searchResults = [FoodItem.fromFoodFactsJson(product)];
+        });
+      } else {
+        _showMessage('Product not found for barcode: $barcode');
+      }
+    } catch (e) {
+      _showMessage('Failed to fetch product: $e');
+    }
   }
 
   // Method to add food item to the list
@@ -35,6 +53,42 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       _searchResults.clear(); // Clear search results after adding
       _searchController.clear(); // Clear search input
     });
+  }
+
+  // Method to show a message
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  // Method to show the barcode scanner and handle the result
+  Future<void> _scanBarcode() async {
+    String barcode = await showDialog<String>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Scan Barcode'),
+              content: SizedBox(
+                height: 400,
+                width: 300,
+                child: MobileScanner(
+                  onDetect: (BarcodeCapture barcodeCapture) {
+                    final String barcodeValue =
+                        barcodeCapture.barcodes.isNotEmpty
+                            ? barcodeCapture.barcodes.first.rawValue ?? ''
+                            : '';
+                    Navigator.pop(context, barcodeValue);
+                  },
+                ),
+              ),
+            );
+          },
+        ) ??
+        ''; // If no barcode is scanned, return an empty string
+
+    if (barcode.isNotEmpty) {
+      await _searchProductByBarcode(barcode);
+    }
   }
 
   @override
@@ -53,11 +107,20 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
               controller: _searchController,
               decoration: InputDecoration(
                 labelText: 'Enter product name or barcode',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {
-                    _searchProducts(_searchController.text);
-                  },
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: () {
+                        _searchProducts(_searchController.text);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.camera_alt),
+                      onPressed: _scanBarcode,
+                    ),
+                  ],
                 ),
               ),
             ),
