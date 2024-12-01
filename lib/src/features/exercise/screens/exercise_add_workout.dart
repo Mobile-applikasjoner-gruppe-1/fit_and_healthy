@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 /**
- * The `AddWorkout` widget, provides a user interface 
+ * The `AddWorkout` widget provides a user interface 
  * for adding and managing a new workout session. It includes:
  * - A form for entering workout details (title, date, time).
  * - Buttons for navigating to add exercises and submitting the workout.
@@ -21,6 +21,7 @@ class AddWorkout extends StatefulWidget {
   const AddWorkout({super.key, required this.workouts});
 
   static const route = '/exercise';
+  static const routeName = 'Add Workout';
 
   final List<Workout> workouts; // The list of workouts
 
@@ -45,18 +46,125 @@ class _AddWorkoutState extends State<AddWorkout> {
     context.push('${AddWorkout.route}/add-exercise');
   }
 
+  /**
+   * Handles the date selection process using `showDatePicker`.
+   * Updates the selected date if the user picks one.
+   */
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  /**
+   * Handles the time selection process using `showTimePicker`.
+   * Updates the selected time if the user picks one.
+   */
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+    );
+    if (pickedTime != null) {
+      setState(() {
+        _selectedTime = pickedTime;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    Widget content = SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            child: Column(
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(label: Text('Title')),
+                  initialValue: _title,
+                  onChanged: (value) => setState(() {
+                    _title = value;
+                  }),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () async {
+                    await _selectDate(context);
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${DateFormat.EEEE().format(_selectedDate)} ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await _selectTime(context);
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.access_alarms_outlined),
+                      const SizedBox(width: 8),
+                      Text(' ${_selectedTime.format(context)}'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => _navigateToAddExercise(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                  ),
+                  child: const Text(
+                    'Add Exercise',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Exercises',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black.withOpacity(0.7),
+                  ),
+                ),
+                const Divider(
+                  thickness: 1,
+                  color: Colors.blue,
+                ),
+                const SizedBox(height: 16),
+                // Add exercise list content here
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
     return NestedScaffold(
       appBar: AppBar(
-        title: const Text('Add workout'),
+        title: const Text('Add Workout'),
         centerTitle: true,
         actions: [
-          /**
-           * Finalizes the workout creation process.
-           * 
-           * Displays a success message and navigates back to the previous screen.
-           */
           TextButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -77,99 +185,7 @@ class _AddWorkoutState extends State<AddWorkout> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(label: Text('Title')),
-                    initialValue: _title,
-                    onChanged: (value) => setState(() {
-                      _title = value;
-                    }),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () async {
-                      final DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: _selectedDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                      );
-                      if (pickedDate != null) {
-                        setState(() {
-                          _selectedDate = pickedDate;
-                        });
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today),
-                        const SizedBox(width: 8),
-                        Text('${DateFormat.EEEE().format(_selectedDate)} ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',)
-                      ]
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      final TimeOfDay? pickedTime = await showTimePicker(
-                        context: context,
-                        initialTime: _selectedTime,
-                      );
-                      if (pickedTime != null) {
-                        setState(() {
-                          _selectedTime = pickedTime;
-                        });
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        const Icon(Icons.access_alarms_outlined),
-                        const SizedBox(width: 8),
-                        Text(' ${_selectedTime.format(context)}',),
-                      ],
-                    )
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => _navigateToAddExercise(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                    ),
-                    child: const Text(
-                      'Add Exercise',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Exercises',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black.withOpacity(0.7),
-                    ),
-                  ),
-                  const Divider(
-                    thickness: 1,
-                    color: Colors.blue,
-                  ),
-                  const SizedBox(height: 16),
-                  // Display the list of exercises here
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      body: content,
     );
   }
 }
