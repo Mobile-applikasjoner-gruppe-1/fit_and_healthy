@@ -4,40 +4,39 @@ import 'package:fit_and_healthy/src/features/exercise/dialogs/exercise_selection
 import 'package:fit_and_healthy/src/features/exercise/dialogs/create_new_exercise_dialog.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 
-/**
- * The `AddExercise` widget provides a user interface
- * for selecting or creating a new exercise, adding sets, and optional notes.
- * It includes:
- * - A dialog for selecting or creating an exercise.
- * - Input fields for sets (reps, weight).
- * - Constructs an `Exercise` object based on the user inputs.
- */
 class AddExercise extends StatefulWidget {
-  /**
-   * Constructor for the `AddExercise` widget.
-   * 
-   * @param exerciseInfoList A list of `ExerciseInfoList` objects for displaying
-   * the available exercises to choose from.
-   */
   const AddExercise({super.key, required this.exerciseInfoList});
 
   static const route = '/exercise';
   static const routeName = 'Add Exercise';
 
-  final List<ExerciseInfoList> exerciseInfoList; // List of available exercises.
+  final List<ExerciseInfoList> exerciseInfoList;
 
   @override
   State<AddExercise> createState() => _AddExerciseState();
 }
 
 class _AddExerciseState extends State<AddExercise> {
-  ExerciseInfoList? selectedExercise; // The selected exercise.
-  List<Map<String, String>> sets = [{'reps': '', 'weight': ''}]; // List of sets (reps, weight).
-  String? note; // Optional note for the exercise.
+  final _formKey = GlobalKey<FormState>();
+  ExerciseInfoList? selectedExercise;
+  final List<Map<String, TextEditingController>> _setsControllers = [];
+  String? note;
 
-  /**
-   * Displays the dialog for selecting an exercise.
-   */
+  @override
+  void initState() {
+    super.initState();
+    _addSet(); // Add the first set by default.
+  }
+
+  @override
+  void dispose() {
+    for (var controllers in _setsControllers) {
+      controllers['reps']?.dispose();
+      controllers['weight']?.dispose();
+    }
+    super.dispose();
+  }
+
   Future<void> _showExerciseSelectionDialog() async {
     await showDialog(
       context: context,
@@ -58,9 +57,6 @@ class _AddExerciseState extends State<AddExercise> {
     );
   }
 
-  /**
-   * Displays the dialog for creating a new exercise.
-   */
   Future<void> _showCreateNewExerciseDialog() async {
     await showDialog(
       context: context,
@@ -78,34 +74,43 @@ class _AddExerciseState extends State<AddExercise> {
     );
   }
 
-  /**
-   * Adds a new set to the list of sets.
-   */
   void _addSet() {
     setState(() {
-      sets.add({'reps': '', 'weight': ''});
+      _setsControllers.add({
+        'reps': TextEditingController(),
+        'weight': TextEditingController(),
+      });
     });
   }
 
-  /**
-   * Removes a set from the list based on its index.
-   * 
-   * @param index The index of the set to be removed.
-   */
   void _removeSet(int index) {
     setState(() {
-      sets.removeAt(index);
+      _setsControllers[index]['reps']?.dispose();
+      _setsControllers[index]['weight']?.dispose();
+      _setsControllers.removeAt(index);
     });
   }
 
-  /**
-   * Constructs an `Exercise` object from the selected exercise, sets, and note.
-   */
+  bool _validateSets() {
+    bool isValid = true;
+
+    for (var controllers in _setsControllers) {
+      final reps = int.tryParse(controllers['reps']?.text ?? '');
+      final weight = double.tryParse(controllers['weight']?.text ?? '');
+
+      if (reps == null || reps <= 0 || weight == null || weight <= 0) {
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  }
+
   Exercise _createExercise() {
-    final exerciseSets = sets.map((set) {
+    final exerciseSets = _setsControllers.map((controllers) {
       return ExerciseSet(
-        repititions: int.tryParse(set['reps'] ?? '0') ?? 0,
-        weight: double.tryParse(set['weight'] ?? '0.0') ?? 0.0,
+        repititions: int.tryParse(controllers['reps']?.text ?? '0') ?? 0,
+        weight: double.tryParse(controllers['weight']?.text ?? '0.0') ?? 0.0,
       );
     }).toList();
 
@@ -154,110 +159,129 @@ class _AddExerciseState extends State<AddExercise> {
     } else {
       exerciseContent = Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  selectedExercise!.name,
-                  style: const TextStyle(
-                    fontSize: 20,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedExercise!.name,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    onPressed: _showExerciseSelectionDialog,
+                    tooltip: 'Edit Exercise',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                selectedExercise!.info,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Add Note (optional)',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                onChanged: (value) => note = value,
+              ),
+              const SizedBox(height: 16),
+              const Center(
+                child: Text(
+                  'Sets',
+                  style: TextStyle(
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: _showExerciseSelectionDialog,
-                  tooltip: 'Edit Exercise',
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              selectedExercise!.info,
-              style: const TextStyle(
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
               ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Add Note (optional)',
-                border: OutlineInputBorder(),
+              const Divider(
+                thickness: 1,
+                color: Colors.blue,
               ),
-              maxLines: 3,
-              onChanged: (value) => note = value,
-            ),
-            const SizedBox(height: 16),
-            const Center(
-              child: Text(
-                'Sets',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const Divider(
-              thickness: 1,
-              color: Colors.blue,
-            ),
-            const SizedBox(height: 16),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: sets.length,
-              itemBuilder: (context, index) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${index + 1}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      width: 60,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Reps',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) => sets[index]['reps'] = value,
+              const SizedBox(height: 16),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: _setsControllers.length,
+                itemBuilder: (context, index) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${index + 1}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    SizedBox(
-                      width: 120,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Weight (kg)',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                      SizedBox(
+                        width: 60,
+                        child: TextFormField(
+                          controller: _setsControllers[index]['reps'],
+                          decoration: InputDecoration(
+                            labelText: 'Reps',
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            final reps = int.tryParse(value ?? '');
+                            if (reps == null || reps <= 0) {
+                              return 'Invalid';
+                            }
+                            return null;
+                          },
                         ),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) => sets[index]['weight'] = value,
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _removeSet(index),
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: TextButton(
-                onPressed: _addSet,
-                child: const Text('Add Set'),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue,
-                ),
+                      SizedBox(
+                        width: 120,
+                        child: TextFormField(
+                          controller: _setsControllers[index]['weight'],
+                          decoration: InputDecoration(
+                            labelText: 'Weight (kg)',
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            final weight = double.tryParse(value ?? '');
+                            if (weight == null || weight <= 0) {
+                              return 'Invalid';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => _removeSet(index),
+                      ),
+                    ],
+                  );
+                },
               ),
-            )
-          ],
+              const SizedBox(height: 16),
+              Center(
+                child: TextButton(
+                  onPressed: _addSet,
+                  child: const Text('Add Set'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue,
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       );
     }
@@ -278,21 +302,28 @@ class _AddExerciseState extends State<AddExercise> {
         actions: [
           TextButton(
             onPressed: () {
-              if (selectedExercise != null) {
+              if (selectedExercise == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('No exercise selected.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              if (_formKey.currentState!.validate()) {
+                final createdExercise = _createExercise();
                 if (mounted) {
-                  final createdExercise = _createExercise();
                   Navigator.pop(context, createdExercise);
                 }
               } else {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please select an exercise first.'),
-                      duration: Duration(seconds: 2),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Must be a positive number.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: const Text(
