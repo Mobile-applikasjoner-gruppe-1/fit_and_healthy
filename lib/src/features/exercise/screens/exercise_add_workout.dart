@@ -97,6 +97,45 @@ class _AddWorkoutState extends State<AddWorkout> {
     );
   }
 
+  /**
+   * Displays an alert dialog when no exercises are added.
+   */
+  Future<void> _showNoExercisesDialog(BuildContext context) async {
+    final shouldContinue = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('No Exercises Added'),
+          content: const Text('You have not added any exercises. Do you want to continue?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldContinue == true) {
+      final newWorkout = _createWorkout();
+      if (mounted) {
+        Navigator.pop(context, newWorkout);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Workout added successfully!'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget content = SingleChildScrollView(
@@ -198,16 +237,20 @@ class _AddWorkoutState extends State<AddWorkout> {
         actions: [
           TextButton(
             onPressed: () {
-              final newWorkout = _createWorkout();
-              if (mounted) {
-                Navigator.pop(context, newWorkout);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Workout added successfully!'),
-                    duration: Duration(seconds: 2),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+              if (_exercises.isEmpty) {
+                _showNoExercisesDialog(context);
+              } else {
+                final newWorkout = _createWorkout();
+                if (mounted) {
+                  Navigator.pop(context, newWorkout);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Workout added successfully!'),
+                      duration: Duration(seconds: 2),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
               }
             },
             child: const Text(
