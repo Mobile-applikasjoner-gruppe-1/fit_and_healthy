@@ -1,22 +1,31 @@
 import 'package:fit_and_healthy/shared/models/exercise.dart';
+import 'package:fit_and_healthy/src/features/exercise/dialogs/exercise_selection_dialog.dart';
+import 'package:fit_and_healthy/src/features/exercise/dialogs/create_new_exercise_dialog.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 
 /**
- * The AddExerciseView widget provides functionality for adding and managing
- * a new workout session.
+ * The `AddExercise` widget, provides a user interface
+ * for selecting or creating a new exercise. It includes:
+ * - A dialog for selecting an existing exercise.
+ * - A dialog for creating a new exercise if none exists or is selected.
+ * - The ability to display the selected exercise with its details.
  */
 class AddExercise extends StatefulWidget {
+  /**
+   * Constructor for the `AddExercise` widget.
+   * 
+   * @param exerciseInfoList A list of `ExerciseInfoList` objects for displaying
+   * the available exercises to choose from.
+   */
   const AddExercise({super.key, required this.exerciseInfoList});
 
   static const route = '/exercise';
 
-  final List<ExerciseInfoList> exerciseInfoList;
+  final List<ExerciseInfoList> exerciseInfoList; // THe list of exercises info
 
   @override
-  State<AddExercise> createState() {
-    return _AddExerciseState();
-  }
+  State<AddExercise> createState() => _AddExerciseState();
 }
 
 class _AddExerciseState extends State<AddExercise> {
@@ -24,231 +33,142 @@ class _AddExerciseState extends State<AddExercise> {
 
   @override
   void initState() {
+    /**
+     * Displays the exercise selection dialog when the widget is first built.
+     * This ensures the user interacts with the dialog immediately on screen load.
+     */
     super.initState();
-    // Show the selection dialog as soon as the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showExerciseSelectionDialog();
     });
   }
 
   /**
-   * Opens a dialog to allow the user to select an exercise.
+   * Displays the dialog for selecting an exercise.
    * 
-   * If the user selects an exercise, it updates the [selectedExercise].
+   * If an exercise is selected, updates the `selectedExercise`. If the user
+   * chooses to create a new exercise, opens the `CreateNewExerciseDialog`.
    */
   Future<void> _showExerciseSelectionDialog() async {
-    final exercise = await showDialog<ExerciseInfoList>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select Exercise'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: widget.exerciseInfoList.length,
-              itemBuilder: (context, index) {
-                final exercise = widget.exerciseInfoList[index];
-                return ListTile(
-                  title: Text(exercise.name),
-                  onTap: () {
-                    Navigator.pop(context, exercise);
-                  },
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); 
-                _showCreateNewExerciseDialog(); 
-              },
-              child: const Text('Create new exercise'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context), 
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (exercise != null) {
-      setState(() {
-        selectedExercise = exercise;
-      });
-    }
-  }
-
-
-  Future<void> _showCreateNewExerciseDialog() async {
-    String? exerciseName;
-    ExerciseCategory? exerciseCategory;
-    String? exerciseInfo;
-
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Create New Exercise'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(labelText: 'Exercise Name'),
-                onChanged: (value) {
-                  exerciseName = value;
-                },
-              ),
-              DropdownButtonFormField<ExerciseCategory>(
-                decoration: const InputDecoration(labelText: 'Category'),
-                items: ExerciseCategory.values.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  exerciseCategory = value;
-                },
-              ),
-              TextField(
-                decoration: const InputDecoration(labelText: 'Note'),
-                onChanged: (value) {
-                  exerciseInfo = value;
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (exerciseName != null && exerciseCategory != null) {
-                  setState(() {
-                    selectedExercise = ExerciseInfoList(
-                      id: UniqueKey().toString(),
-                      name: exerciseName!,
-                      exerciseCategory: exerciseCategory!,
-                      info: exerciseInfo ?? '',
-                    );
-                  });
-
-                  Navigator.pop(context); // Close only the Create Exercise dialog
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please fill out all fields'),
-                      duration: Duration(seconds: 2),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              child: const Text('Create'),
-            ),
-          ],
+        return ExerciseSelectionDialog(
+          exerciseInfoList: widget.exerciseInfoList,
+          onExerciseSelected: (exercise) {
+            if (exercise == null) {
+              _showCreateNewExerciseDialog();
+            } else {
+              setState(() {
+                selectedExercise = exercise;
+              });
+            }
+          },
         );
       },
     );
   }
 
   /**
-   * Adds the selected exercise to the workout.
-   * Displays a success message using a SnackBar.
+   * Displays the dialog for creating a new exercise.
+   * 
+   * If a new exercise is created, updates the `selectedExercise` to reflect the new value.
    */
-  void _addExerciseToWorkout() {
-    if (selectedExercise == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select an exercise first.'),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    print('Exercise added to workout: ${selectedExercise!.name}');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Exercise added successfully!'),
-        duration: Duration(seconds: 2),
-        backgroundColor: Colors.green,
-      ),
+  Future<void> _showCreateNewExerciseDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return CreateNewExerciseDialog(
+          onCreateExercise: (newExercise) {
+            if (newExercise != null) {
+              setState(() {
+                selectedExercise = newExercise;
+              });
+            }
+          },
+        );
+      },
     );
-    Navigator.pop(context); 
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
-
-    if (selectedExercise == null) {
-      content = const Center(
-        child: Text(
-          'Oh no! Please select an exercise.',
-          style: TextStyle(fontSize: 16),
-        ),
-      );
-    } else {
-      content = Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  '${selectedExercise!.name}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: () {
-                    _showExerciseSelectionDialog();
-                  },
-                  tooltip: 'Edit Exercise',
-                ),
-              ],
-            ),
-            Text(
-              '${selectedExercise!.exerciseCategory}',
-              style: const TextStyle(fontSize: 12,),
-            ),
-            Text(
-              '${selectedExercise!.info}',
-              style: const TextStyle(fontSize: 12,),
-            ),
-          ],
-        )
-      );
-    }
-
     return NestedScaffold(
       appBar: AppBar(
         title: const Text('Add Exercise'),
         centerTitle: true,
         actions: [
+          /**
+           * Finalizes the process by validating and confirming the selected exercise.
+           * 
+           * Displays a success message if an exercise is selected or an error message if not.
+           */
           TextButton(
-            onPressed: _addExerciseToWorkout,
+            onPressed: () {
+              if (selectedExercise != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Exercise added successfully!'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.pop(context);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please select an exercise first.'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
             child: const Text(
-              '+',
-              style: TextStyle(
-                color: Colors.blue,
-              ),
+              'Add exercise',
+              style: TextStyle(color: Colors.blue),
             ),
           ),
         ],
       ),
-      body: content,
+      body: selectedExercise == null
+          ? const Center(
+              child: Text(
+                'Oh no! Please select an exercise.',
+                style: TextStyle(fontSize: 16),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedExercise!.name,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: _showExerciseSelectionDialog,
+                        tooltip: 'Edit Exercise',
+                      ),
+                    ],
+                  ),
+                  Text(
+                    selectedExercise!.exerciseCategory.name,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    selectedExercise!.info,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
