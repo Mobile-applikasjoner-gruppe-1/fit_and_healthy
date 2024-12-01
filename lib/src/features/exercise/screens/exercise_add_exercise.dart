@@ -180,7 +180,6 @@ class _AddExerciseState extends State<AddExercise> {
               style: const TextStyle(
                 fontSize: 14,
                 fontStyle: FontStyle.italic,
-                color: Colors.black87,
               ),
             ),
             const SizedBox(height: 16),
@@ -199,7 +198,6 @@ class _AddExerciseState extends State<AddExercise> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
                 ),
               ),
             ),
@@ -281,16 +279,20 @@ class _AddExerciseState extends State<AddExercise> {
           TextButton(
             onPressed: () {
               if (selectedExercise != null) {
-                final createdExercise = _createExercise();
-                Navigator.pop(context, createdExercise);
+                if (mounted) {
+                  final createdExercise = _createExercise();
+                  Navigator.pop(context, createdExercise);
+                }
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please select an exercise first.'),
-                    duration: Duration(seconds: 2),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select an exercise first.'),
+                      duration: Duration(seconds: 2),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             child: const Text(

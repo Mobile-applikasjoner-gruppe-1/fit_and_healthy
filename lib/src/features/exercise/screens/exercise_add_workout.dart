@@ -18,12 +18,10 @@ class AddWorkout extends StatefulWidget {
    * 
    * @param workouts A list of `Workout` objects used to manage and display exercises in the workout session.
    */
-  const AddWorkout({super.key, required this.workouts});
+  const AddWorkout({super.key});
 
   static const route = '/exercise';
   static const routeName = 'Add Workout';
-
-  final List<Workout> workouts; // The list of workouts
 
   @override
   State<AddWorkout> createState() {
@@ -84,6 +82,19 @@ class _AddWorkoutState extends State<AddWorkout> {
         _selectedTime = pickedTime;
       });
     }
+  }
+
+  /**
+   * Creates a Workout object using the data entered in the form.
+   */
+  Workout _createWorkout() {
+    return Workout(
+      id: UniqueKey().toString(),
+      title: _title,
+      dateTime: _selectedDate,
+      time: _selectedTime.toString(),
+      exercises: _exercises,
+    );
   }
 
   @override
@@ -150,7 +161,6 @@ class _AddWorkoutState extends State<AddWorkout> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(0.7),
                   ),
                 ),
                 const Divider(
@@ -188,14 +198,17 @@ class _AddWorkoutState extends State<AddWorkout> {
         actions: [
           TextButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Workout added successfully!'),
-                  duration: Duration(seconds: 2),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.pop(context);
+              final newWorkout = _createWorkout();
+              if (mounted) {
+                Navigator.pop(context, newWorkout);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Workout added successfully!'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
             },
             child: const Text(
               'Finish',

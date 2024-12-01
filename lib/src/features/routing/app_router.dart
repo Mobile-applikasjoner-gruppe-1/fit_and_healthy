@@ -73,7 +73,7 @@ GoRouter appRouter(Ref ref) {
                     path: 'add-workout',
                     name: 'AddWorkout',
                     builder: (context, state) =>
-                        AddWorkout(workouts: sampleWorkouts),
+                        AddWorkout(),
                   ),
                   GoRoute(
                       path: 'add-exercise',
