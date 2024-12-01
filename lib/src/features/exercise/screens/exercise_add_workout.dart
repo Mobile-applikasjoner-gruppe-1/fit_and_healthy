@@ -35,15 +35,21 @@ class _AddWorkoutState extends State<AddWorkout> {
   String _title = 'New Workout'; // Default title of the workout
   DateTime _selectedDate = DateTime.now(); // Selected date
   TimeOfDay _selectedTime = TimeOfDay.now(); // Selected time
+  List<Exercise> _exercises = []; // List of exercises added to the workout.
 
   /**
-   * Navigates to the Add Exercise screen using `GoRouter` to 
-   * navigate to the add-exercise route.
+   * Navigates to the Add Exercise screen and waits for the result.
+   * Updates the exercise list if a new exercise is added.
    * 
    * @param context The current BuildContext of the widget.
    */
-  void _navigateToAddExercise(BuildContext context) {
-    context.push('${AddWorkout.route}/add-exercise');
+  Future<void> _navigateToAddExercise(BuildContext context) async {
+    final newExercise = await context.push<Exercise?>('${AddWorkout.route}/add-exercise');
+    if (newExercise != null) {
+      setState(() {
+        _exercises.add(newExercise);
+      });
+    }
   }
 
   /**
@@ -152,7 +158,22 @@ class _AddWorkoutState extends State<AddWorkout> {
                   color: Colors.blue,
                 ),
                 const SizedBox(height: 16),
-                // Add exercise list content here
+                if (_exercises.isNotEmpty)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _exercises.length,
+                    itemBuilder: (context, index) {
+                      final exercise = _exercises[index];
+                      return ListTile(
+                        title: Text(exercise.exerciseInfoList.name),
+                        subtitle: Text(
+                          'Sets: ${exercise.sets.length} - Notes: ${exercise.note ?? 'None'}',
+                        ),
+                      );
+                    },
+                  )
+                else
+                  const Text('No exercises added yet.'),
               ],
             ),
           ),
