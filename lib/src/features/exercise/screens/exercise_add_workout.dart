@@ -1,6 +1,7 @@
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -27,19 +28,59 @@ class AddWorkout extends StatefulWidget {
 }
 
 class _AddWorkoutState extends State<AddWorkout> {
+  String _title = 'New Workout';
+  DateTime _selectedDate = DateTime.now(); 
+  TimeOfDay _selectedTime = TimeOfDay.now();
+  List<Exercise> _exercises = [];
+  
+  /**
+   * Opens the date picker dialog and updates the selected date.
+   */
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate; // Update the selected date
+      });
+    }
+  }
 
   /**
-   * Navigates to the Add Exercise screen for a spesific workout with id.
+   * Opens the time picker dialog and updates the selected time.
    */
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+    );
+    if (pickedTime != null && pickedTime != _selectedTime) {
+      setState(() {
+        _selectedTime = pickedTime; // Update the selected time
+      });
+    }
+  }
+
   void navigateToAddExercise(BuildContext context) {
-    //context.push('${AddWorkout.route}/add-exercise/${id}');
+    context.push('${AddWorkout.route}/add-exercise');
   }
 
   List<Exercise> getExercisesFromWorkout(Workout workout) {
     return workout.exercises;
   }
-  void createWorkout(Workout workout) {
-    // Create workout logic when pressed 'finished'
+
+  void _createWorkout() {
+    final newWorkout = Workout(
+      id: UniqueKey().toString(),
+      title: _title,
+      time: _formatTime(_selectedTime),
+      dateTime: _selectedDate,
+      exercises: _exercises,
+    );
   }
 
   /**
@@ -50,10 +91,14 @@ class _AddWorkoutState extends State<AddWorkout> {
     return DateFormat('MMMM d, yyyy').format(date);
   }
 
+  String _formatTime(TimeOfDay time) {
+    final now = DateTime.now();
+    final timeAsDateTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return DateFormat('hh:mm a').format(timeAsDateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
-
-
     Widget content = SingleChildScrollView(
       child: Center(
         child: Padding(
@@ -65,40 +110,35 @@ class _AddWorkoutState extends State<AddWorkout> {
                 children:[
                   TextFormField(
                     decoration: InputDecoration(
-                      label: Text('Date')
+                      label: Text('Title')
                     ),
-                    initialValue: _formatDate(DateTime.now()),
+                    initialValue: 'New workout',
                   ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      label: Text('Time')
-                    ),
-                    initialValue: TimeOfDay.fromDateTime(DateTime.now()).toString(),
-                  ),
-                  DropdownButtonFormField<ExerciseCategory>(
-                    items: [
-                      for (final category in ExerciseCategory.values)
-                        DropdownMenuItem(
-                          value: category,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 16,
-                                height: 16,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(category.name),
-                            ],
-                          ),
+                  GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          label: Text('Date'),
                         ),
-                    ],
-                    onChanged: (value) {
-                      print('Selected Category: $value');
-                    },
-                    decoration: const InputDecoration(
-                      label: Text('Select Category'),
+                        controller: TextEditingController(
+                          text: _formatDate(_selectedDate),
+                        ),
+                      ),
                     ),
                   ),
+                  GestureDetector(
+                    onTap: () => _selectTime(context),
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        decoration: const InputDecoration(label: Text('Time')),
+                        controller: TextEditingController(
+                          text: _formatTime(_selectedTime),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () => {
@@ -147,7 +187,16 @@ class _AddWorkoutState extends State<AddWorkout> {
         actions: [
           TextButton(
             onPressed: () {
-              // createWorkout(newWorkout)
+              //_createWorkout();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Workout added successfully!'),
+                  duration: const Duration(seconds: 2),
+                  backgroundColor: Colors.green,
+                ),
+              );
+
+              Navigator.pop(context);
             },
             child: const Text(
               'Finish',
