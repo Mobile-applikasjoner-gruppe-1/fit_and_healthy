@@ -30,8 +30,9 @@ class WeeklyExerciseChart extends StatelessWidget {
             BarChartRodData(
               toY: completedExercises.toDouble(),
               width: 20,
-              color:
-                  completedExercises >= weeklyGoal ? Colors.green : Colors.red,
+              color: completedExercises >= weeklyGoal
+                  ? Colors.black45
+                  : Colors.black54,
               borderRadius: BorderRadius.circular(5),
             ),
           ],
@@ -42,7 +43,7 @@ class WeeklyExerciseChart extends StatelessWidget {
         horizontalInterval: 1,
         getDrawingHorizontalLine: (value) => FlLine(
           color: value == weeklyGoal
-              ? Colors.orange
+              ? Colors.black45
               : Colors.grey.withOpacity(0.5),
           strokeWidth: value == weeklyGoal ? 2 : 0.5,
         ),

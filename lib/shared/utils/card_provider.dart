@@ -2,8 +2,9 @@ import 'package:fit_and_healthy/shared/models/widget_card.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/card_amount_weekly_workout.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/card_calories_nutrition.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/card_macro_nutritions.dart';
+import 'package:fit_and_healthy/shared/widgets/cards/card_weekly_workout.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/card_weight.dart';
-import 'package:fit_and_healthy/shared/widgets/cards/cart_weekly_workout.dart';
+
 import 'package:fit_and_healthy/shared/widgets/cards/nutrition_card_full.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,13 +30,20 @@ final allCards = [
   ),
   WidgetCard(
     id: '4',
+    title: 'Weight',
+    size: 0.5,
+    widgetCardCategory: WidgetCardCategory.measurament,
+    builder: () => CardWeight(),
+  ),
+  WidgetCard(
+    id: '5',
     title: 'WeeklyWorkout',
     size: 0.5,
     widgetCardCategory: WidgetCardCategory.workout,
     builder: () => CardWeeklyWorkout(),
   ),
   WidgetCard(
-    id: '5',
+    id: '6',
     title: 'Nutrition',
     size: 1,
     widgetCardCategory: WidgetCardCategory.nutrition,
@@ -51,7 +59,7 @@ final allCards = [
     ),
   ),
   WidgetCard(
-    id: '6',
+    id: '7',
     title: 'Calories',
     size: 0.5,
     widgetCardCategory: WidgetCardCategory.nutrition,
@@ -60,7 +68,7 @@ final allCards = [
     ),
   ),
   WidgetCard(
-    id: '7',
+    id: '8',
     title: 'Macros',
     size: 0.5,
     widgetCardCategory: WidgetCardCategory.nutrition,

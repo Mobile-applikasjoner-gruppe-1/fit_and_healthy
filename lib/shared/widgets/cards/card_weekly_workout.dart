@@ -16,8 +16,8 @@ class CardWeeklyWorkout extends ConsumerWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.green,
-              Colors.green.shade300,
+              Colors.blue,
+              Colors.blue.shade300,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -49,7 +49,7 @@ class CardWeeklyWorkout extends ConsumerWidget {
             SizedBox(
               height: 100, // Fixed height for chart
               child: WeeklyExerciseChart(
-                completedExercises: 2,
+                completedExercises: 4,
                 weeklyGoal: 3,
               ), // Reuse WeightChart
             ),

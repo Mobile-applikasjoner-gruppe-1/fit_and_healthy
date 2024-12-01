@@ -43,9 +43,10 @@ class DashboardView extends ConsumerWidget {
                   ),
                   SizedBox(height: 12),
                   ElevatedButton(
-                      // TODO, add a predifined list and add it to the current selected cards
                       onPressed: () {
-                        ref.read(CardProvider.notifier).state = [...allCards];
+                        ref.read(CardProvider.notifier).state = allCards
+                            .where((card) => ['5', '4', '6'].contains(card.id))
+                            .toList();
                       },
                       child: Text('Add Default'))
                 ],

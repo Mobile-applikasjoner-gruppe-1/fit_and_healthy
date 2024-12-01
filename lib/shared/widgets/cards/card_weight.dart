@@ -49,7 +49,7 @@ class CardWeight extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   ),
-                  Icon(Icons.monitor_weight, color: Colors.white),
+                  //Icon(Icons.monitor_weight, color: Colors.white),
                 ],
               ),
             ),
