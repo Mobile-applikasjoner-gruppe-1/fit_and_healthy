@@ -12,6 +12,7 @@ class WidgetCard {
   final double size;
   final WidgetCardCategory widgetCardCategory;
   final Widget Function() builder;
+  final String? route;
 
   const WidgetCard({
     required this.id,
@@ -19,5 +20,6 @@ class WidgetCard {
     required this.size,
     required this.widgetCardCategory,
     required this.builder,
+    this.route,
   });
 }

@@ -63,7 +63,14 @@ class DashboardView extends ConsumerWidget {
                     return StaggeredGridTile.count(
                       crossAxisCellCount: card.size == 1.0 ? 2 : 1,
                       mainAxisCellCount: 1,
-                      child: card.builder(),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (card.route != null) {
+                            context.pushNamed(card.route!);
+                          }
+                        },
+                        child: card.builder(),
+                      ),
                     );
                   }).toList(),
                 ),
