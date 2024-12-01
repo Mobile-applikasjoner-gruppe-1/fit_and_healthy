@@ -8,6 +8,13 @@ class MealDetailScreen extends StatefulWidget {
 
   MealDetailScreen({required this.meal});
 
+  // TODO: Switch to using a routing-based solutions by going to the id of the meal
+  // final String mealId;
+  // static const route = '/meal-detail/:mealId';
+  // static const routeName = 'Meal Details';
+  // MealDetailScreen({required this.mealId});
+  // final Meal meal = MealHolder.getMealById(mealId);
+
   @override
   _MealDetailScreenState createState() => _MealDetailScreenState();
 }

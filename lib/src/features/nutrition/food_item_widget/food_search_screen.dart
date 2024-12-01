@@ -1,10 +1,9 @@
-// FoodSearchScreen.dart
 import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_item_widget.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'barcode_scanner_widget.dart';
 
 class FoodSearchScreen extends StatefulWidget {
   static const route = '/search';
@@ -15,11 +14,11 @@ class FoodSearchScreen extends StatefulWidget {
 }
 
 class _FoodSearchScreenState extends State<FoodSearchScreen> {
-  final List<FoodItem> foodItems = []; // List of added food items
+  final List<FoodItem> _foodItems = []; // Added food items
   final TextEditingController _searchController = TextEditingController();
-  List<FoodItem> _searchResults = []; // Store search results
+  List<FoodItem> _searchResults = []; // Search results
 
-  // Method to search for products
+  // Search by product name
   Future<void> _searchProducts(String query) async {
     final api = OpenFoodApi();
     final results = await api.searchProductsByName(query);
@@ -29,7 +28,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     });
   }
 
-  // Method to fetch product by barcode and add to search results
+  // Search by barcode
   Future<void> _searchProductByBarcode(String barcode) async {
     final api = OpenFoodApi();
     try {
@@ -46,49 +45,32 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     }
   }
 
-  // Method to add food item to the list
+  // Add a food item to the list
   void _addFoodItem(FoodItem item) {
     setState(() {
-      foodItems.add(item);
-      _searchResults.clear(); // Clear search results after adding
-      _searchController.clear(); // Clear search input
+      _foodItems.add(item);
+      _searchResults.clear();
+      _searchController.clear();
     });
   }
 
-  // Method to show a message
+  // Show barcode scanner
+  Future<void> _scanBarcode() async {
+    String? barcode = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return BarcodeScannerDialog(); // Updated for better naming
+      },
+    );
+    if (barcode != null && barcode.isNotEmpty) {
+      await _searchProductByBarcode(barcode);
+    }
+  }
+
+  // Show a message to the user
   void _showMessage(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  // Method to show the barcode scanner and handle the result
-  Future<void> _scanBarcode() async {
-    String barcode = await showDialog<String>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Scan Barcode'),
-              content: SizedBox(
-                height: 400,
-                width: 300,
-                child: MobileScanner(
-                  onDetect: (BarcodeCapture barcodeCapture) {
-                    final String barcodeValue =
-                        barcodeCapture.barcodes.isNotEmpty
-                            ? barcodeCapture.barcodes.first.rawValue ?? ''
-                            : '';
-                    Navigator.pop(context, barcodeValue);
-                  },
-                ),
-              ),
-            );
-          },
-        ) ??
-        ''; // If no barcode is scanned, return an empty string
-
-    if (barcode.isNotEmpty) {
-      await _searchProductByBarcode(barcode);
-    }
   }
 
   @override
@@ -103,6 +85,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Search Input
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -125,6 +108,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
               ),
             ),
             SizedBox(height: 16),
+            // Search Results
             Text(
               'Search Results',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -146,15 +130,16 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
               ),
             ),
             SizedBox(height: 16),
+            // Added Items
             Text(
               'Added Items',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: foodItems.length,
+                itemCount: _foodItems.length,
                 itemBuilder: (context, index) {
-                  return FoodItemWidget(foodItem: foodItems[index]);
+                  return FoodItemWidget(foodItem: _foodItems[index]);
                 },
               ),
             ),
