@@ -51,20 +51,21 @@ class DashboardView extends ConsumerWidget {
                 ],
               ),
             )
-          : Container(
-              padding: const EdgeInsets.all(10),
-              child: StaggeredGrid.count(
-                crossAxisCount: 2, // Two columns
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                children: selectedCards.map((card) {
-                  return StaggeredGridTile.count(
-                    crossAxisCellCount:
-                        card.size == 1.0 ? 2 : 1, // Full-width or half-width
-                    mainAxisCellCount: 1, // Uniform height
-                    child: card.builder(),
-                  );
-                }).toList(),
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: StaggeredGrid.count(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  children: selectedCards.map((card) {
+                    return StaggeredGridTile.count(
+                      crossAxisCellCount: card.size == 1.0 ? 2 : 1,
+                      mainAxisCellCount: 1,
+                      child: card.builder(),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
     );
