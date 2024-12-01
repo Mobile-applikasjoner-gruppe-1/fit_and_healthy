@@ -1,7 +1,10 @@
+import 'package:fit_and_healthy/src/features/exercise/exercise_date_notifier.dart';
+import 'package:fit_and_healthy/src/features/exercise/workout_list_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_workout_item.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /**
@@ -13,13 +16,11 @@ import 'package:go_router/go_router.dart';
  * - Lists all workouts using ExerciseWorkoutItem widgets.
  * - Navigates to the WorkoutDetailView when a workout is selected.
  */
-class ExerciseView extends StatelessWidget {
-  const ExerciseView({super.key, required this.workouts});
+class ExerciseView extends ConsumerWidget {
+  const ExerciseView({super.key});
 
   static const route = '/exercise';
   static const routeName = 'Exercise';
-
-  final List<Workout> workouts; // List of workouts to be displayed in the view.
 
   /**
    * Navigates to the WorkoutDetailView for the selected workout.
@@ -37,8 +38,8 @@ class ExerciseView extends StatelessWidget {
    * - If the workout has an ID of 1, this method navigates to the route '/exercise/1'.
    */
   void selectWorkout(BuildContext context, Workout workout) {
-    String id = workout.id; 
-    context.push('${ExerciseView.route}/${id}'); 
+    String id = workout.id;
+    context.push('${ExerciseView.route}/${id}');
   }
 
   /**
@@ -49,75 +50,104 @@ class ExerciseView extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Widget loggedWorkouts;
 
-    if (workouts.isEmpty) {
-      loggedWorkouts = const Text(
-        'No workouts logged',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-      );
-    } else {
-      loggedWorkouts = ListView.builder(
-        shrinkWrap: true, // Ensures it integrates well in the scrollable content
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: workouts.length,
-        itemBuilder: (ctx, index) => ExerciseWorkoutItem(
-          workout: workouts[index],
-          onSelectWorkout: (workout) {
-            selectWorkout(context, workout);
-          },
-        ),
-      );
-    }
+    final exerciseDateFuture = ref.watch(exerciseDateNotifierProvider.future);
 
-    Widget content = SingleChildScrollView(
-      child: Center(
-        child: Padding(
-        padding: const EdgeInsets.all(16.0), 
-        child: 
-          Column(
-            children:[
-              ElevatedButton(
-                onPressed: () => navigateToAddWorkout(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                ),
-                child: Text(
-                  'Add Workout', 
-                  style: TextStyle(
-                    fontSize: 16, 
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Logged',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black.withOpacity(0.7),
-                ),
-              ),
-              const Divider(
-                thickness: 1,
-                color: Colors.blue,
-              ),
-              const SizedBox(height: 16),
-              loggedWorkouts,
-            ],
-          ),
-        ),
-      ),
-    );
+    Widget content = FutureBuilder(
+        future: exerciseDateFuture,
+        builder: (context, snapshot) {
+          final date = snapshot.data;
 
+          if (date == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final workoutNotifier = ref.read(workoutNotifierProvider.notifier);
+          workoutNotifier.changeDate(date);
+
+          final workoutsStream = workoutNotifier.getWorkoutDateStreams(date);
+
+          return StreamBuilder(
+              stream: workoutsStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('An error occurred'));
+                } else {
+                  final workouts = snapshot.data;
+                  if (workouts == null || workouts.isEmpty) {
+                    return const Center(
+                        child: Text(
+                      'No workouts logged',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                    ));
+                  } else {
+                    loggedWorkouts = ListView.builder(
+                      shrinkWrap:
+                          true, // Ensures it integrates well in the scrollable content
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: workouts.length,
+                      itemBuilder: (ctx, index) => ExerciseWorkoutItem(
+                        workout: workouts[index],
+                        onSelectWorkout: (workout) {
+                          selectWorkout(context, workout);
+                        },
+                      ),
+                    );
+                  }
+
+                  return SingleChildScrollView(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => navigateToAddWorkout(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                              ),
+                              child: Text(
+                                'Add Workout',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Logged',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black.withOpacity(0.7),
+                              ),
+                            ),
+                            const Divider(
+                              thickness: 1,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(height: 16),
+                            loggedWorkouts,
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              });
+        });
     return NestedScaffold(
       appBar: AppBar(
-        title: const Text('Exercise'), 
+        title: const Text('Exercise'),
         centerTitle: true,
-        ),
+      ),
       body: content,
     );
   }

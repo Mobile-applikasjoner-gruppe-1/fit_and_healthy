@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum ExerciseCategory {
   back,
   chest,
@@ -145,29 +147,35 @@ class Workout {
     required this.exercises,
   });
 
-  factory Workout.fromFirebase(Map<String, dynamic> json) {
-    if (json['id'] is! String) {
+  factory Workout.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data();
+
+    if (data == null) {
+      throw Exception('Document data is null');
+    }
+
+    if (data['id'] is! String) {
       throw TypeError();
     }
-    if (json['title'] is! String) {
+    if (data['title'] is! String) {
       throw TypeError();
     }
-    if (json['time'] is! String) {
+    if (data['time'] is! String) {
       throw TypeError();
     }
-    if (json['dateTime'] is! DateTime) {
+    if (data['dateTime'] is! DateTime) {
       throw TypeError();
     }
-    if (json['exercises'] is! List) {
+    if (data['exercises'] is! List) {
       throw TypeError();
     }
 
     return Workout(
-      id: json['id'],
-      title: json['title'],
-      time: json['time'],
-      dateTime: json['dateTime'],
-      exercises: json['exercises'],
+      id: data['id'],
+      title: data['title'],
+      time: data['time'],
+      dateTime: data['dateTime'],
+      exercises: data['exercises'],
     );
   }
 

@@ -66,8 +66,9 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: ExerciseView.route,
                 name: ExerciseView.routeName,
-                builder: (context, state) =>
-                    ExerciseView(workouts: sampleWorkouts),
+                builder: (context, state) {
+                  return ExerciseView();
+                },
                 routes: [
                   GoRoute(
                     path: 'add-workout',
