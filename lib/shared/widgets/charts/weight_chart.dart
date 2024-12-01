@@ -102,7 +102,7 @@ class WeightChart extends StatelessWidget {
           isCurved: false,
           spots: spots,
           barWidth: 4,
-          color: Colors.blue,
+          color: Colors.lightBlue,
           dotData: FlDotData(show: true),
           belowBarData: BarAreaData(
             show: true,

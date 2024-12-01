@@ -58,9 +58,8 @@ class CardCaloriesNutrition extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and Icon
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -78,12 +77,12 @@ class CardCaloriesNutrition extends ConsumerWidget {
             ),
             // Chart
             SizedBox(
-              height: 100, // Fixed height for chart
+              height: 100,
               child: DonutChart(
                 label: 'Calories',
                 value: caloriesConsumed,
                 total: caloriesModel.totalCalorie,
-              ), // Reuse WeightChart
+              ),
             ),
           ],
         ),

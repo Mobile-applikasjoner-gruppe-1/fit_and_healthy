@@ -23,10 +23,7 @@ class CardWeight extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Colors.green,
-              Colors.green.shade300,
-            ],
+            colors: [Colors.pink, Colors.pink.shade300],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -37,7 +34,7 @@ class CardWeight extends ConsumerWidget {
           children: [
             // Title and Icon
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -53,10 +50,9 @@ class CardWeight extends ConsumerWidget {
                 ],
               ),
             ),
-            // Chart
             SizedBox(
-              height: 100, // Fixed height for chart
-              child: WeightChart(entries: weightEntries), // Reuse WeightChart
+              height: 130,
+              child: WeightChart(entries: weightEntries),
             ),
           ],
         ),

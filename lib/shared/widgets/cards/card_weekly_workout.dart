@@ -29,7 +29,7 @@ class CardWeeklyWorkout extends ConsumerWidget {
           children: [
             // Title and Icon
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

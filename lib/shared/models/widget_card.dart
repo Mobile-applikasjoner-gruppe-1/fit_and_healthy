@@ -4,7 +4,6 @@ enum WidgetCardCategory {
   workout,
   nutrition,
   measurament,
-  other,
 }
 
 class WidgetCard {

@@ -29,6 +29,8 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
       return const Center(child: Text('No data available.'));
     }
 
+    //TODO: get the latest weight
+    final weigth = data.weightHistory.last;
     final height = data.height;
     final birthday = data.birthday;
     final gender = data.gender;
@@ -71,8 +73,8 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                     ? '${_caloriesNeeded!.toStringAsFixed(0)} calories needed per day'
                     : 'Get your daily calorie requirement',
                 onTap: () {
-                  _showCalorieCalculatorModal(
-                      height, birthday, gender, activityLevel, weightGoal);
+                  _showCalorieCalculatorModal(height, weigth.weight, birthday,
+                      gender, activityLevel, weightGoal);
                 },
               ),
             ],
@@ -237,17 +239,19 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
 
   void _showCalorieCalculatorModal(
     double height,
+    double weight,
     DateTime? birthday,
-    Gender? gender,
-    ActivityLevel? activityLevel,
-    WeightGoal? weighGoal,
+    Gender gender,
+    ActivityLevel activityLevel,
+    WeightGoal weighGoal,
   ) {
     final _formKey = GlobalKey<FormState>();
     final TextEditingController heightController =
         TextEditingController(text: height.toString());
     final TextEditingController birthdayController = TextEditingController();
 
-    late final TextEditingController weightController = TextEditingController();
+    late final TextEditingController weightController =
+        TextEditingController(text: weight.toString());
     ActivityLevel? selectedActivityLevel = activityLevel;
 
     showModalBottomSheet(
@@ -295,30 +299,6 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                         return null;
                       },
                     ),
-                    if (birthday == null) const SizedBox(height: 16),
-                    if (birthday == null)
-                      TextFormField(
-                        controller: birthdayController,
-                        readOnly: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Birthday',
-                          border: OutlineInputBorder(),
-                        ),
-                        onTap: () async {
-                          final selectedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime(2000),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                          );
-                          if (selectedDate != null) {
-                            setState(() {
-                              birthdayController.text =
-                                  '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
-                            });
-                          }
-                        },
-                      ),
                     const SizedBox(height: 16),
                     _buildTextField(
                       controller: heightController,

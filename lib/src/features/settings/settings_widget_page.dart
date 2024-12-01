@@ -197,8 +197,6 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
         return 'Nutrition';
       case WidgetCardCategory.measurament:
         return 'Measurements';
-      case WidgetCardCategory.other:
-        return 'Other';
       default:
         return 'Unknown';
     }
