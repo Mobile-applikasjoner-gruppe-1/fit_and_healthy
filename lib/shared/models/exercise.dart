@@ -151,8 +151,8 @@ class Workout {
   final String title;
   final String time;
   final DateTime dateTime;
-  final List<Exercise> exercises;
-  const Workout({
+  List<Exercise> exercises;
+  Workout({
     required this.id,
     required this.title,
     required this.time,

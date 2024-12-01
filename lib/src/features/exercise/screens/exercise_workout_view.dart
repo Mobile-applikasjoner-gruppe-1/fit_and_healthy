@@ -59,32 +59,32 @@ class ExerciseView extends ConsumerWidget {
     DateTime? selectedDate;
 
     if (exerciseDate is AsyncLoading) {
-      return const Center(child: CircularProgressIndicator());
+      loggedWorkouts = const Center(child: CircularProgressIndicator());
     } else if (exerciseDate is AsyncError) {
-      return Center(child: Text('Error: ${exerciseDate.error}'));
+      loggedWorkouts = Center(child: Text('Error: ${exerciseDate.error}'));
     } else {
       selectedDate = exerciseDate.value;
       if (selectedDate == null) {
-        return const Center(child: CircularProgressIndicator());
+        loggedWorkouts = const Center(child: CircularProgressIndicator());
+      } else {
+        final workoutNotifier = ref.read(workoutNotifierProvider.notifier);
+        workoutNotifier.listenToDate(selectedDate);
       }
-
-      final workoutNotifier = ref.read(workoutNotifierProvider.notifier);
-      workoutNotifier.listenToDate(selectedDate);
     }
 
     if (workoutListState is AsyncLoading) {
-      return const Center(child: CircularProgressIndicator());
+      loggedWorkouts = const Center(child: CircularProgressIndicator());
     } else if (workoutListState is AsyncError) {
-      return Center(child: Text('Error: ${workoutListState.error}'));
+      loggedWorkouts = Center(child: Text('Error: ${workoutListState.error}'));
     } else {
       if (workoutListState.value == null) {
-        return const Center(child: CircularProgressIndicator());
+        loggedWorkouts = const Center(child: CircularProgressIndicator());
       }
 
       final workouts = workoutListState.value!.cachedDateWorkouts[selectedDate];
 
       if (workouts == null || workouts.isEmpty) {
-        return const Center(
+        loggedWorkouts = const Center(
             child: Text(
           'No workouts logged',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),

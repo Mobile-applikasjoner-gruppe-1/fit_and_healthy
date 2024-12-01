@@ -89,8 +89,7 @@ GoRouter appRouter(Ref ref) {
                     name: 'WorkoutDetail',
                     builder: (context, state) {
                       final workoutId = state.pathParameters['id']!;
-                      return WorkoutDetailView(
-                          workoutId: workoutId, workouts: sampleWorkouts);
+                      return WorkoutDetailView(workoutId: workoutId);
                     },
                   ),
                 ],

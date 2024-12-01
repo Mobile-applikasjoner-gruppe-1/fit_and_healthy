@@ -49,21 +49,8 @@ class ExerciseRepository {
   /// Auto generates an ID for the exercise and returns it.
   /// Will throw an error if the exercise is not added successfully.
   Future<String> addExercise(Exercise exercise) async {
-    final AuthUser user = _authRepository.currentUser!;
-
-    CollectionReference exercisesRef = _firestore
-        .collection('users')
-        .doc(user.firebaseUser.uid)
-        .collection('workouts')
-        .doc(_workoutId)
-        .collection('exercises');
-
-    DocumentReference exerciseRef = await exercisesRef
-        .withConverter<Exercise>(
-          fromFirestore: exerciseConverter.fromFirestore,
-          toFirestore: exerciseConverter.toFirestore,
-        )
-        .add(exercise);
+    DocumentReference exerciseRef =
+        await _getExerciseCollection().add(exercise);
 
     return exerciseRef.id;
   }
@@ -72,36 +59,12 @@ class ExerciseRepository {
   /// Overwrites the existing exercise with the new exercise data.
   /// Will throw an error if the exercise is not updated successfully.
   Future<void> updateExercise(Exercise exercise) async {
-    final AuthUser user = _authRepository.currentUser!;
-
-    DocumentReference exerciseRef = _firestore
-        .collection('users')
-        .doc(user.firebaseUser.uid)
-        .collection('workouts')
-        .doc(_workoutId)
-        .collection('exercises')
-        .doc(exercise.id);
-
-    await exerciseRef
-        .withConverter<Exercise>(
-          fromFirestore: exerciseConverter.fromFirestore,
-          toFirestore: exerciseConverter.toFirestore,
-        )
-        .set(exercise);
+    await _getExerciseCollection().doc(exercise.id).set(exercise);
   }
 
   /// Deletes all exercises for the given workout.
   Future<void> deleteAllExercises() async {
-    final AuthUser user = _authRepository.currentUser!;
-
-    await _firestore
-        .collection('users')
-        .doc(user.firebaseUser.uid)
-        .collection('workouts')
-        .doc(_workoutId)
-        .collection('exercises')
-        .get()
-        .then((snapshot) {
+    await _getExerciseCollection().get().then((snapshot) {
       for (DocumentSnapshot doc in snapshot.docs) {
         // TODO: Delete subcollections (sets?)
         doc.reference.delete();
@@ -109,5 +72,9 @@ class ExerciseRepository {
     });
   }
 
-  // TODO: Add CRUD operations add, update, delete exercises
+  Stream<List<Exercise>> getExercisesStream() {
+    return _getExerciseCollection().snapshots().map(
+          (snapshot) => snapshot.docs.map((doc) => doc.data()).toList(),
+        );
+  }
 }
