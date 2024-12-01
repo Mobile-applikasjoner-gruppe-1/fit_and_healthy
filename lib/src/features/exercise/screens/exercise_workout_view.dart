@@ -32,7 +32,16 @@ class _ExerciseViewState extends State<ExerciseView> {
   void initState() {
     super.initState();
     _workouts = List.from(widget.workouts); 
+    _sortWorkoutsByDate();
   }
+
+    /**
+   * Sorts the workouts by date in descending order (latest first).
+   */
+  void _sortWorkoutsByDate() {
+    _workouts.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+  }
+
 
   /**
    * Navigates to the WorkoutDetailView for the selected workout.
@@ -55,7 +64,8 @@ class _ExerciseViewState extends State<ExerciseView> {
     final newWorkout = await context.push<Workout?>('${ExerciseView.route}/add-workout');
     if (newWorkout != null) {
       setState(() {
-        _workouts.add(newWorkout); // Add the new workout to the list.
+        _workouts.add(newWorkout);
+        _sortWorkoutsByDate(); 
       });
     }
   }
