@@ -138,7 +138,7 @@ class _AddExerciseState extends State<AddExercise> {
                 Text(
                   selectedExercise!.name,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -150,13 +150,30 @@ class _AddExerciseState extends State<AddExercise> {
               ],
             ),
             Text(
-              selectedExercise!.exerciseCategory.name,
-              style: const TextStyle(fontSize: 12),
-            ),
-            Text(
               selectedExercise!.info,
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+                color: Colors.black87,
+              ),
             ),
+            const SizedBox(height: 24),
+            const Center(
+              child: Text(
+                'Sets',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const Divider(
+              thickness: 1,
+              color: Colors.blue,
+            ),
+            const SizedBox(height: 16),
+            //sets
           ],
         ),
       );
