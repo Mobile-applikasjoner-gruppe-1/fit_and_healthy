@@ -7,13 +7,16 @@ import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_passwor
 import 'package:fit_and_healthy/src/features/auth/login/login_view.dart';
 import 'package:fit_and_healthy/src/features/auth/register/register_view.dart';
 import 'package:fit_and_healthy/src/features/dashboard/dashboard_view.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_exercise.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_workout.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_workout_detail.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/gdpr_policy/gdpr_settings_page.dart';
 import 'package:fit_and_healthy/src/features/goals/goals_settings_page.dart';
 import 'package:fit_and_healthy/src/features/metrics/measurement_settings_page.dart';
 import 'package:fit_and_healthy/src/features/gdpr_policy/privacy_gdpr_policy_settings_page.dart';
 import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_widget_page.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
 import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_search_screen.dart';
@@ -62,23 +65,36 @@ GoRouter appRouter(Ref ref) {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: ExerciseView.route,
-                  name: ExerciseView.routeName,
-                  builder: (context, state) =>
-                      ExerciseView(workouts: sampleWorkouts),
-                  routes: [
-                    // TODO: Switch to a routing based approach to navigate to the WorkoutDetailView. Use path parameters to pass the workout id.
-                    // GoRoute(
-                    //   path: WorkoutDetailView.route,
-                    //   name: WorkoutDetailView.routeName,
-                    //   builder: (context, state) {
-                    //     final workoutId = state.pathParameters['workoutId']!;
-                    //     final workout = sampleWorkouts
-                    //         .firstWhere((workout) => workout.id == workoutId);
-                    //     return WorkoutDetailView(workout: workout);
-                    //   },
-                    // )
-                  ]),
+                path: ExerciseView.route,
+                name: ExerciseView.routeName,
+                builder: (context, state) =>
+                    ExerciseView(workouts: sampleWorkouts),
+                routes: [
+                  GoRoute(
+                    path: 'add-workout',
+                    name: 'AddWorkout',
+                    builder: (context, state) =>
+                        AddWorkout(workouts: sampleWorkouts),
+                  ),
+                  GoRoute(
+                      path: 'add-exercise:id',
+                      name: 'AddExercise',
+                      builder: (context, state) {
+                        final workoutId = state.pathParameters['id']!;
+                        return AddExercise(
+                            workouts: sampleWorkouts, workoutId: workoutId);
+                      }),
+                  GoRoute(
+                    path: ':id',
+                    name: 'WorkoutDetail',
+                    builder: (context, state) {
+                      final workoutId = state.pathParameters['id']!;
+                      return WorkoutDetailView(
+                          workoutId: workoutId, workouts: sampleWorkouts);
+                    },
+                  ),
+                ],
+              ),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
