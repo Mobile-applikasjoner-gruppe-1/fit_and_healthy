@@ -1,26 +1,36 @@
+import 'package:fit_and_healthy/shared/utils/calorie_calculator.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/horizontal_bar_chart.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CardMacroNutritions extends StatelessWidget {
-  final double carbs; // In grams
-  final double fats; // In grams
-  final double proteins; // In grams
-  final double carbsGoal; // In grams
-  final double fatsGoal; // In grams
-  final double proteinsGoal; // In grams
-
-  const CardMacroNutritions({
-    Key? key,
-    required this.carbs,
-    required this.fats,
-    required this.proteins,
-    required this.carbsGoal,
-    required this.fatsGoal,
-    required this.proteinsGoal,
-  }) : super(key: key);
-
+class CardMacroNutritions extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final metricsState = ref.watch(metricsControllerProvider);
+
+    final data = metricsState.value;
+
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
+
+    // TODO: Use the latest weigth from the controller, without callin the firestore
+    final latestWeight = data.weightHistory.last;
+    final height = data.height;
+    final birthday = data.birthday;
+    final gender = data.gender;
+    final activityLevel = data.activityLevel;
+    final weightGoal = data.weightGoal;
+
+    final caloriesModel = CalorieCalculator.calculateCalories(
+      height: height,
+      birthday: birthday,
+      weight: latestWeight.weight,
+      gender: gender,
+      activityLevel: activityLevel,
+      weightGoal: weightGoal,
+    );
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -63,7 +73,7 @@ class CardMacroNutritions extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Expanded(
-                flex: 2, // Takes 2/3 of the space
+                flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -71,21 +81,21 @@ class CardMacroNutritions extends StatelessWidget {
                     HorizontalBarChart(
                       label: 'Protein',
                       value: 100,
-                      goal: 150,
+                      goal: caloriesModel.recommendedProtein,
                       color: Colors.red,
                     ),
                     const SizedBox(height: 8),
                     HorizontalBarChart(
                       label: 'Carbs',
                       value: 100,
-                      goal: 150,
+                      goal: caloriesModel.recommendedCarbs,
                       color: Colors.black,
                     ),
                     const SizedBox(height: 8),
                     HorizontalBarChart(
                       label: 'Fat',
                       value: 100,
-                      goal: 150,
+                      goal: caloriesModel.recommendedFats,
                       color: Colors.blue,
                     ),
                   ],

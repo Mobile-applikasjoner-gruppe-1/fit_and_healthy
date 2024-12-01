@@ -57,7 +57,6 @@ final allCards = [
     widgetCardCategory: WidgetCardCategory.nutrition,
     builder: () => CardCaloriesNutrition(
       caloriesConsumed: 1500,
-      totalCalories: 2500,
     ),
   ),
   WidgetCard(
@@ -65,14 +64,7 @@ final allCards = [
     title: 'Macros',
     size: 0.5,
     widgetCardCategory: WidgetCardCategory.nutrition,
-    builder: () => CardMacroNutritions(
-      carbs: 100,
-      carbsGoal: 150,
-      fats: 100,
-      fatsGoal: 150,
-      proteins: 100,
-      proteinsGoal: 150,
-    ),
+    builder: () => CardMacroNutritions(),
   ),
 ];
 

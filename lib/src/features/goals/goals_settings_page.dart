@@ -394,15 +394,15 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                                   .updateActivityLevel(selectedActivityLevel!);
                               final calories =
                                   CalorieCalculator.calculateCalories(
-                                weight,
-                                height,
-                                26,
-                                selectedActivityLevel!,
-                                gender!,
-                                weighGoal!,
+                                weight: weight,
+                                height: height,
+                                birthday: birthday!,
+                                activityLevel: ActivityLevel.moderatelyActive,
+                                gender: Gender.male,
+                                weightGoal: WeightGoal.maintain,
                               );
                               setState(() {
-                                _caloriesNeeded = calories;
+                                _caloriesNeeded = calories.totalCalorie;
                               });
                               Navigator.of(context).pop();
                             }

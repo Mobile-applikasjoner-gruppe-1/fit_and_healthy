@@ -1,18 +1,43 @@
+import 'package:fit_and_healthy/shared/utils/calorie_calculator.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/dounut_chart.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CardCaloriesNutrition extends ConsumerWidget {
   final double caloriesConsumed;
-  final double totalCalories;
   const CardCaloriesNutrition({
     super.key,
     required this.caloriesConsumed,
-    required this.totalCalories,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final metricsState = ref.watch(metricsControllerProvider);
+
+    final data = metricsState.value;
+
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
+
+    // TODO: Use the latest weigth from the controller, without callin the firestore
+    final latestWeight = data.weightHistory.last;
+    final height = data.height;
+    final birthday = data.birthday;
+    final gender = data.gender;
+    final activityLevel = data.activityLevel;
+    final weightGoal = data.weightGoal;
+
+    final caloriesModel = CalorieCalculator.calculateCalories(
+      height: height,
+      birthday: birthday,
+      weight: latestWeight.weight,
+      gender: gender,
+      activityLevel: activityLevel,
+      weightGoal: weightGoal,
+    );
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -57,7 +82,7 @@ class CardCaloriesNutrition extends ConsumerWidget {
               child: DonutChart(
                 label: 'Calories',
                 value: caloriesConsumed,
-                total: totalCalories,
+                total: caloriesModel.totalCalorie,
               ), // Reuse WeightChart
             ),
           ],
