@@ -47,37 +47,29 @@ class WorkoutHistoryCard extends StatelessWidget {
     );
   }
 
-  /// Groups the workouts by week, with the current week being index 0.
   Map<int, int> _groupWorkoutsByWeek(List<Workout> workouts) {
     final now = DateTime.now();
     final mondayOfCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
 
     final Map<int, int> counts = {};
     for (final workout in workouts) {
-      // Find the difference in days from the current week's Monday
       final daysFromMonday =
           workout.dateTime.difference(mondayOfCurrentWeek).inDays;
 
-      // Calculate the week index
       final weekIndex = (daysFromMonday / 7).floor();
-
-      // Initialize the count if it doesn't exist
       if (!counts.containsKey(weekIndex)) {
         counts[weekIndex] = 0;
       }
 
-      // Increment the count for the respective week
       counts[weekIndex] = counts[weekIndex]! + 1;
     }
 
     return counts;
   }
 
-  /// Builds the bar chart data for the given workout counts by week.
   BarChartData _buildBarChartData(Map<int, int> countsByWeek) {
     final barGroups = <BarChartGroupData>[];
-    final maxWeeksToShow = 6; // Show the last 6 weeks.
-
+    final maxWeeksToShow = 6;
     for (int i = 0; i <= maxWeeksToShow; i++) {
       barGroups.add(
         BarChartGroupData(

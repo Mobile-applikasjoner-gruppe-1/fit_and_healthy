@@ -78,7 +78,7 @@ class WeeklyExerciseChart extends StatelessWidget {
         border: Border.all(color: Colors.grey.withOpacity(0.5)),
       ),
       barTouchData: BarTouchData(enabled: false),
-      maxY: (weeklyGoal + 1).toDouble(), // Adjust to include goal line
+      maxY: (weeklyGoal + 1).toDouble(),
     );
   }
 }

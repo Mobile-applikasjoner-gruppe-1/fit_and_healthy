@@ -1,4 +1,5 @@
 import 'package:fit_and_healthy/shared/widgets/charts/workout_bar_cart_weekly.dart';
+import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +8,16 @@ class CardWeeklyWorkout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final metricsState = ref.watch(metricsControllerProvider);
+
+    final data = metricsState.value;
+
+    if (data == null) {
+      return const Center(child: Text('No data available.'));
+    }
+
+    final weeklyWorkoutGoal = data.weeklyWorkoutGoal;
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -49,8 +60,8 @@ class CardWeeklyWorkout extends ConsumerWidget {
             SizedBox(
               height: 100, // Fixed height for chart
               child: WeeklyExerciseChart(
-                completedExercises: 4,
-                weeklyGoal: 3,
+                completedExercises: 3,
+                weeklyGoal: weeklyWorkoutGoal,
               ), // Reuse WeightChart
             ),
           ],
