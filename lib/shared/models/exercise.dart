@@ -11,6 +11,18 @@ enum ExerciseCategory {
   legs,
 }
 
+extension ExerciseCategoryExtension on ExerciseCategory {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+
+  static ExerciseCategory fromShortString(String shortString) {
+    return ExerciseCategory.values.firstWhere(
+      (element) => element.toShortString() == shortString,
+    );
+  }
+}
+
 enum ExerciseSetType {
   warmup,
   dropset,
@@ -47,7 +59,8 @@ class ExerciseInfoList {
     return ExerciseInfoList(
       id: json['id'],
       name: json['name'],
-      exerciseCategory: json['exerciseCategory'],
+      exerciseCategory:
+          ExerciseCategoryExtension.fromShortString(json['exerciseCategory']),
       info: json['info'],
     );
   }
@@ -56,7 +69,7 @@ class ExerciseInfoList {
     return {
       'id': id,
       'name': name,
-      'exerciseCategory': exerciseCategory,
+      'exerciseCategory': exerciseCategory.toShortString(),
       'info': info,
     };
   }
@@ -111,7 +124,7 @@ class Exercise {
     return {
       'id': id,
       'name': exerciseInfoList.name,
-      'exerciseCategory': exerciseInfoList.exerciseCategory,
+      'exerciseCategory': exerciseInfoList.exerciseCategory.toShortString(),
       'info': exerciseInfoList.info,
       'note': note,
     };
@@ -154,38 +167,33 @@ class Workout {
       throw Exception('Document data is null');
     }
 
-    if (data['id'] is! String) {
-      throw TypeError();
+    final title = data['title'];
+    final time = data['time'];
+    final dateTime = data['dateTime'];
+
+    if (title is! String) {
+      throw Exception('Workout title is not a string');
     }
-    if (data['title'] is! String) {
-      throw TypeError();
+    if (time is! String) {
+      throw Exception('Workout time is not a string');
     }
-    if (data['time'] is! String) {
-      throw TypeError();
-    }
-    if (data['dateTime'] is! DateTime) {
-      throw TypeError();
-    }
-    if (data['exercises'] is! List) {
-      throw TypeError();
+    if (dateTime is! Timestamp) {
+      throw Exception('Workout dateTime is not a Timestamp');
     }
 
     return Workout(
-      id: data['id'],
-      title: data['title'],
-      time: data['time'],
-      dateTime: data['dateTime'],
-      exercises: data['exercises'],
-    );
+        id: doc.id,
+        title: title,
+        time: time,
+        dateTime: dateTime.toDate(),
+        exercises: []);
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
       'title': title,
       'time': time,
       'dateTime': dateTime,
-      'exercises': exercises.map((e) => e.toFirestore()).toList(),
     };
   }
 }

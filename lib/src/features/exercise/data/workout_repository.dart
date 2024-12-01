@@ -6,7 +6,7 @@ import 'package:fit_and_healthy/src/features/exercise/data/exercise_repository.d
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 
 final workoutConverter = (
-  fromFirestore: (snapshot, _) => Workout.fromFirestore(snapshot.data()!),
+  fromFirestore: (snapshot, _) => Workout.fromFirestore(snapshot),
   toFirestore: (Workout workout, _) => workout.toFirestore(),
 );
 
@@ -58,7 +58,18 @@ class WorkoutRepository {
     DateTime startOfDay = DateTime(date.year, date.month, date.day);
     DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-    return _getWorkoutCollection()
+    final AuthUser user = _authRepository.currentUser!;
+
+    print('Getting workouts from database for date: $startOfDay');
+
+    return _firestore
+        .collection(UserRepository.collectionName)
+        .doc(user.firebaseUser.uid)
+        .collection(collectionName)
+        .withConverter<Workout>(
+          fromFirestore: workoutConverter.fromFirestore,
+          toFirestore: workoutConverter.toFirestore,
+        )
         .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
         .where('dateTime', isLessThanOrEqualTo: endOfDay)
         .snapshots()

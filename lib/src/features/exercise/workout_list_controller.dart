@@ -15,7 +15,7 @@ class WorkoutNotifier extends _$WorkoutNotifier {
     _workoutRepository = WorkoutRepository(authRepository);
 
     return WorkoutListState(
-      workoutDateStreams: {},
+      cachedDateWorkouts: {},
       cachedWorkouts: {},
     );
   }
@@ -24,24 +24,23 @@ class WorkoutNotifier extends _$WorkoutNotifier {
     return DateTime(dateTime.year, dateTime.month, dateTime.day);
   }
 
-  void _listenToDate(DateTime date) {
+  void listenToDate(DateTime date) {
+    final normalizedDate = _dateTimeToDate(date);
     state.when(
       data: (data) {
-        if (!data.workoutDateStreams.containsKey(date)) {
-          final stream = _workoutRepository.getWorkoutsStreamForDate(date);
-          state = AsyncValue.data(data.copyWith());
+        if (!data.cachedDateWorkouts.containsKey(normalizedDate)) {
+          final stream =
+              _workoutRepository.getWorkoutsStreamForDate(normalizedDate);
+          // state = AsyncValue.data(data.copyWith());
 
           stream.listen((workouts) {
-            state = AsyncValue.data(data.copyWith(
-              workoutDateStreams: {
-                ...data.workoutDateStreams,
-                date: stream,
-              },
-              cachedWorkouts: {
-                ...data.cachedWorkouts,
-                for (final workout in workouts) workout.id: workout,
-              },
-            ));
+            state = AsyncValue.data(data.copyWith(cachedDateWorkouts: {
+              ...data.cachedDateWorkouts,
+              normalizedDate: workouts,
+            }, cachedWorkouts: {
+              ...data.cachedWorkouts,
+              for (final workout in workouts) workout.id: workout,
+            }));
           });
         }
       },
@@ -49,36 +48,24 @@ class WorkoutNotifier extends _$WorkoutNotifier {
       error: (err, stack) {},
     );
   }
-
-  void changeDate(DateTime newDate) {
-    final normalizedDate = _dateTimeToDate(newDate);
-    _listenToDate(normalizedDate);
-  }
-
-  Stream<List<Workout>> getWorkoutDateStreams(DateTime date) {
-    return state.maybeWhen(
-      data: (data) => data.workoutDateStreams[date] ?? Stream.empty(),
-      orElse: () => Stream.empty(),
-    );
-  }
 }
 
 class WorkoutListState {
-  final Map<DateTime, Stream<List<Workout>>> workoutDateStreams;
+  final Map<DateTime, List<Workout>> cachedDateWorkouts;
   final Map<String, Workout> cachedWorkouts;
 
   WorkoutListState({
-    required this.workoutDateStreams,
+    required this.cachedDateWorkouts,
     required this.cachedWorkouts,
   });
 
   WorkoutListState copyWith({
-    Map<DateTime, Stream<List<Workout>>>? workoutDateStreams,
+    Map<DateTime, List<Workout>>? cachedDateWorkouts,
     Map<String, Workout>? cachedWorkouts,
   }) {
     return WorkoutListState(
-      workoutDateStreams: workoutDateStreams ?? this.workoutDateStreams,
       cachedWorkouts: cachedWorkouts ?? this.cachedWorkouts,
+      cachedDateWorkouts: cachedDateWorkouts ?? this.cachedDateWorkouts,
     );
   }
 }

@@ -53,96 +53,99 @@ class ExerciseView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Widget loggedWorkouts;
 
-    final exerciseDateFuture = ref.watch(exerciseDateNotifierProvider.future);
+    final exerciseDate = ref.watch(exerciseDateNotifierProvider);
+    final workoutListState = ref.watch(workoutNotifierProvider);
 
-    Widget content = FutureBuilder(
-        future: exerciseDateFuture,
-        builder: (context, snapshot) {
-          final date = snapshot.data;
+    DateTime? selectedDate;
 
-          if (date == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    if (exerciseDate is AsyncLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (exerciseDate is AsyncError) {
+      return Center(child: Text('Error: ${exerciseDate.error}'));
+    } else {
+      selectedDate = exerciseDate.value;
+      if (selectedDate == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-          final workoutNotifier = ref.read(workoutNotifierProvider.notifier);
-          workoutNotifier.changeDate(date);
+      final workoutNotifier = ref.read(workoutNotifierProvider.notifier);
+      workoutNotifier.listenToDate(selectedDate);
+    }
 
-          final workoutsStream = workoutNotifier.getWorkoutDateStreams(date);
+    if (workoutListState is AsyncLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (workoutListState is AsyncError) {
+      return Center(child: Text('Error: ${workoutListState.error}'));
+    } else {
+      if (workoutListState.value == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-          return StreamBuilder(
-              stream: workoutsStream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('An error occurred'));
-                } else {
-                  final workouts = snapshot.data;
-                  if (workouts == null || workouts.isEmpty) {
-                    return const Center(
-                        child: Text(
-                      'No workouts logged',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-                    ));
-                  } else {
-                    loggedWorkouts = ListView.builder(
-                      shrinkWrap:
-                          true, // Ensures it integrates well in the scrollable content
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: workouts.length,
-                      itemBuilder: (ctx, index) => ExerciseWorkoutItem(
-                        workout: workouts[index],
-                        onSelectWorkout: (workout) {
-                          selectWorkout(context, workout);
-                        },
-                      ),
-                    );
-                  }
+      final workouts = workoutListState.value!.cachedDateWorkouts[selectedDate];
 
-                  return SingleChildScrollView(
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () => navigateToAddWorkout(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                              ),
-                              child: Text(
-                                'Add Workout',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Logged',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black.withOpacity(0.7),
-                              ),
-                            ),
-                            const Divider(
-                              thickness: 1,
-                              color: Colors.blue,
-                            ),
-                            const SizedBox(height: 16),
-                            loggedWorkouts,
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              });
-        });
+      if (workouts == null || workouts.isEmpty) {
+        return const Center(
+            child: Text(
+          'No workouts logged',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+        ));
+      } else {
+        loggedWorkouts = ListView.builder(
+          shrinkWrap:
+              true, // Ensures it integrates well in the scrollable content
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: workouts.length,
+          itemBuilder: (ctx, index) => ExerciseWorkoutItem(
+            workout: workouts[index],
+            onSelectWorkout: (workout) {
+              selectWorkout(context, workout);
+            },
+          ),
+        );
+      }
+    }
+
+    Widget content = SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              ElevatedButton(
+                onPressed: () => navigateToAddWorkout(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                ),
+                child: Text(
+                  'Add Workout',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Logged',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black.withOpacity(0.7),
+                ),
+              ),
+              const Divider(
+                thickness: 1,
+                color: Colors.blue,
+              ),
+              const SizedBox(height: 16),
+              loggedWorkouts,
+            ],
+          ),
+        ),
+      ),
+    );
+
     return NestedScaffold(
       appBar: AppBar(
         title: const Text('Exercise'),

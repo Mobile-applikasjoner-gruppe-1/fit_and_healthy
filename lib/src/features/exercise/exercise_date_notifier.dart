@@ -6,10 +6,15 @@ part 'exercise_date_notifier.g.dart';
 class ExerciseDateNotifier extends _$ExerciseDateNotifier {
   @override
   Future<DateTime> build() async {
-    return DateTime.now();
+    return _dateTimeToDate(DateTime.now());
+  }
+
+  _dateTimeToDate(DateTime dateTime) {
+    return DateTime(dateTime.year, dateTime.month, dateTime.day);
   }
 
   void changeDate(DateTime newDate) {
-    state = AsyncValue.data(newDate);
+    DateTime normalizedDate = _dateTimeToDate(newDate);
+    state = AsyncValue.data(normalizedDate);
   }
 }
