@@ -22,7 +22,7 @@ class NutritionScreen extends StatelessWidget {
               onPressed: () {
                 context.pushNamed(FoodSearchScreen.routeName);
               },
-              child: Text('Add Food'),
+              child: Text('Find products'),
             ),
             SizedBox(height: 20), // Add spacing between buttons
             ElevatedButton(
