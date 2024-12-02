@@ -3,6 +3,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+/// A widget that displays a history of workouts grouped by week.
+/// The data is visualized using a bar chart, where each bar represents
+/// the number of workouts completed in a specific week.
 class WorkoutHistoryCard extends StatelessWidget {
   final List<Workout> workouts;
 
@@ -25,7 +28,6 @@ class WorkoutHistoryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
             const Text(
               "Workout History",
               style: TextStyle(
@@ -34,7 +36,6 @@ class WorkoutHistoryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            // Bar Chart
             SizedBox(
               height: 100,
               child: BarChart(
@@ -60,10 +61,8 @@ class WorkoutHistoryCard extends StatelessWidget {
       if (!counts.containsKey(weekIndex)) {
         counts[weekIndex] = 0;
       }
-
       counts[weekIndex] = counts[weekIndex]! + 1;
     }
-
     return counts;
   }
 

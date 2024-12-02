@@ -80,12 +80,14 @@ class UserRepository {
     });
   }
 
-  Future<void> updateHeight(double height) async {
+  Future<double?> updateHeight(double height) async {
     if (!User.isValidHeight(height)) {
       throw Exception('Invalid height');
     }
 
     await _getUserRef().update({UserField.height.toShortString(): height});
+
+    return height;
   }
 
   Future<void> updateGender(Gender gender) async {
@@ -109,14 +111,14 @@ class UserRepository {
         .update({UserField.birthday.toShortString(): timestamp});
   }
 
-  Future<void> updateWeeklyWorkoutGoal(int goal) {
+  Future<int> updateWeeklyWorkoutGoal(int goal) async {
     if (!User.isValidWeeklyWorkoutGoal(goal)) {
       throw Exception('Invalid weekly workout goal');
     }
 
-    return _getUserRef().update({
-      UserField.weeklyWorkoutGoal.toShortString(): goal,
-    });
+    await _getUserRef()
+        .update({UserField.weeklyWorkoutGoal.toShortString(): goal});
+    return goal;
   }
 
   Future<void> updateWeightGoal(WeightGoal goal) {

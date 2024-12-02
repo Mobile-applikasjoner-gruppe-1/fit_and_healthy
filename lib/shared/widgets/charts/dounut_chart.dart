@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+/// A widget that displays a donut-style chart using the `fl_chart` package.
+/// The chart represents a proportion of a value out of a total, along with a label.
 class DonutChart extends StatelessWidget {
   final double value;
   final double total;

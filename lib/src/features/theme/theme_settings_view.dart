@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 
+/// This page allows users to customize the theme of the app. Users can select
+/// between system, light, and dark theme modes. The settings are managed using
+/// the `SettingsController`.
 class ThemeSettingsPage extends ConsumerWidget {
   const ThemeSettingsPage({Key? key}) : super(key: key);
 

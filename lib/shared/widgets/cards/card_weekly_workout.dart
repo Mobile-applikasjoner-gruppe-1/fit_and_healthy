@@ -3,6 +3,9 @@ import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// A widget that displays a card showing the user's weekly workout progress.
+/// The progress is visualized using a bar chart that compares the completed
+/// exercises to the user's weekly workout goal.
 class CardWeeklyWorkout extends ConsumerWidget {
   const CardWeeklyWorkout({Key? key}) : super(key: key);
 
@@ -38,7 +41,6 @@ class CardWeeklyWorkout extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and Icon
             Padding(
               padding: const EdgeInsets.all(8),
               child: Row(
@@ -52,17 +54,15 @@ class CardWeeklyWorkout extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   ),
-                  //Icon(Icons.monitor_weight, color: Colors.white),
                 ],
               ),
             ),
-            // Chart
             SizedBox(
-              height: 100, // Fixed height for chart
+              height: 100,
               child: WeeklyExerciseChart(
                 completedExercises: 3,
                 weeklyGoal: weeklyWorkoutGoal,
-              ), // Reuse WeightChart
+              ),
             ),
           ],
         ),
