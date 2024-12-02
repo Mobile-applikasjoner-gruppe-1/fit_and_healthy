@@ -2,6 +2,7 @@ import 'package:fit_and_healthy/src/features/auth/add_display_name/add_display_n
 import 'package:fit_and_healthy/src/features/auth/email_verification/email_verification_view.dart';
 import 'package:fit_and_healthy/src/features/measurement/measurement_settings_page.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_setup_page.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_creation_screen.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_detail_screen.dart';
 import 'package:fit_and_healthy/src/features/routing/app_router_redirect.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
@@ -20,7 +21,6 @@ import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart'
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_widget_page.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
-import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_search_screen.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_list_screen.dart';
 import 'package:fit_and_healthy/src/features/theme/theme_settings_view.dart';
 import 'package:fit_and_healthy/src/utils/stream_listenable.dart';
@@ -109,6 +109,13 @@ GoRouter appRouter(Ref ref) {
                       return MealDetailScreen(mealId: mealId);
                     },
                   ),
+                  GoRoute(
+                    path: MealCreationScreen.route,
+                    name: MealCreationScreen.routeName,
+                    builder: (context, state) {
+                      return MealCreationScreen();
+                    },
+                  )
                 ],
               ),
             ]),

@@ -12,11 +12,17 @@ class MealItemController extends _$MealItemController {
   @override
   Future<void> build() async {}
 
-  Future<void> addFoodItemsToMeal(
-      String mealId, List<FoodItem> foodItems) async {
+  Future<void> addItemsToMeal(String mealId, List<FoodItem> foodItems) async {
     final authRepository = ref.read(firebaseAuthRepositoryProvider);
     final exerciseRepository = MealItemRepository(authRepository, mealId);
 
     await exerciseRepository.addFoodItems(foodItems);
+  }
+
+  Future<void> removeItemFromMeal(String mealId, String itemId) async {
+    final authRepository = ref.read(firebaseAuthRepositoryProvider);
+    final exerciseRepository = MealItemRepository(authRepository, mealId);
+
+    await exerciseRepository.deleteMealItemById(itemId);
   }
 }

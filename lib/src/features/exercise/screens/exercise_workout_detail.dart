@@ -1,8 +1,8 @@
 import 'package:fit_and_healthy/src/features/exercise/controllers/exercise_cache_notifier.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
+import 'package:fit_and_healthy/src/utils/date_formater.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_item.dart';
 
@@ -21,14 +21,6 @@ class WorkoutDetailView extends ConsumerWidget {
   static const routeName = 'WorkoutDetail';
 
   final String workoutId; // The workout to be displayed.
-
-  /**
-   * The formatDate method, format the date as 'MMM d, yyyy'. 
-   * This could be for example, 'November 13, 2024'
-   */
-  String _formatDate(DateTime date) {
-    return DateFormat('MMMM d, yyyy').format(date);
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,7 +45,7 @@ class WorkoutDetailView extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Workout Date: ${_formatDate(workout.dateTime)}",
+                "Workout Date: ${formatDate(workout.dateTime)}",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),

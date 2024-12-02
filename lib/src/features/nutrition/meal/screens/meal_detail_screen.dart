@@ -1,12 +1,14 @@
+import 'package:fit_and_healthy/src/features/nutrition/controllers/meal_item_controller.dart';
 import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_cache_notifier.dart';
 import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
+import 'package:fit_and_healthy/src/utils/date_formater.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MealDetailScreen extends ConsumerStatefulWidget {
-  static const route = ':mealId';
+  static const route = '/meal/:id';
   static const routeName = 'Meal Details';
 
   MealDetailScreen({required this.mealId});
@@ -73,12 +75,6 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   // }
 
   // Remove a food item from the meal
-  // void _removeFoodItem(int index) {
-  //   // TODO: Consider using the id instead to make changing to database easier
-  //   setState(() {
-  //     widget.meal.removeFoodItemByIndex(index);
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +84,13 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
     String mealId = widget.mealId;
 
     final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
+
+    void _removeFoodItem(mealItemId) {
+      ref.read(mealItemControllerProvider.notifier).removeItemFromMeal(
+            mealId,
+            mealItemId,
+          );
+    }
 
     if (nutritionCacheState is AsyncLoading) {
       content = Center(child: CircularProgressIndicator());
@@ -99,14 +102,31 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
       if (meal == null) {
         content = Center(child: Text('Meal not found'));
       } else {
+        final totalNutrition = meal.calculateTotalNutrition();
         content = SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Meal Date: ${_formatDate(workout.dateTime)}",
+                "Meal Date: ${formatDate(meal.timestamp)}",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total Nutrition for Meal:',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    for (var nutrient in totalNutrition.entries)
+                      Text(
+                          '${nutrient.key}: ${nutrient.value.toStringAsFixed(2)}'),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               if (meal.items.isEmpty)
@@ -119,7 +139,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
               else
                 Column(
                   children: meal.items.map((item) {
-                    return MealItemView(item: item);
+                    return Text('- ${item.name} (${item.grams} grams)');
                   }).toList(),
                 ),
             ],
@@ -175,9 +195,9 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
           // Display meal items with options to edit grams and delete item
           Expanded(
             child: ListView.builder(
-              itemCount: widget.meal.items.length,
+              itemCount: meal?.items.length ?? 0,
               itemBuilder: (context, index) {
-                final item = widget.meal.items[index]; // item is _MealItem
+                final item = meal!.items[index]; // item is _MealItem
                 return ListTile(
                   title: Text(item.name),
                   subtitle: Text('${item.grams} grams'),
@@ -204,20 +224,6 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
           ),
 
           // Total Nutrition Summary
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Total Nutrition for Meal:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                for (var nutrient in totalNutrition.entries)
-                  Text('${nutrient.key}: ${nutrient.value.toStringAsFixed(2)}'),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -246,7 +252,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
             onPressed: () {
               final grams = double.tryParse(gramsController.text) ?? 0.0;
               if (grams > 0) {
-                _addProductToMeal(product, grams);
+                // _addProductToMeal(product, grams);
                 Navigator.of(context).pop();
               }
             },
@@ -282,7 +288,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
               final grams =
                   double.tryParse(gramsController.text) ?? currentGrams;
               if (grams > 0) {
-                _editFoodItemGrams(index, grams);
+                // _editFoodItemGrams(index, grams);
                 Navigator.of(context).pop();
               }
             },

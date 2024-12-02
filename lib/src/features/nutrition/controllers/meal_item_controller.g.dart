@@ -7,7 +7,7 @@ part of 'meal_item_controller.dart';
 // **************************************************************************
 
 String _$mealItemControllerHash() =>
-    r'd8aa7689bc48040594c334944b7882d37b2c8883';
+    r'56dff68df0084698101019a3db807e243f43a974';
 
 /// See also [MealItemController].
 @ProviderFor(MealItemController)
