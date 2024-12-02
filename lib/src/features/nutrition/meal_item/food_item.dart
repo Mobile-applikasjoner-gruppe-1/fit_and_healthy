@@ -73,7 +73,7 @@ class FoodItem {
         NutritionInfoKey.carbs.name:
             (nutriments['carbohydrates_100g'] ?? 0).toDouble(),
       },
-      grams: json['grams'],
+      grams: 100,
     );
   }
 

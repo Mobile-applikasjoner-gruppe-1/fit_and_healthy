@@ -1,6 +1,5 @@
 import 'package:fit_and_healthy/shared/widgets/fields/height_editor.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
-import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +19,6 @@ class ProfileSettingsPage extends ConsumerStatefulWidget {
 class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final settingsState = ref.watch(settingsControllerProvider).value;
     final metricsState = ref.watch(metricsControllerProvider);
     final theme = Theme.of(context);
 
@@ -97,12 +95,6 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
               elevation: Sizes.s25,
               child: Column(
                 children: [
-                  _buildThemeSwitcher(
-                    context,
-                    themeMode: settingsState!.themeMode,
-                    ref: ref,
-                  ),
-                  _buildDivider(),
                   _buildEditableGenderField(context, ref, gender),
                   _buildDivider(),
                   _buildEditableHeightField(context, ref, height),
@@ -113,38 +105,6 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildThemeSwitcher(
-    BuildContext context, {
-    required ThemeMode themeMode,
-    required WidgetRef ref,
-  }) {
-    final theme = Theme.of(context);
-
-    return ListTile(
-      leading: Icon(Icons.color_lens, color: theme.colorScheme.primary),
-      title: const Text('Theme'),
-      trailing: DropdownButton<ThemeMode>(
-        value: themeMode,
-        onChanged:
-            ref.read(settingsControllerProvider.notifier).updateThemeMode,
-        items: const [
-          DropdownMenuItem(
-            value: ThemeMode.system,
-            child: Text('System'),
-          ),
-          DropdownMenuItem(
-            value: ThemeMode.light,
-            child: Text('Light'),
-          ),
-          DropdownMenuItem(
-            value: ThemeMode.dark,
-            child: Text('Dark'),
-          ),
-        ],
       ),
     );
   }
