@@ -1,6 +1,6 @@
-import 'package:fit_and_healthy/src/features/exercise/exercise_date_notifier.dart';
+import 'package:fit_and_healthy/src/features/exercise/controllers/exercise_date_notifier.dart';
 import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_workout.dart';
-import 'package:fit_and_healthy/src/features/exercise/workout_list_controller.dart';
+import 'package:fit_and_healthy/src/features/exercise/controllers/exercise_cache_notifier.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
@@ -50,7 +50,7 @@ class ExerciseView extends ConsumerWidget {
     Widget loggedWorkouts;
 
     final exerciseDate = ref.watch(exerciseDateNotifierProvider);
-    final workoutListState = ref.watch(workoutNotifierProvider);
+    final exerciseCacheState = ref.watch(exerciseCacheNotifierProvider);
 
     DateTime? selectedDate;
 
@@ -63,39 +63,42 @@ class ExerciseView extends ConsumerWidget {
       if (selectedDate == null) {
         loggedWorkouts = const Center(child: CircularProgressIndicator());
       } else {
-        final workoutNotifier = ref.read(workoutNotifierProvider.notifier);
-        workoutNotifier.listenToDate(selectedDate);
-      }
-    }
+        final workoutNotifier =
+            ref.read(exerciseCacheNotifierProvider.notifier);
+        workoutNotifier.listenToDate(selectedDate, true);
 
-    if (workoutListState is AsyncLoading) {
-      loggedWorkouts = const Center(child: CircularProgressIndicator());
-    } else if (workoutListState is AsyncError) {
-      loggedWorkouts = Center(child: Text('Error: ${workoutListState.error}'));
-    } else {
-      if (workoutListState.value == null) {
-        loggedWorkouts = const Center(child: CircularProgressIndicator());
-      }
+        if (exerciseCacheState is AsyncLoading) {
+          loggedWorkouts = const Center(child: CircularProgressIndicator());
+        } else if (exerciseCacheState is AsyncError) {
+          loggedWorkouts =
+              Center(child: Text('Error: ${exerciseCacheState.error}'));
+        } else {
+          if (exerciseCacheState.value == null) {
+            loggedWorkouts = const Center(child: CircularProgressIndicator());
+          }
 
-      final workouts = workoutListState.value!.cachedDateWorkouts[selectedDate];
+          final workouts =
+              exerciseCacheState.value!.cachedDateWorkouts[selectedDate];
 
-      if (workouts == null || workouts.isEmpty) {
-        loggedWorkouts = const Text(
-          'No workouts logged',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-        );
-      } else {
-        loggedWorkouts = ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: workouts.length,
-          itemBuilder: (ctx, index) => ExerciseWorkoutItem(
-            workout: workouts[index],
-            onSelectWorkout: (workout) {
-              selectWorkout(context, workout);
-            },
-          ),
-        );
+          if (workouts == null || workouts.isEmpty) {
+            loggedWorkouts = const Text(
+              'No workouts logged',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            );
+          } else {
+            loggedWorkouts = ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: workouts.length,
+              itemBuilder: (ctx, index) => ExerciseWorkoutItem(
+                workout: workouts[index],
+                onSelectWorkout: (workout) {
+                  selectWorkout(context, workout);
+                },
+              ),
+            );
+          }
+        }
       }
     }
 

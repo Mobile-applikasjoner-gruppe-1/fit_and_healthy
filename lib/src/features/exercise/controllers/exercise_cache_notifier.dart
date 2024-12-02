@@ -6,24 +6,27 @@ import 'package:fit_and_healthy/src/features/exercise/data/exercise_repository.d
 import 'package:fit_and_healthy/src/features/exercise/data/workout_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'workout_list_controller.g.dart';
+part 'exercise_cache_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
-class WorkoutNotifier extends _$WorkoutNotifier {
+class ExerciseCacheNotifier extends _$ExerciseCacheNotifier {
   late final FirebaseAuthRepository _authRepository;
   late final WorkoutRepository _workoutRepository;
 
   Map<DateTime, StreamSubscription<List<Workout>>>
       _dateWorkoutsStreamSubscriptions = {};
+  Map<DateTime, Stream<List<Workout>>> _dateWorkoutsStreams = {};
   Map<String, StreamSubscription<List<Exercise>>>
       _workoutExercisesStreamSubscriptions = {};
+  Map<String, Stream<List<Exercise>>> _workoutExercisesStreams = {};
+  Map<DateTime, bool> _datesWithExerciseListeners = {};
 
   @override
-  Future<WorkoutListState> build() async {
+  Future<ExerciseCacheState> build() async {
     _authRepository = ref.read(firebaseAuthRepositoryProvider);
     _workoutRepository = WorkoutRepository(_authRepository);
 
-    return WorkoutListState(
+    return ExerciseCacheState(
       cachedDateWorkouts: {},
       cachedWorkouts: {},
       cachedWorkoutExercises: {},
@@ -74,7 +77,8 @@ class WorkoutNotifier extends _$WorkoutNotifier {
     );
   }
 
-  _workoutsStreamCallback(List<Workout> workouts, DateTime normalizedDate) {
+  _workoutsStreamCallback(
+      List<Workout> workouts, DateTime normalizedDate, bool listenToExercises) {
     state.when(
       data: (data) {
         // Update cached workouts by adding them to a map indexed by workout id
@@ -86,21 +90,24 @@ class WorkoutNotifier extends _$WorkoutNotifier {
           ...data.cachedWorkoutExercises,
         };
 
-        for (final workout in workouts) {
-          if (!data.cachedWorkoutExercises.containsKey(workout.id)) {
-            final normalizedWorkoutDate = _dateTimeToDate(workout.dateTime);
+        if (listenToExercises) {
+          for (final workout in workouts) {
+            if (!data.cachedWorkoutExercises.containsKey(workout.id)) {
+              final normalizedWorkoutDate = _dateTimeToDate(workout.dateTime);
 
-            final exerciseRepository =
-                ExerciseRepository(_authRepository, workout.id);
-            final exerciseStream = exerciseRepository.getExercisesStream();
-            final exerciseSubscription = exerciseStream.listen((exercises) {
-              _exercisesStreamCallback(
-                  exercises, normalizedWorkoutDate, workout.id);
-            });
+              final exerciseStream = _getExerciseStreamByWorkoutId(workout.id);
+              if (_workoutExercisesStreamSubscriptions[workout.id] != null) {
+                _workoutExercisesStreamSubscriptions[workout.id]?.cancel();
+              }
+              final exerciseSubscription = exerciseStream.listen((exercises) {
+                _exercisesStreamCallback(
+                    exercises, normalizedWorkoutDate, workout.id);
+              });
 
-            // Track the subscription for cleanup
-            _workoutExercisesStreamSubscriptions[workout.id] =
-                exerciseSubscription;
+              // Track the subscription for cleanup
+              _workoutExercisesStreamSubscriptions[workout.id] =
+                  exerciseSubscription;
+            }
           }
         }
 
@@ -135,21 +142,68 @@ class WorkoutNotifier extends _$WorkoutNotifier {
     );
   }
 
-  void listenToDate(DateTime date) {
+  Stream<List<Exercise>> _getExerciseStreamByWorkoutId(String workoutId) {
+    final existingStream = _workoutExercisesStreams[workoutId];
+    if (existingStream != null) {
+      return existingStream;
+    }
+
+    final exerciseRepository = ExerciseRepository(_authRepository, workoutId);
+    final newStream = exerciseRepository.getExercisesStream();
+    _workoutExercisesStreams[workoutId] = newStream;
+    return newStream;
+  }
+
+  void listenToDate(DateTime date, bool listenToExercises) {
     final normalizedDate = _dateTimeToDate(date);
     state.when(
         data: (data) {
-          if (!data.cachedDateWorkouts.containsKey(normalizedDate)) {
+          if (!_dateWorkoutsStreams.containsKey(normalizedDate)) {
             final stream =
                 _workoutRepository.getWorkoutsStreamForDate(normalizedDate);
 
             // Listen to workout stream
             final subscription = stream.listen((workouts) {
-              _workoutsStreamCallback(workouts, normalizedDate);
+              _workoutsStreamCallback(
+                  workouts, normalizedDate, listenToExercises);
             });
 
             // Track date-based subscriptions for cleanup
             _dateWorkoutsStreamSubscriptions[normalizedDate] = subscription;
+            _dateWorkoutsStreams[normalizedDate] = stream;
+          } else if (listenToExercises &&
+              !_datesWithExerciseListeners.containsKey(normalizedDate)) {
+            final oldSubscription =
+                _dateWorkoutsStreamSubscriptions[normalizedDate];
+            final stream = _dateWorkoutsStreams[normalizedDate];
+
+            if (stream == null) {
+              throw Exception('Stream not found for date $normalizedDate');
+            }
+
+            if (oldSubscription != null) {
+              oldSubscription.cancel();
+            }
+
+            final subscription = stream.listen((workouts) {
+              _workoutsStreamCallback(
+                  workouts, normalizedDate, listenToExercises);
+            });
+
+            data.cachedDateWorkouts[normalizedDate]?.forEach((workout) {
+              final exerciseStream = _getExerciseStreamByWorkoutId(workout.id);
+              final exerciseSubscription = exerciseStream.listen((exercises) {
+                _exercisesStreamCallback(exercises, normalizedDate, workout.id);
+              });
+
+              _workoutExercisesStreamSubscriptions[workout.id] =
+                  exerciseSubscription;
+            });
+
+            _dateWorkoutsStreamSubscriptions[normalizedDate] = subscription;
+          }
+          if (listenToExercises) {
+            _datesWithExerciseListeners[normalizedDate] = true;
           }
         },
         loading: () {},
@@ -157,23 +211,23 @@ class WorkoutNotifier extends _$WorkoutNotifier {
   }
 }
 
-class WorkoutListState {
+class ExerciseCacheState {
   final Map<DateTime, List<Workout>> cachedDateWorkouts;
   final Map<String, Workout> cachedWorkouts;
   final Map<String, List<Exercise>> cachedWorkoutExercises;
 
-  WorkoutListState({
+  ExerciseCacheState({
     required this.cachedDateWorkouts,
     required this.cachedWorkouts,
     required this.cachedWorkoutExercises,
   });
 
-  WorkoutListState copyWith({
+  ExerciseCacheState copyWith({
     Map<DateTime, List<Workout>>? cachedDateWorkouts,
     Map<String, Workout>? cachedWorkouts,
     Map<String, List<Exercise>>? cachedWorkoutExercises,
   }) {
-    return WorkoutListState(
+    return ExerciseCacheState(
       cachedWorkouts: cachedWorkouts ?? this.cachedWorkouts,
       cachedDateWorkouts: cachedDateWorkouts ?? this.cachedDateWorkouts,
       cachedWorkoutExercises:

@@ -1,12 +1,11 @@
 import 'package:fit_and_healthy/shared/models/exercise.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_controller.dart';
+import 'package:fit_and_healthy/src/features/exercise/controllers/exercise_controller.dart';
 import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_exercise.dart';
-import 'package:fit_and_healthy/src/features/exercise/workout_controller.dart';
+import 'package:fit_and_healthy/src/features/exercise/controllers/workout_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -153,17 +152,7 @@ class _AddWorkoutState extends ConsumerState<AddWorkout> {
     );
 
     if (shouldContinue == true) {
-      final newWorkout = _getWorkoutFromFields();
-      if (mounted) {
-        Navigator.pop(context, newWorkout);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Workout added successfully!'),
-            duration: Duration(seconds: 2),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      _createWorkout();
     }
   }
 

@@ -2,6 +2,8 @@ import 'package:fit_and_healthy/src/features/auth/add_display_name/add_display_n
 import 'package:fit_and_healthy/src/features/auth/email_verification/email_verification_view.dart';
 import 'package:fit_and_healthy/src/features/measurement/measurement_settings_page.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_setup_page.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_creation_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_detail_screen.dart';
 import 'package:fit_and_healthy/src/features/routing/app_router_redirect.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/auth/forgot_password/forgot_password_view.dart';
@@ -19,9 +21,7 @@ import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart'
 import 'package:fit_and_healthy/src/features/settings/settings_view.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_widget_page.dart';
 import 'package:fit_and_healthy/src/features/tabs/tabs_view.dart';
-import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/food_search_screen.dart';
-import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_creation_screen.dart';
-import 'package:fit_and_healthy/src/features/nutrition/nutrition_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_list_screen.dart';
 import 'package:fit_and_healthy/src/features/theme/theme_settings_view.dart';
 import 'package:fit_and_healthy/src/utils/stream_listenable.dart';
 import 'package:flutter/cupertino.dart';
@@ -95,32 +95,27 @@ GoRouter appRouter(Ref ref) {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                path: NutritionScreen.route,
-                name: NutritionScreen.routeName,
-                builder: (context, state) => NutritionScreen(),
+                path: MealListScreen.route,
+                name: MealListScreen.routeName,
+                builder: (context, state) {
+                  return MealListScreen();
+                },
                 routes: [
                   GoRoute(
-                    path: FoodSearchScreen.route,
-                    name: FoodSearchScreen.routeName,
-                    builder: (context, state) => FoodSearchScreen(),
+                    path: MealDetailScreen.route,
+                    name: MealDetailScreen.routeName,
+                    builder: (context, state) {
+                      final mealId = state.pathParameters['id']!;
+                      return MealDetailScreen(mealId: mealId);
+                    },
                   ),
                   GoRoute(
-                      path: MealListScreen.route,
-                      name: MealListScreen.routeName,
-                      builder: (context, state) {
-                        return MealListScreen();
-                      }),
-                  // TODO: Use a route parameter to pass the mealId to the MealDetailScreen instead of passing the entire Meal
-                  // GoRoute(
-                  //     path: MealDetailScreen.route,
-                  //     name: MealDetailScreen.routeName,
-                  //     builder: (context, state) {
-                  //       final mealId = state.pathParameters['mealId']!;
-                  //       return MealDetailScreen(
-                  //         mealId: mealId,
-                  //       );
-                  //     },
-                  // ),
+                    path: MealCreationScreen.route,
+                    name: MealCreationScreen.routeName,
+                    builder: (context, state) {
+                      return MealCreationScreen();
+                    },
+                  )
                 ],
               ),
             ]),
