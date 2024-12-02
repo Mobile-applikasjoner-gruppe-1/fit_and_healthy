@@ -56,7 +56,6 @@ class MeasurementSettingsPage extends ConsumerWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 16),
-            // Chart Filters
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -84,13 +83,25 @@ class MeasurementSettingsPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            // Add Weight Button
             Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  _showAddWeightModal(context, metricsController);
-                },
-                child: const Text('Add Weight'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _showAddWeightModal(context, metricsController);
+                    },
+                    child: const Text('Add Weight'),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      _showDeleteWeightModal(
+                          context, weightHistory, metricsController);
+                    },
+                    child: const Text('Delete Weight'),
+                  ),
+                ],
               ),
             ),
           ],
@@ -266,6 +277,111 @@ class MeasurementSettingsPage extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteWeightModal(
+    BuildContext context,
+    List<WeightEntry> weightHistory,
+    MetricsController metricsController,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Delete Weight Entries',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 16),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: weightHistory.length,
+                itemBuilder: (context, index) {
+                  final entry = weightHistory[index];
+                  return ListTile(
+                    title: Text(
+                      '${entry.weight} kg',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    subtitle: Text(
+                      '${entry.timestamp.day}/${entry.timestamp.month}/${entry.timestamp.year}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final shouldDelete = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Confirm Delete'),
+                            content: Text(
+                              'Are you sure you want to delete the entry for ${entry.weight} kg?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (shouldDelete == true) {
+                          try {
+                            await metricsController.deleteWeight(entry.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text('Weight entry deleted successfully.'),
+                              ),
+                            );
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Failed to delete weight entry.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         );
       },

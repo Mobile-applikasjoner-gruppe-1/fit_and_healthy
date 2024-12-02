@@ -139,6 +139,18 @@ class MetricsController extends _$MetricsController {
     return await _weightRepository.getWeightHistoryPastYear();
   }
 
+  Future<void> deleteWeight(String id) async {
+    final currentState = await future;
+
+    await _weightRepository.deleteWeightEntry(id);
+
+    final updatedHistory =
+        currentState.weightHistory.where((entry) => entry.id != id).toList();
+
+    state =
+        AsyncValue.data(currentState.copyWith(weightHistory: updatedHistory));
+  }
+
   Future<void> updateHeight(double height) async {
     final currentState = await future;
 
