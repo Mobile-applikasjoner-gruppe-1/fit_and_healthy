@@ -18,8 +18,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///
 /// Each card is associated with a unique ID, size, category, widget builder,
 /// and a route for detailed views.
-
-//TODO: Remove parameters in classes/methods, the card itself should handle fetching the data.
 final allCards = [
   WidgetCard(
     id: '3',
@@ -50,16 +48,7 @@ final allCards = [
     title: 'Nutrition',
     size: 1,
     widgetCardCategory: WidgetCardCategory.nutrition,
-    builder: () => NutritionCard(
-      caloriesConsumed: 1500,
-      carbs: 100,
-      carbsGoal: 150,
-      fats: 100,
-      fatsGoal: 150,
-      proteins: 100,
-      proteinsGoal: 150,
-      totalCalories: 3000,
-    ),
+    builder: () => NutritionCard(),
     route: MealListScreen.routeName,
   ),
   WidgetCard(
@@ -67,9 +56,7 @@ final allCards = [
     title: 'Calories',
     size: 0.5,
     widgetCardCategory: WidgetCardCategory.nutrition,
-    builder: () => CardCaloriesNutrition(
-      caloriesConsumed: 1500,
-    ),
+    builder: () => CardCaloriesNutrition(),
     route: MealListScreen.routeName,
   ),
   WidgetCard(

@@ -2,6 +2,8 @@ import 'package:fit_and_healthy/shared/utils/calorie_calculator.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/dounut_chart.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/horizontal_bar_chart.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
+import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_cache_notifier.dart';
+import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_date_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,53 +14,49 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// The card dynamically calculates the user's recommended calories and macronutrient goals
 /// based on their personal metrics and activity level.
 class NutritionCard extends ConsumerWidget {
-  final double caloriesConsumed;
-  final double totalCalories;
-  final double carbs;
-  final double fats;
-  final double proteins;
-  final double carbsGoal;
-  final double fatsGoal;
-  final double proteinsGoal;
-
-  const NutritionCard({
-    Key? key,
-    required this.caloriesConsumed,
-    required this.totalCalories,
-    required this.carbs,
-    required this.fats,
-    required this.proteins,
-    required this.carbsGoal,
-    required this.fatsGoal,
-    required this.proteinsGoal,
-  }) : super(key: key);
+  const NutritionCard({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final metricsState = ref.watch(metricsControllerProvider);
+    final nutritionDate = ref.watch(nutritionDateNotifierProvider);
+    final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
 
-    final data = metricsState.value;
-
-    if (data == null) {
-      return const Center(child: Text('No data available.'));
+    if (metricsState.value == null || nutritionDate.value == null) {
+      return const Center(child: CircularProgressIndicator());
     }
 
-    // TODO: Use the latest weigth from the controller, without callin the firestore
-    final latestWeight = data.weightHistory.last;
-    final height = data.height;
-    final birthday = data.birthday;
-    final gender = data.gender;
-    final activityLevel = data.activityLevel;
-    final weightGoal = data.weightGoal;
-
-    final caloriesModel = CalorieCalculator.calculateCalories(
-      height: height,
-      birthday: birthday,
-      weight: latestWeight.weight,
-      gender: gender,
-      activityLevel: activityLevel,
-      weightGoal: weightGoal,
+    final metricsData = metricsState.value!;
+    final selectedDate = nutritionDate.value!;
+    final meals = nutritionCacheState.maybeWhen(
+      data: (data) => data.cachedDateMeals[selectedDate] ?? [],
+      orElse: () => [],
     );
+
+    // Calculate consumed calories and macronutrients
+    final macronutrients = meals.fold<Map<String, double>>(
+      {'protein': 0.0, 'carbs': 0.0, 'fats': 0.0, 'calories': 0.0},
+      (accumulated, meal) {
+        final mealNutrition = meal.calculateTotalNutrition();
+        return {
+          'protein': accumulated['protein']! + mealNutrition['protein']!,
+          'carbs': accumulated['carbs']! + mealNutrition['carbs']!,
+          'fats': accumulated['fats']! + mealNutrition['fat']!,
+          'calories': accumulated['calories']! + mealNutrition['calories']!,
+        };
+      },
+    );
+
+    // Calculate recommended calories and macronutrients
+    final caloriesModel = CalorieCalculator.calculateCalories(
+      height: metricsData.height,
+      birthday: metricsData.birthday,
+      weight: metricsData.weightHistory.last.weight,
+      gender: metricsData.gender,
+      activityLevel: metricsData.activityLevel,
+      weightGoal: metricsData.weightGoal,
+    );
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -82,9 +80,9 @@ class NutritionCard extends ConsumerWidget {
               padding: const EdgeInsets.all(8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: const [
                   Text(
-                    'Weekly workout',
+                    'Nutrition Summary',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -102,9 +100,10 @@ class NutritionCard extends ConsumerWidget {
                   Expanded(
                     flex: 1,
                     child: DonutChart(
-                        value: 1700,
-                        total: caloriesModel.totalCalorie,
-                        label: 'Calories'),
+                      value: macronutrients['calories']!,
+                      total: caloriesModel.totalCalorie,
+                      label: 'Calories',
+                    ),
                   ),
                   const SizedBox(width: 24),
                   Expanded(
@@ -115,21 +114,21 @@ class NutritionCard extends ConsumerWidget {
                       children: [
                         HorizontalBarChart(
                           label: 'Protein',
-                          value: 100,
+                          value: macronutrients['protein']!,
                           goal: caloriesModel.recommendedProtein,
                           color: Colors.deepOrange,
                         ),
                         const SizedBox(height: 8),
                         HorizontalBarChart(
                           label: 'Carbs',
-                          value: 100,
+                          value: macronutrients['carbs']!,
                           goal: caloriesModel.recommendedCarbs,
                           color: Colors.deepPurple,
                         ),
                         const SizedBox(height: 8),
                         HorizontalBarChart(
                           label: 'Fat',
-                          value: 100,
+                          value: macronutrients['fats']!,
                           goal: caloriesModel.recommendedFats,
                           color: Colors.blue,
                         ),

@@ -1,6 +1,8 @@
 import 'package:fit_and_healthy/shared/utils/calorie_calculator.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/dounut_chart.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
+import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_cache_notifier.dart';
+import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_date_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,21 +10,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// The progress is visualized using a donut chart, which compares the consumed
 /// calories to the total recommended calorie intake.
 class CardCaloriesNutrition extends ConsumerWidget {
-  final double caloriesConsumed;
-  const CardCaloriesNutrition({
-    super.key,
-    required this.caloriesConsumed,
-  });
+  const CardCaloriesNutrition({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final metricsState = ref.watch(metricsControllerProvider);
+    final nutritionDate = ref.watch(nutritionDateNotifierProvider);
+    final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
 
     final data = metricsState.value;
 
-    if (data == null) {
+    if (data == null || nutritionDate.value == null) {
       return const Center(child: Text('No data available.'));
     }
+
+    final selectedDate = nutritionDate.value!;
+    final meals = nutritionCacheState.maybeWhen(
+      data: (data) => data.cachedDateMeals[selectedDate] ?? [],
+      orElse: () => [],
+    );
+
+    final caloriesConsumed = meals.fold<double>(
+      0.0,
+      (sum, meal) => sum + meal.calculateTotalNutrition()['calories']!,
+    );
 
     // TODO: Use the latest weigth from the controller, without callin the firestore
     final latestWeight = data.weightHistory.last;
@@ -77,6 +88,7 @@ class CardCaloriesNutrition extends ConsumerWidget {
                 ],
               ),
             ),
+            SizedBox(height: 8),
             SizedBox(
               height: 100,
               child: DonutChart(
