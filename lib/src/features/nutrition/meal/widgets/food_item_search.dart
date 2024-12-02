@@ -1,5 +1,6 @@
 import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/widgets/barcode_scanner_widget.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/widgets/food_item_widget.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:flutter/material.dart';
 
@@ -122,9 +123,18 @@ class _FoodItemSearchState extends State<FoodItemSearch> {
               return ListTile(
                 title: Text(item.name),
                 subtitle: Text(item.barcode),
-                trailing: IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () => _addFoodItem(item),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.info),
+                      onPressed: () => showFoodItemInfoDialog(context, item),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () => _addFoodItem(item),
+                    ),
+                  ],
                 ),
               );
             },

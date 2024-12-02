@@ -270,7 +270,7 @@ class MealListScreen extends ConsumerWidget {
                 ],
                 const SizedBox(height: 16),
                 const Text(
-                  'Logged',
+                  'Meals',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
