@@ -19,6 +19,107 @@ void navigateToAddMeal(BuildContext context) {
   context.pushNamed(MealCreationScreen.routeName);
 }
 
+Widget _buildDateSelector(
+  BuildContext context,
+  WidgetRef ref,
+  DateTime? selectedDate,
+) {
+  final displayDate = selectedDate ?? DateTime.now();
+  final dateFormat = DateFormat('d');
+  final monthFormat = DateFormat('MMMM');
+  final theme = Theme.of(context);
+
+  return GestureDetector(
+    onTap: () async {
+      final pickedDate = await showDatePicker(
+        context: context,
+        initialDate: displayDate,
+        firstDate: DateTime(2000),
+        lastDate: DateTime.now(),
+        builder: (context, child) {
+          return Theme(
+            data: theme.copyWith(
+              colorScheme: theme.colorScheme.copyWith(
+                primary: theme.colorScheme.primary,
+                onPrimary: theme.colorScheme.onPrimary,
+                surface: theme.colorScheme.surface,
+                onSurface: theme.colorScheme.onSurface,
+              ),
+            ),
+            child: child!,
+          );
+        },
+      );
+      if (pickedDate != null) {
+        ref.read(nutritionDateNotifierProvider.notifier).changeDate(pickedDate);
+      }
+    },
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.2),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.arrow_left,
+              size: 28,
+              color: theme.colorScheme.primary,
+            ),
+            onPressed: () {
+              final newDate = displayDate.subtract(const Duration(days: 1));
+              ref
+                  .read(nutritionDateNotifierProvider.notifier)
+                  .changeDate(newDate);
+            },
+          ),
+          Column(
+            children: [
+              Text(
+                dateFormat.format(displayDate),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              Text(
+                monthFormat.format(displayDate),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w400,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_right,
+              size: 28,
+              color: theme.colorScheme.primary,
+            ),
+            onPressed: () {
+              final newDate = displayDate.add(const Duration(days: 1));
+              ref
+                  .read(nutritionDateNotifierProvider.notifier)
+                  .changeDate(newDate);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class MealListScreen extends ConsumerWidget {
   static const route = '/nutrition';
   static const routeName = 'Nutrition';
@@ -57,8 +158,8 @@ class MealListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Widget loggedMeals = const SizedBox();
-    Widget nutritionSummary = const SizedBox();
+    Widget? loggedMeals;
+    Widget? nutritionSummary;
 
     final nutritionDate = ref.watch(nutritionDateNotifierProvider);
     final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
@@ -180,115 +281,10 @@ class MealListScreen extends ConsumerWidget {
                   color: Colors.blue,
                 ),
                 const SizedBox(height: 16),
-                if (loggedMeals != null) ...[
-                  loggedMeals,
-                ],
+                loggedMeals,
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateSelector(
-    BuildContext context,
-    WidgetRef ref,
-    DateTime? selectedDate,
-  ) {
-    final displayDate = selectedDate ?? DateTime.now();
-    final dateFormat = DateFormat('d');
-    final monthFormat = DateFormat('MMMM');
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-      onTap: () async {
-        final pickedDate = await showDatePicker(
-          context: context,
-          initialDate: displayDate,
-          firstDate: DateTime(2000),
-          lastDate: DateTime.now(),
-          builder: (context, child) {
-            return Theme(
-              data: theme.copyWith(
-                colorScheme: theme.colorScheme.copyWith(
-                  primary: theme.colorScheme.primary,
-                  onPrimary: theme.colorScheme.onPrimary,
-                  surface: theme.colorScheme.surface,
-                  onSurface: theme.colorScheme.onSurface,
-                ),
-              ),
-              child: child!,
-            );
-          },
-        );
-        if (pickedDate != null) {
-          ref
-              .read(nutritionDateNotifierProvider.notifier)
-              .changeDate(pickedDate);
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(12.0),
-          boxShadow: [
-            BoxShadow(
-              color: theme.shadowColor.withOpacity(0.2),
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: Icon(
-                Icons.arrow_left,
-                size: 28,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: () {
-                final newDate = displayDate.subtract(const Duration(days: 1));
-                ref
-                    .read(nutritionDateNotifierProvider.notifier)
-                    .changeDate(newDate);
-              },
-            ),
-            Column(
-              children: [
-                Text(
-                  dateFormat.format(displayDate),
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                Text(
-                  monthFormat.format(displayDate),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.arrow_right,
-                size: 28,
-                color: theme.colorScheme.primary,
-              ),
-              onPressed: () {
-                final newDate = displayDate.add(const Duration(days: 1));
-                ref
-                    .read(nutritionDateNotifierProvider.notifier)
-                    .changeDate(newDate);
-              },
-            ),
-          ],
         ),
       ),
     );
