@@ -1,8 +1,10 @@
 import 'package:fit_and_healthy/shared/models/exercise.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_controller.dart';
 import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_exercise.dart';
+import 'package:fit_and_healthy/src/features/exercise/workout_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
-import 'package:fit_and_healthy/src/utils/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -16,7 +18,7 @@ import 'package:uuid/uuid.dart';
  * - The ability to select a date and time using pickers.
  */
 
-class AddWorkout extends StatefulWidget {
+class AddWorkout extends ConsumerStatefulWidget {
   /**
    * Constructor for the `AddWorkout` widget.
    * 
@@ -28,12 +30,12 @@ class AddWorkout extends StatefulWidget {
   static const routeName = 'AddWorkout';
 
   @override
-  State<AddWorkout> createState() {
+  ConsumerState<AddWorkout> createState() {
     return _AddWorkoutState();
   }
 }
 
-class _AddWorkoutState extends State<AddWorkout> {
+class _AddWorkoutState extends ConsumerState<AddWorkout> {
   final uuid = Uuid();
   String _title = 'New Workout'; // Default title of the workout
   DateTime _selectedDate = DateTime.now(); // Selected date
@@ -49,24 +51,34 @@ class _AddWorkoutState extends State<AddWorkout> {
   void _navigateToAddExercise(BuildContext context) async {
     final res = await context.pushNamed(AddExercise.routeName);
     if (res != null && res is Exercise) {
-      _addExerciseToWorkout(res);
+      setState(() {
+        _exercises.add(res);
+      });
     }
   }
 
-  _addExerciseToWorkout(Exercise exercise) {
-    newWorkout.copyOf(exercises: [...newWorkout.exercises, exercise]);
-  }
+  void _createWorkout() async {
+    final workout = _getWorkoutFromFields();
 
-  List<Exercise> getExercisesFromWorkout(Workout workout) {
-    return workout.exercises;
-  }
+    print(workout);
 
-  void createWorkout(Workout workout) async {
-    // final id = await workoutController.addWorkout(workout);
+    final workoutController = ref.read(workoutControllerProvider.notifier);
+    final exerciseController = ref.read(exerciseControllerProvider.notifier);
 
-    // await exerciseController.addExercisesToWorkout(id, workout.exercises);
+    final id = await workoutController.addWorkout(workout);
 
-    context.pop();
+    await exerciseController.addExercisesToWorkout(id, workout.exercises);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Workout added successfully!'),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
+      ),
+    );
+    if (context.canPop()) {
+      Navigator.pop(context);
+    }
   }
 
   /**
@@ -106,7 +118,7 @@ class _AddWorkoutState extends State<AddWorkout> {
   /**
    * Creates a Workout object using the data entered in the form.
    */
-  Workout _createWorkout() {
+  Workout _getWorkoutFromFields() {
     return Workout(
       id: uuid.v4(),
       title: _title,
@@ -141,7 +153,7 @@ class _AddWorkoutState extends State<AddWorkout> {
     );
 
     if (shouldContinue == true) {
-      final newWorkout = _createWorkout();
+      final newWorkout = _getWorkoutFromFields();
       if (mounted) {
         Navigator.pop(context, newWorkout);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -155,12 +167,12 @@ class _AddWorkoutState extends State<AddWorkout> {
     }
   }
 
-  Workout newWorkout = Workout(
-    id: '1',
-    dateTime: DateTime.now(),
-    exercises: [],
-    title: 'temp',
-  );
+  // Workout newWorkout = Workout(
+  //   id: '1',
+  //   dateTime: DateTime.now(),
+  //   exercises: [],
+  //   title: 'temp',
+  // );
 
   final TextEditingController dateTimeController = TextEditingController();
 
@@ -268,17 +280,7 @@ class _AddWorkoutState extends State<AddWorkout> {
               if (_exercises.isEmpty) {
                 _showNoExercisesDialog(context);
               } else {
-                final newWorkout = _createWorkout();
-                if (mounted) {
-                  Navigator.pop(context, newWorkout);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Workout added successfully!'),
-                      duration: Duration(seconds: 2),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
+                _createWorkout();
               }
             },
             child: const Text(

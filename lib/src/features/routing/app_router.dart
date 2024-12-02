@@ -80,8 +80,7 @@ GoRouter appRouter(Ref ref) {
                       path: AddExercise.route,
                       name: AddExercise.routeName,
                       builder: (context, state) {
-                        final workoutId = state.pathParameters['id']!;
-                        return AddExercise(workoutId: workoutId);
+                        return AddExercise();
                       }),
                   GoRoute(
                     path: WorkoutDetailView.route,

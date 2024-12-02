@@ -1,4 +1,5 @@
 import 'package:fit_and_healthy/src/features/exercise/exercise_date_notifier.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_workout.dart';
 import 'package:fit_and_healthy/src/features/exercise/workout_list_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +41,7 @@ class ExerciseView extends ConsumerWidget {
    * Adds the new workout to the list if one is returned.
    */
   Future<void> navigateToAddWorkout(BuildContext context) async {
-    final newWorkout =
-        await context.push<Workout?>('${ExerciseView.route}/add-workout');
+    await context.pushNamed(AddWorkout.routeName);
   }
 
   @override

@@ -17,7 +17,6 @@ class CreateNewExerciseDialog extends StatefulWidget {
    */
   const CreateNewExerciseDialog({super.key, required this.onCreateExercise});
 
-
   /**
    * Callback function triggered when a new exercise is created.
    * 
@@ -25,9 +24,9 @@ class CreateNewExerciseDialog extends StatefulWidget {
    */
   final Function(ExerciseInfoList?) onCreateExercise;
 
-
   @override
-  State<CreateNewExerciseDialog> createState() => _CreateNewExerciseDialogState();
+  State<CreateNewExerciseDialog> createState() =>
+      _CreateNewExerciseDialogState();
 }
 
 /**
@@ -45,7 +44,6 @@ class _CreateNewExerciseDialogState extends State<CreateNewExerciseDialog> {
   void _createExercise() {
     if (exerciseName != null && exerciseCategory != null) {
       final newExercise = ExerciseInfoList(
-        id: UniqueKey().toString(),
         name: exerciseName!,
         exerciseCategory: exerciseCategory!,
         info: exerciseInfo ?? '',

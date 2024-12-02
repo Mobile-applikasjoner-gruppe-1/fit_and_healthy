@@ -6,12 +6,10 @@ import 'package:fit_and_healthy/src/features/exercise/dialogs/create_new_exercis
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 
 class AddExercise extends StatefulWidget {
-  const AddExercise({super.key, required this.workoutId});
+  const AddExercise({super.key});
 
-  static const route = ':id/add-exercise';
+  static const route = 'add-exercise';
   static const routeName = 'AddExercise';
-
-  final String workoutId;
 
   @override
   State<AddExercise> createState() => _AddExerciseState();

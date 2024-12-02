@@ -2,31 +2,26 @@ import 'package:fit_and_healthy/shared/models/exercise.dart';
 
 const List<ExerciseInfoList> sampleExerciseInfoList = [
   ExerciseInfoList(
-    id: '1',
     name: 'Bench Press',
     exerciseCategory: ExerciseCategory.chest,
     info: 'A classic chest exercise for building upper body strength.',
   ),
   ExerciseInfoList(
-    id: '2',
     name: 'Deadlift',
     exerciseCategory: ExerciseCategory.back,
     info: 'A compound exercise targeting back, legs, and core.',
   ),
   ExerciseInfoList(
-    id: '3',
     name: 'Squat',
     exerciseCategory: ExerciseCategory.legs,
     info: 'A key lower body exercise for building leg strength.',
   ),
   ExerciseInfoList(
-    id: '4',
     name: 'Shoulder Press',
     exerciseCategory: ExerciseCategory.shoulders,
     info: 'Targets shoulder muscles, enhancing upper body strength.',
   ),
   ExerciseInfoList(
-    id: '5',
     name: 'Bicep Curl',
     exerciseCategory: ExerciseCategory.biceps,
     info: 'An isolation exercise for strengthening the biceps.',
@@ -48,7 +43,6 @@ const List<Exercise> sampleExercises = [
   Exercise(
     id: '1',
     exerciseInfoList: ExerciseInfoList(
-      id: '1',
       name: 'Bench Press',
       exerciseCategory: ExerciseCategory.chest,
       info: 'A classic chest exercise for building upper body strength.',
@@ -66,7 +60,6 @@ const List<Exercise> sampleExercises = [
   Exercise(
     id: '2',
     exerciseInfoList: ExerciseInfoList(
-      id: '2',
       name: 'Deadlift',
       exerciseCategory: ExerciseCategory.back,
       info: 'A compound exercise targeting back, legs, and core.',
@@ -84,7 +77,6 @@ const List<Exercise> sampleExercises = [
   Exercise(
     id: '3',
     exerciseInfoList: ExerciseInfoList(
-      id: '3',
       name: 'Squat',
       exerciseCategory: ExerciseCategory.legs,
       info: 'A key lower body exercise for building leg strength.',

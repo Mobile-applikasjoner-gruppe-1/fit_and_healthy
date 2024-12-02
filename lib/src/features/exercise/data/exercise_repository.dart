@@ -6,7 +6,7 @@ import 'package:fit_and_healthy/src/features/exercise/data/workout_repository.da
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 
 final exerciseConverter = (
-  fromFirestore: (snapshot, _) => Exercise.fromFirebase(snapshot.data()!),
+  fromFirestore: (snapshot, _) => Exercise.fromFirebase(snapshot),
   toFirestore: (Exercise exercise, _) => exercise.toFirestore(),
 );
 
@@ -55,6 +55,17 @@ class ExerciseRepository {
     return exerciseRef.id;
   }
 
+  Future<void> addExercises(List<Exercise> exercises) async {
+    WriteBatch batch = _firestore.batch();
+
+    exercises.forEach((exercise) {
+      final exerciseRef = _getExerciseCollection().doc();
+      batch.set(exerciseRef, exercise);
+    });
+
+    await batch.commit();
+  }
+
   /// Updates an existing exercise in the database.
   /// Overwrites the existing exercise with the new exercise data.
   /// Will throw an error if the exercise is not updated successfully.
@@ -66,7 +77,6 @@ class ExerciseRepository {
   Future<void> deleteAllExercises() async {
     await _getExerciseCollection().get().then((snapshot) {
       for (DocumentSnapshot doc in snapshot.docs) {
-        // TODO: Delete subcollections (sets?)
         doc.reference.delete();
       }
     });
