@@ -71,15 +71,36 @@ class FoodItem {
       servingSize: json['serving_size'],
       nutritionInfo: {
         NutritionInfoKey.calories.name:
-            (nutriments['energy-kcal_100g'] ?? 0).toDouble(),
-        NutritionInfoKey.protein.name:
-            (nutriments['proteins_100g'] ?? 0).toDouble(),
-        NutritionInfoKey.fat.name: (nutriments['fat_100g'] ?? 0).toDouble(),
-        NutritionInfoKey.sugars.name:
-            (nutriments['sugars_100g'] ?? 0).toDouble(),
-        NutritionInfoKey.fiber.name: (nutriments['fiber_100g'] ?? 0).toDouble(),
-        NutritionInfoKey.carbs.name:
-            (nutriments['carbohydrates_100g'] ?? 0).toDouble(),
+            (nutriments['energy-kcal_100g'] is String
+                        ? double.tryParse(nutriments['energy-kcal_100g'])
+                        : nutriments['energy-kcal_100g'])
+                    ?.toDouble() ??
+                0.0,
+        NutritionInfoKey.protein.name: (nutriments['proteins_100g'] is String
+                    ? double.tryParse(nutriments['proteins_100g'])
+                    : nutriments['proteins_100g'])
+                ?.toDouble() ??
+            0.0,
+        NutritionInfoKey.fat.name: (nutriments['fat_100g'] is String
+                    ? double.tryParse(nutriments['fat_100g'])
+                    : nutriments['fat_100g'])
+                ?.toDouble() ??
+            0.0,
+        NutritionInfoKey.sugars.name: (nutriments['sugars_100g'] is String
+                    ? double.tryParse(nutriments['sugars_100g'])
+                    : nutriments['sugars_100g'])
+                ?.toDouble() ??
+            0.0,
+        NutritionInfoKey.fiber.name: (nutriments['fiber_100g'] is String
+                    ? double.tryParse(nutriments['fiber_100g'])
+                    : nutriments['fiber_100g'])
+                ?.toDouble() ??
+            0.0,
+        NutritionInfoKey.carbs.name: (nutriments['carbohydrates_100g'] is String
+                    ? double.tryParse(nutriments['carbohydrates_100g'])
+                    : nutriments['carbohydrates_100g'])
+                ?.toDouble() ??
+            0.0,
       },
       grams: 100,
     );
@@ -166,31 +187,31 @@ class FoodItem {
     final servingSize = data['servingSize'];
     final grams = data['grams'];
 
-    if (name == null || name is! String || name.isEmpty) {
+    if (name != null && name is! String) {
       throw Exception('Invalid name');
     }
 
-    if (barcode == null || barcode is! String || barcode.isEmpty) {
+    if (barcode != null && barcode is! String) {
       throw Exception('Invalid barcode');
     }
 
-    if (imageUrl == null || imageUrl is! String || imageUrl.isEmpty) {
+    if (imageUrl != null && imageUrl is! String) {
       throw Exception('Invalid imageUrl');
     }
 
-    if (ingredients == null || ingredients is! String || ingredients.isEmpty) {
+    if (ingredients != null && ingredients is! String) {
       throw Exception('Invalid ingredients');
     }
 
-    if (allergens == null || allergens is! String || allergens.isEmpty) {
+    if (allergens != null && allergens is! String) {
       throw Exception('Invalid allergens');
     }
 
-    if (servingSize == null || servingSize is! String || servingSize.isEmpty) {
+    if (servingSize != null && servingSize is! String) {
       throw Exception('Invalid servingSize');
     }
 
-    if (grams == null || grams is! double || grams <= 0) {
+    if (grams == null && (grams is! double || grams <= 0)) {
       throw Exception('Invalid grams');
     }
 

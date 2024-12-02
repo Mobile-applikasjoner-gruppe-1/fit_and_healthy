@@ -38,9 +38,9 @@ FutureOr<String?> appRouterRedirectHandler(
       state.matchedLocation == EmailVerificationView.route;
 
   // Checks for display name.
-  final bool loggedInWithoutDisplayName =
+  final bool isLoggedInWithoutDisplayName =
       isLoggedIn && currentUser.firebaseUser.displayName == null;
-  final bool loggedInWithDisplayName =
+  final bool isLoggedInWithDisplayName =
       isLoggedIn && currentUser.firebaseUser.displayName != null;
   final bool isAddingDisplayName =
       state.matchedLocation == AddDisplayNameView.route;
@@ -53,24 +53,27 @@ FutureOr<String?> appRouterRedirectHandler(
   final bool isAddingData = state.matchedLocation == MetricsSetupPage.route;
 
   // Redirect to the add display name page if the user is logged in but the display name is not set.
-  if (loggedInWithoutDisplayName) {
+  if (isLoggedInWithoutDisplayName) {
     return AddDisplayNameView.route;
   }
 
   // Redirect to the email verification page if the user is logged in but the email is not verified.
-  if (isUnverfiedEmail && !isVerifyingEmail) {
+  if (isLoggedInWithDisplayName && isUnverfiedEmail && !isVerifyingEmail) {
     return EmailVerificationView.route;
   }
 
   // Redirect to the page where the user is supposed to add data if the user is logged in but required data is not added.
-  if (isLoggedInWithoutData && !isAddingData) {
+  if (isLoggedInWithDisplayName &&
+      isVerifiedEmail &&
+      isLoggedInWithoutData &&
+      !isAddingData) {
     return MetricsSetupPage.route;
   }
 
   // Redirect to the dashboard (main page) if the user is already logged in, email is verified, display name is set and required data is added.
   if ((isLoggedIn && isLoggingIn) ||
       (isVerifiedEmail && isVerifyingEmail) ||
-      (loggedInWithDisplayName && isAddingDisplayName) ||
+      (isLoggedInWithDisplayName && isAddingDisplayName) ||
       (isLoggedInWithData && isAddingData)) {
     return DashboardView.route;
   }

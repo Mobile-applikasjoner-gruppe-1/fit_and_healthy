@@ -58,7 +58,11 @@ class WorkoutRepository {
     DateTime startOfDay = DateTime(date.year, date.month, date.day);
     DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-    final AuthUser user = _authRepository.currentUser!;
+    final AuthUser? user = _authRepository.currentUser;
+
+    if (user == null) {
+      throw Exception('User is not logged in');
+    }
 
     print('Getting workouts from database for date: $startOfDay');
 
