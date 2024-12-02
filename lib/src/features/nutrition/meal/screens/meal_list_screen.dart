@@ -1,4 +1,3 @@
-import 'package:fit_and_healthy/src/features/nutrition/controllers/meal_controller.dart';
 import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_cache_notifier.dart';
 import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_date_notifier.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
@@ -65,7 +64,7 @@ class MealListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Widget loggedMeals;
+    Widget? loggedMeals;
     Widget content = const Center(child: Text('temp'));
     Widget? nutritionSummary;
 
@@ -180,7 +179,9 @@ class MealListScreen extends ConsumerWidget {
                     color: Colors.blue,
                   ),
                   const SizedBox(height: 16),
-                  loggedMeals,
+                  if (loggedMeals != null) ...[
+                    loggedMeals,
+                  ],
                 ],
               ),
             ),

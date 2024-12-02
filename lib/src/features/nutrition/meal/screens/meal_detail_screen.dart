@@ -68,7 +68,6 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
 
   // Edit grams of an existing food item
   // void _editFoodItemGrams(int index, double grams) {
-  //   // TODO: Consider using the id instead to make changing to database easier
   //   setState(() {
   //     widget.meal.items[index].setGrams(grams);
   //   });
@@ -85,10 +84,30 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
 
     final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
 
-    void _removeFoodItem(mealItemId) {
+    void _removeFoodItem(String mealItemId) {
       ref.read(mealItemControllerProvider.notifier).removeItemFromMeal(
             mealId,
             mealItemId,
+          );
+    }
+
+    void _addFoodItem(FoodItem foodItem) {
+      ref.read(mealItemControllerProvider.notifier).addItemsToMeal(
+        mealId,
+        [foodItem],
+      );
+    }
+
+    void _editFoodItemGrams(String mealItemId, double grams) {
+      final item = meal?.items.firstWhere((item) => item.id == mealItemId);
+      if (item != null) {
+        item.setGrams(grams);
+      }
+
+      ref.read(mealItemControllerProvider.notifier).updateMealItemGrams(
+            mealId,
+            mealItemId,
+            grams,
           );
     }
 
@@ -207,13 +226,19 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                       IconButton(
                         icon: Icon(Icons.edit),
                         onPressed: () {
-                          _showEditGramsDialog(index, item.grams);
+                          if (item.id != null) {
+                            _showEditGramsDialog(
+                                (grams) => _editFoodItemGrams(item.id!, grams),
+                                item.grams);
+                          }
                         },
                       ),
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
-                          _removeFoodItem(index);
+                          if (item.id != null) {
+                            _removeFoodItem(item.id!);
+                          }
                         },
                       ),
                     ],
@@ -264,7 +289,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   }
 
   // Dialog to edit grams of an existing food item
-  void _showEditGramsDialog(int index, double currentGrams) {
+  void _showEditGramsDialog(Function(double) setGrams, double currentGrams) {
     final TextEditingController gramsController =
         TextEditingController(text: currentGrams.toString());
     showDialog(
@@ -288,7 +313,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
               final grams =
                   double.tryParse(gramsController.text) ?? currentGrams;
               if (grams > 0) {
-                // _editFoodItemGrams(index, grams);
+                setGrams(grams);
                 Navigator.of(context).pop();
               }
             },

@@ -1,6 +1,7 @@
 import 'package:fit_and_healthy/src/features/nutrition/controllers/meal_controller.dart';
 import 'package:fit_and_healthy/src/features/nutrition/controllers/meal_item_controller.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/widgets/food_item_search.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   final TextEditingController _titleController = TextEditingController();
 
   Meal _getMealFromFields() {
-    // TODO: Implement getting meal from fields in form
     final meal = Meal(
       id: 'temp',
       name: _titleController.text,
@@ -28,22 +28,7 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
           _selectedDate.day, _selectedTime.hour, _selectedTime.minute),
     );
 
-    // TODO: Implement getting meal from UI
-    meal.items.add(
-      FoodItem(
-        id: '1',
-        name: 'Item 1',
-        barcode: '1234567890',
-        nutritionInfo: {
-          'calories': 100,
-          'protein': 10,
-          'fat': 5,
-          'sugars': 5,
-          'fiber': 2,
-          'carbs': 20,
-        },
-      ),
-    );
+    meal.items.addAll(_items);
 
     return meal;
   }
@@ -179,6 +164,14 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                       Text(' ${_selectedTime.format(context)}'),
                     ],
                   ),
+                ),
+                const SizedBox(height: 24),
+                FoodItemSearch(
+                  onFoodItemAdded: (item) {
+                    setState(() {
+                      _items.add(item);
+                    });
+                  },
                 ),
                 const SizedBox(height: 24),
                 Text(

@@ -88,15 +88,11 @@ class Meal {
     final name = data['name'];
     final timestamp = data['timestamp'];
 
-    if (name == null || timestamp == null) {
-      throw Exception('Document data is missing required fields');
-    }
-
-    if (!name is String) {
+    if (name is! String) {
       throw Exception('Name is not a string');
     }
 
-    if (!timestamp is Timestamp) {
+    if (timestamp is! Timestamp) {
       throw Exception('Timestamp is not a Timestamp');
     }
 

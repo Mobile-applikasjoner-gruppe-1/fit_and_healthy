@@ -9,6 +9,12 @@ enum NutritionInfoKey {
   carbs,
 }
 
+extension NutritionInfoKeyExtension on NutritionInfoKey {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+}
+
 class FoodItem {
   final String? id;
   final String name;
@@ -126,12 +132,15 @@ class FoodItem {
 
   static Map<String, double> nutritionInfoFromDynamic(dynamic data) {
     if (data == null) {
-      throw Exception('nutritionInfo data is null');
+      throw Exception('nutritionInfo data is! null');
     }
 
     if (data is Map<String, dynamic>) {
       return data.map((key, value) {
-        if (NutritionInfoKey.values.contains(key) && value is num) {
+        if (NutritionInfoKey.values
+                .map((e) => e.toShortString())
+                .contains(key) &&
+            value is num) {
           return MapEntry(key.toString(), value.toDouble());
         } else {
           throw Exception('Invalid nutritionInfo data');
@@ -157,35 +166,31 @@ class FoodItem {
     final servingSize = data['servingSize'];
     final grams = data['grams'];
 
-    if (name == null || !name is String || (name as String).isEmpty) {
+    if (name == null || name is! String || name.isEmpty) {
       throw Exception('Invalid name');
     }
 
-    if (barcode == null || !barcode is String || (barcode as String).isEmpty) {
+    if (barcode == null || barcode is! String || barcode.isEmpty) {
       throw Exception('Invalid barcode');
     }
 
-    if (imageUrl != null &&
-        (!imageUrl is String || (imageUrl as String).isEmpty)) {
+    if (imageUrl == null || imageUrl is! String || imageUrl.isEmpty) {
       throw Exception('Invalid imageUrl');
     }
 
-    if (ingredients != null &&
-        (!ingredients is String || (ingredients as String).isEmpty)) {
+    if (ingredients == null || ingredients is! String || ingredients.isEmpty) {
       throw Exception('Invalid ingredients');
     }
 
-    if (allergens != null &&
-        (!allergens is String || (allergens as String).isEmpty)) {
+    if (allergens == null || allergens is! String || allergens.isEmpty) {
       throw Exception('Invalid allergens');
     }
 
-    if (servingSize != null &&
-        (!servingSize is String || (servingSize as String).isEmpty)) {
+    if (servingSize == null || servingSize is! String || servingSize.isEmpty) {
       throw Exception('Invalid servingSize');
     }
 
-    if (grams == null || !grams is double || (grams as double) <= 0) {
+    if (grams == null || grams is! double || grams <= 0) {
       throw Exception('Invalid grams');
     }
 

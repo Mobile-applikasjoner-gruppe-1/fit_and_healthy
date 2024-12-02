@@ -14,15 +14,23 @@ class MealItemController extends _$MealItemController {
 
   Future<void> addItemsToMeal(String mealId, List<FoodItem> foodItems) async {
     final authRepository = ref.read(firebaseAuthRepositoryProvider);
-    final exerciseRepository = MealItemRepository(authRepository, mealId);
+    final mealItemRepository = MealItemRepository(authRepository, mealId);
 
-    await exerciseRepository.addFoodItems(foodItems);
+    await mealItemRepository.addFoodItems(foodItems);
   }
 
   Future<void> removeItemFromMeal(String mealId, String itemId) async {
     final authRepository = ref.read(firebaseAuthRepositoryProvider);
-    final exerciseRepository = MealItemRepository(authRepository, mealId);
+    final mealItemRepository = MealItemRepository(authRepository, mealId);
 
-    await exerciseRepository.deleteMealItemById(itemId);
+    await mealItemRepository.deleteMealItemById(itemId);
+  }
+
+  Future<void> updateMealItemGrams(
+      String mealId, String itemId, double grams) async {
+    final authRepository = ref.read(firebaseAuthRepositoryProvider);
+    final mealItemRepository = MealItemRepository(authRepository, mealId);
+
+    await mealItemRepository.updateFoodItemGrams(itemId, grams);
   }
 }

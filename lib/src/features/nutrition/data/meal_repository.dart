@@ -84,7 +84,7 @@ class MealRepository {
 
     final userId = _authRepository.currentUser!.firebaseUser.uid;
 
-    print('Getting workouts from database for date: $startOfDay');
+    print('Getting meals from database for date: $startOfDay');
 
     return _firestore
         .collection(UserRepository.collectionName)
@@ -94,8 +94,8 @@ class MealRepository {
           fromFirestore: mealConverter.fromFirestore,
           toFirestore: mealConverter.toFirestore,
         )
-        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
-        .where('dateTime', isLessThanOrEqualTo: endOfDay)
+        .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
+        .where('timestamp', isLessThanOrEqualTo: endOfDay)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }

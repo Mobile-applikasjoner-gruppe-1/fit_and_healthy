@@ -95,4 +95,8 @@ class MealItemRepository {
 
     await batch.commit();
   }
+
+  Future<void> updateFoodItemGrams(String itemId, double grams) async {
+    await _getMealItemsCollection().doc(itemId).update({'grams': grams});
+  }
 }
