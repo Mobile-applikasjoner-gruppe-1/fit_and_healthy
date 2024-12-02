@@ -41,7 +41,7 @@ class MealView extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.fitness_center, size: 18),
+                  Icon(Icons.restaurant, size: 16),
                   const SizedBox(width: 4),
                   Text("Items:"),
                 ],

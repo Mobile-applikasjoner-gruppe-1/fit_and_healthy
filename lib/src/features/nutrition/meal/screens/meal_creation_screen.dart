@@ -55,6 +55,49 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }
   }
 
+  void _removeFoodItem(FoodItem item) {
+    setState(() {
+      _items.remove(item);
+    });
+  }
+
+  void _showEditGramsDialog(FoodItem item, double currentGrams) {
+    final TextEditingController gramsController =
+        TextEditingController(text: currentGrams.toString());
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit Grams'),
+        content: TextField(
+          controller: gramsController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: 'Enter new weight in grams'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final grams =
+                  double.tryParse(gramsController.text) ?? currentGrams;
+              if (grams > 0) {
+                setState(() {
+                  item.setGrams(grams);
+                });
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   DateTime _selectedDate = DateTime.now(); // Selected date
   TimeOfDay _selectedTime = TimeOfDay.now(); // Selected time
   List<FoodItem> _items = []; // List of items added to the meal.
@@ -193,7 +236,25 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
                     itemBuilder: (context, index) {
                       final item = _items[index];
                       return ListTile(
-                        title: Text('${item.name} (${item.grams})'),
+                        title: Text(item.name),
+                        subtitle: Text('${item.grams} grams'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                _showEditGramsDialog(item, item.grams);
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                _removeFoodItem(item);
+                              },
+                            ),
+                          ],
+                        ),
                       );
                     },
                   )

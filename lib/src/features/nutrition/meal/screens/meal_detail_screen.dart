@@ -2,6 +2,7 @@ import 'package:fit_and_healthy/src/features/nutrition/controllers/meal_item_con
 import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_cache_notifier.dart';
 import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/widgets/food_item_widget.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:fit_and_healthy/src/utils/date_formater.dart';
 import 'package:flutter/material.dart';
@@ -158,7 +159,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
               else
                 Column(
                   children: meal.items.map((item) {
-                    return Text('- ${item.name} (${item.grams} grams)');
+                    return FoodItemWidget(foodItem: item);
                   }).toList(),
                 ),
             ],
@@ -216,13 +217,17 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
             child: ListView.builder(
               itemCount: meal?.items.length ?? 0,
               itemBuilder: (context, index) {
-                final item = meal!.items[index]; // item is _MealItem
+                final item = meal!.items[index];
                 return ListTile(
                   title: Text(item.name),
                   subtitle: Text('${item.grams} grams'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      IconButton(
+                        icon: Icon(Icons.info),
+                        onPressed: () => showFoodItemInfoDialog(context, item),
+                      ),
                       IconButton(
                         icon: Icon(Icons.edit),
                         onPressed: () {
