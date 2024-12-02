@@ -158,7 +158,7 @@ class ExerciseCacheNotifier extends _$ExerciseCacheNotifier {
     final normalizedDate = _dateTimeToDate(date);
     state.when(
         data: (data) {
-          if (_dateWorkoutsStreams.containsKey(normalizedDate)) {
+          if (!_dateWorkoutsStreams.containsKey(normalizedDate)) {
             final stream =
                 _workoutRepository.getWorkoutsStreamForDate(normalizedDate);
 

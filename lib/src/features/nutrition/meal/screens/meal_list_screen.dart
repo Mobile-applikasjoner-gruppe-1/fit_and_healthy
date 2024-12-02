@@ -1,33 +1,118 @@
-import 'package:fit_and_healthy/src/features/nutrition/meal/meal_controller.dart';
+import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_cache_notifier.dart';
+import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_date_notifier.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+/**
+   * Navigates to the WorkoutDetailView for the selected workout.
+   *
+   * Functionality:
+   * - Converts the workout's integer ID to a string, as GoRouter expects path parameters to be strings.
+   * - Uses the GoRouter's `context.push` method to navigate to the WorkoutDetailView.
+   * - Appends the workout ID to the route path as a path parameter.
+   */
+  void selectMeal(BuildContext context, Meal meal) {
+    String id = meal.id;
+    context.push('${MealDetailScreen.route}/${id}');
+  }
 
 class MealListScreen extends ConsumerWidget {
-  static const route = '/create-meal';
-  static const routeName = 'Create Meal';
+  static const route = '/nutrition';
+  static const routeName = 'Nutrition';
+
+  _getTotalNutrition(List<Meal>? meals) {
+    final totalNutrition = {
+      'calories': 0.0,
+      'protein': 0.0,
+      'fat': 0.0,
+      'sugars': 0.0,
+      'fiber': 0.0,
+      'carbs': 0.0,
+    };
+
+    if (meals == null) {
+      return totalNutrition;
+    }
+
+    for (var meal in meals) {
+      final mealNutrition = meal.calculateTotalNutrition();
+      totalNutrition['calories'] = totalNutrition['calories']! + mealNutrition['calories']!;
+      totalNutrition['protein'] = totalNutrition['protein']! + mealNutrition['protein']!;
+      totalNutrition['fat'] = totalNutrition['fat']! + mealNutrition['fat']!;
+      totalNutrition['sugars'] = totalNutrition['sugars']! + mealNutrition['sugars']!;
+      totalNutrition['fiber'] = totalNutrition['fiber']! + mealNutrition['fiber']!;
+      totalNutrition['carbs'] = totalNutrition['carbs']! + mealNutrition['carbs']!;
+    }
+
+    return totalNutrition;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mealHolderFuture = ref.watch(mealControllerProvider.future);
+    Widget loggedMeals;
 
-    return FutureBuilder(
-      future: mealHolderFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data == null) {
-          return Center(child: Text('No meals found.'));
+    final nutritionDate = ref.watch(nutritionDateNotifierProvider);
+    final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
+
+    DateTime? selectedDate;
+
+    if (nutritionDate is AsyncLoading) {
+      loggedMeals = const Center(child: CircularProgressIndicator());
+    } else if (nutritionDate is AsyncError) {
+      loggedMeals = Center(child: Text('Error: ${nutritionDate.error}'));
+    } else {
+      selectedDate = nutritionDate.value;
+      if (selectedDate == null) {
+        loggedMeals = const Center(child: CircularProgressIndicator());
+      } else {
+        final mealNotifier =
+            ref.read(nutritionCacheNotifierProvider.notifier);
+        mealNotifier.listenToDate(selectedDate, true);
+
+        if (nutritionCacheState is AsyncLoading) {
+          loggedMeals = const Center(child: CircularProgressIndicator());
+        } else if (nutritionCacheState is AsyncError) {
+          loggedMeals =
+              Center(child: Text('Error: ${nutritionCacheState.error}'));
         } else {
-          final mealHolder = snapshot.data!;
-          final totalNutrition = mealHolder.totalNutrition;
+          if (nutritionCacheState.value == null) {
+            loggedMeals = const Center(child: CircularProgressIndicator());
+          }
 
-          return Scaffold(
+          final meals =
+              nutritionCacheState.value!.cachedDateMeals[selectedDate];
+            
+          final totalNutrition = _getTotalNutrition(meals);
+
+          if (meals == null || meals.isEmpty) {
+            loggedMeals = const Text(
+              'No meals logged',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            );
+          } else {
+            loggedMeals = ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: meals.length,
+              itemBuilder: (ctx, index) => MealItem(
+                meal: meals[index],
+                onSelectMeal: (meal) {
+                  selectMeal(context, meal);
+                },
+              ),
+            );
+          }
+        }
+      }
+    }
+
+    return Scaffold(
             appBar: AppBar(
               title: Text(
-                'Meals on ${mealHolder.date.toLocal().toString().split(' ')[0]}',
+                'Meals on ${selectedDate?.toLocal().toString().split(' ')[0] ?? 'No Date Selected'}',
               ),
             ),
             body: Column(

@@ -7,7 +7,7 @@ part of 'exercise_cache_notifier.dart';
 // **************************************************************************
 
 String _$exerciseCacheNotifierHash() =>
-    r'f05cc8e7a7c9162bb3938b227a0251e694c32d81';
+    r'a3170eb5a4d55bf0f52c8a1a8fd7f07214969507';
 
 /// See also [ExerciseCacheNotifier].
 @ProviderFor(ExerciseCacheNotifier)

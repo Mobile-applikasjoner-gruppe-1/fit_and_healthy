@@ -2,24 +2,21 @@ import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MealDetailScreen extends StatefulWidget {
-  final Meal meal;
+class MealDetailScreen extends ConsumerStatefulWidget {
+  static const route = ':mealId';
+  static const routeName = 'Meal Details';
 
-  MealDetailScreen({required this.meal});
+  MealDetailScreen({required this.mealId});
 
-  // TODO: Switch to using a routing-based solutions by going to the id of the meal
-  // final String mealId;
-  // static const route = '/meal-detail/:mealId';
-  // static const routeName = 'Meal Details';
-  // MealDetailScreen({required this.mealId});
-  // final Meal meal = MealHolder.getMealById(mealId);
+  final String mealId;
 
   @override
   _MealDetailScreenState createState() => _MealDetailScreenState();
 }
 
-class _MealDetailScreenState extends State<MealDetailScreen> {
+class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   final TextEditingController _searchController = TextEditingController();
   final OpenFoodApi _openFoodApi = OpenFoodApi();
   List<Map<String, dynamic>> _searchResults = [];
@@ -64,9 +61,6 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
       },
       grams: grams,
     );
-
-    widget.meal.addFoodItem(foodItem);
-    setState(() {}); // Refresh to reflect changes in meal items and nutrition
   }
 
   // Edit grams of an existing food item

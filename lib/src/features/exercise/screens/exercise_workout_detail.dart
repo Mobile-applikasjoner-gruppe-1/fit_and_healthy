@@ -1,4 +1,4 @@
-import 'package:fit_and_healthy/src/features/exercise/exercise_cache_notifier.dart';
+import 'package:fit_and_healthy/src/features/exercise/controllers/exercise_cache_notifier.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

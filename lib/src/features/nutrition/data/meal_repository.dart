@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fit_and_healthy/src/features/auth/auth_repository/firebase_auth_repository.dart';
 import 'package:fit_and_healthy/src/features/nutrition/data/meal_item_repository.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
+import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 
 final mealConverter = (
   fromFirestore: (snapshot, _) => Meal.fromFirebase(snapshot),
@@ -12,9 +13,11 @@ class MealRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuthRepository _authRepository;
 
+  static const collectionName = 'meals';
+
   MealRepository(this._authRepository);
 
-  Future<String> addMeal(Meal meal) async {
+  CollectionReference<Meal> _getMealsCollection() {
     final user = _authRepository.currentUser;
 
     if (user == null) {
@@ -23,39 +26,24 @@ class MealRepository {
 
     final firebaseUser = user.firebaseUser;
 
-    final mealsCollection = _firestore
-        .collection('users')
+    return _firestore
+        .collection(UserRepository.collectionName)
         .doc(firebaseUser.uid)
-        .collection('meals');
-    final docRef = await mealsCollection
+        .collection(collectionName)
         .withConverter<Meal>(
           fromFirestore: (snapshot, _) => Meal.fromFirebase(snapshot),
           toFirestore: mealConverter.toFirestore,
-        )
-        .add(meal);
+        );
+  }
+
+  Future<String> addMeal(Meal meal) async {
+    final docRef = await _getMealsCollection().add(meal);
 
     return docRef.id;
   }
 
   Future<Meal> getMealById(String mealId) async {
-    final user = _authRepository.currentUser;
-
-    if (user == null) {
-      throw Exception('User not logged in');
-    }
-
-    final firebaseUser = user.firebaseUser;
-
-    final mealDoc = await _firestore
-        .collection('users')
-        .doc(firebaseUser.uid)
-        .collection('meals')
-        .doc(mealId)
-        .withConverter<Meal>(
-          fromFirestore: (snapshot, _) => Meal.fromFirebase(snapshot),
-          toFirestore: mealConverter.toFirestore,
-        )
-        .get();
+    final mealDoc = await _getMealsCollection().doc(mealId).get();
 
     if (!mealDoc.exists) {
       throw Exception('Meal not found');
@@ -71,27 +59,10 @@ class MealRepository {
   }
 
   Future<List<Meal>> getAllMealsForDate(DateTime date) async {
-    final user = _authRepository.currentUser;
-
-    if (user == null) {
-      throw Exception('User not logged in');
-    }
-
     final startOfDay = DateTime(date.year, date.month, date.day);
     final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-    final firebaseUser = user.firebaseUser;
-
-    final mealsCollection = _firestore
-        .collection('users')
-        .doc(firebaseUser.uid)
-        .collection('meals');
-
-    final meals = await mealsCollection
-        .withConverter<Meal>(
-          fromFirestore: (snapshot, _) => Meal.fromFirebase(snapshot),
-          toFirestore: mealConverter.toFirestore,
-        )
+    final meals = await _getMealsCollection()
         .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
         .where('timestamp', isLessThanOrEqualTo: endOfDay)
         .get();
@@ -100,23 +71,32 @@ class MealRepository {
   }
 
   Future<void> deleteMealById(String mealId) async {
-    final user = _authRepository.currentUser;
+    final mealItemRepository = MealItemRepository(_authRepository, mealId);
 
-    if (user == null) {
-      throw Exception('User not logged in');
-    }
+    await mealItemRepository.deleteAllItemsForMeal();
 
-    final firebaseUser = user.firebaseUser;
+    await _getMealsCollection().doc(mealId).delete();
+  }
 
-    final mealItemRepository = MealItemRepository(_authRepository);
+  Stream<List<Meal>> getMealsStreamForDate(DateTime date) {
+    DateTime startOfDay = DateTime(date.year, date.month, date.day);
+    DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-    await mealItemRepository.deleteAllItemsForMeal(mealId);
+    final userId = _authRepository.currentUser!.firebaseUser.uid;
 
-    await _firestore
-        .collection('users')
-        .doc(firebaseUser.uid)
-        .collection('meals')
-        .doc(mealId)
-        .delete();
+    print('Getting workouts from database for date: $startOfDay');
+
+    return _firestore
+        .collection(UserRepository.collectionName)
+        .doc(userId)
+        .collection(collectionName)
+        .withConverter<Meal>(
+          fromFirestore: mealConverter.fromFirestore,
+          toFirestore: mealConverter.toFirestore,
+        )
+        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+        .where('dateTime', isLessThanOrEqualTo: endOfDay)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 }

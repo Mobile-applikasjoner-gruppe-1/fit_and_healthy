@@ -33,7 +33,7 @@ void main() {
         final result = await api.fetchProductByBarcode(barcode);
         if (result != null) {
           final foodItem = FoodItem.fromFoodFactsJson(result);
-          meal.addFoodItem(foodItem);
+          meal.items.add(foodItem);
           print('Added ${foodItem.name} (${grams}g) to the meal.');
         } else {
           print('No food item found for barcode: $barcode');
