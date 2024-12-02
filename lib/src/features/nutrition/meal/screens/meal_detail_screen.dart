@@ -2,18 +2,12 @@ import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
 import 'package:flutter/material.dart';
+import 'package:fit_and_healthy/src/features/nutrition/food_item_widget/barcode_scanner_widget.dart';
 
 class MealDetailScreen extends StatefulWidget {
   final Meal meal;
 
   MealDetailScreen({required this.meal});
-
-  // TODO: Switch to using a routing-based solutions by going to the id of the meal
-  // final String mealId;
-  // static const route = '/meal-detail/:mealId';
-  // static const routeName = 'Meal Details';
-  // MealDetailScreen({required this.mealId});
-  // final Meal meal = MealHolder.getMealById(mealId);
 
   @override
   _MealDetailScreenState createState() => _MealDetailScreenState();
@@ -71,7 +65,6 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
 
   // Edit grams of an existing food item
   void _editFoodItemGrams(int index, double grams) {
-    // TODO: Consider using the id instead to make changing to database easier
     setState(() {
       widget.meal.items[index].setGrams(grams);
     });
@@ -79,7 +72,6 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
 
   // Remove a food item from the meal
   void _removeFoodItem(int index) {
-    // TODO: Consider using the id instead to make changing to database easier
     setState(() {
       widget.meal.removeFoodItemByIndex(index);
     });
@@ -88,6 +80,54 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
   // Calculate the total nutrition for the current meal
   Map<String, double> _calculateTotalNutrition() {
     return widget.meal.calculateTotalNutrition();
+  }
+
+  // Function to handle barcode scanning and fetch product by barcode
+  void _scanBarcode() async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return BarcodeScannerDialog(); // Assuming you have a BarcodeScannerDialog widget
+      },
+    );
+
+    if (result != null && result.isNotEmpty) {
+      _searchProductByBarcode(result);
+    }
+  }
+
+  // Fetch product by barcode
+  Future<void> _searchProductByBarcode(String barcode) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final product = await _openFoodApi.fetchProductByBarcode(barcode);
+      if (product != null) {
+        setState(() {
+          _searchResults = [
+            product
+          ]; // Show the fetched product in search results
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        _showMessage('Product not found for barcode: $barcode');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showMessage('Failed to fetch product: $e');
+    }
+  }
+
+  // Show message (toast, dialog, etc.)
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -101,16 +141,26 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
       ),
       body: Column(
         children: [
-          // Search Field
+          // Search Field with Camera Icon
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 labelText: 'Search for a food item',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: _searchProducts,
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: _searchProducts,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                          Icons.camera_alt), // Camera icon for barcode scanning
+                      onPressed: _scanBarcode, // Trigger barcode scanning
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -144,7 +194,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
             child: ListView.builder(
               itemCount: widget.meal.items.length,
               itemBuilder: (context, index) {
-                final item = widget.meal.items[index]; // item is _MealItem
+                final item = widget.meal.items[index];
                 return ListTile(
                   title: Text(item.name),
                   subtitle: Text('${item.grams} grams'),
@@ -246,8 +296,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
           ),
           TextButton(
             onPressed: () {
-              final grams =
-                  double.tryParse(gramsController.text) ?? currentGrams;
+              final grams = double.tryParse(gramsController.text) ?? 0.0;
               if (grams > 0) {
                 _editFoodItemGrams(index, grams);
                 Navigator.of(context).pop();
