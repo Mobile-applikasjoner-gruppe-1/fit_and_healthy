@@ -22,4 +22,17 @@ class WidgetCard {
     required this.builder,
     this.route,
   });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'size': size,
+        'widgetCardCategory': widgetCardCategory.index,
+        'route': route,
+      };
+
+  static WidgetCard fromJson(
+      Map<String, dynamic> json, List<WidgetCard> allCards) {
+    return allCards.firstWhere((card) => card.id == json['id']);
+  }
 }

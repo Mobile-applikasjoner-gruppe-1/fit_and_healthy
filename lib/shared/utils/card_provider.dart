@@ -1,4 +1,6 @@
 import 'package:fit_and_healthy/shared/models/widget_card.dart';
+import 'package:fit_and_healthy/shared/utils/dashboard_card_storage.dart';
+
 import 'package:fit_and_healthy/shared/widgets/cards/card_calories_nutrition.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/card_macro_nutritions.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/card_weekly_workout.dart';
@@ -86,4 +88,53 @@ final allCards = [
   ),
 ];
 
-final CardProvider = StateProvider<List<WidgetCard>>((ref) => []);
+final CardProvider =
+    StateNotifierProvider<CardNotifier, List<WidgetCard>>((ref) {
+  return CardNotifier(ref);
+});
+
+class CardNotifier extends StateNotifier<List<WidgetCard>> {
+  final Ref _ref;
+
+  CardNotifier(this._ref) : super([]);
+
+  Future<void> loadCards(List<WidgetCard> allCards) async {
+    try {
+      final savedCards = await DashboardCardStorage.loadSelectedCards(allCards);
+      state = savedCards;
+    } catch (e) {
+      print("Error loading cards: $e");
+      state = [];
+    }
+  }
+
+  Future<void> saveState() async {
+    try {
+      await DashboardCardStorage.saveSelectedCards(state);
+    } catch (e) {
+      print("Error saving cards: $e");
+    }
+  }
+
+  void addCard(WidgetCard card) {
+    if (!state.contains(card)) {
+      state = [...state, card];
+      saveState();
+    }
+  }
+
+  void removeCard(WidgetCard card) {
+    state = state.where((c) => c.id != card.id).toList();
+    saveState();
+  }
+
+  void setDefaultCards(List<String> defaultIds) {
+    final allCards = _ref.read(allCardsProvider);
+    final defaultCards =
+        allCards.where((card) => defaultIds.contains(card.id)).toList();
+    state = defaultCards;
+    saveState();
+  }
+}
+
+final allCardsProvider = Provider<List<WidgetCard>>((_) => allCards);

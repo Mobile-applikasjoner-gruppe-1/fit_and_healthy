@@ -21,7 +21,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
   void initState() {
     super.initState();
     for (var category in WidgetCardCategory.values) {
-      _expandedState[category] = false; // Default: all collapsed
+      _expandedState[category] = false;
     }
   }
 
@@ -63,7 +63,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     String categoryName,
     List<WidgetCard> categoryCards,
     List<WidgetCard> selectedCards,
-    StateController<List<WidgetCard>> notifier,
+    CardNotifier notifier,
     WidgetCardCategory category,
   ) {
     final isExpanded = _expandedState[category] ?? false;
@@ -102,9 +102,9 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
                 return GestureDetector(
                   onTap: () {
                     if (isSelected) {
-                      notifier.state = List.from(notifier.state)..remove(card);
+                      notifier.removeCard(card);
                     } else {
-                      notifier.state = List.from(notifier.state)..add(card);
+                      notifier.addCard(card);
                     }
                   },
                   child: Card(
@@ -208,25 +208,21 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     overlayEntry = OverlayEntry(
       builder: (context) => GestureDetector(
         onTap: () {
-          overlayEntry.remove(); // Remove the overlay on tap
+          overlayEntry.remove();
         },
         child: Stack(
           children: [
-            // Semi-transparent background
             Container(
               color: Colors.black.withOpacity(0.7),
             ),
-            // Centered card content
             Center(
               child: Padding(
-                padding: const EdgeInsets.all(16.0), // Padding around the card
+                padding: const EdgeInsets.all(16.0),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width *
-                      (cardContent.size == 1.0
-                          ? 1.0
-                          : 0.5), // Width for 1.0 or 0.5
-                  height: 200, // Set standard height (similar to dashboard)
-                  child: cardContent.builder(), // Render the card's content
+                      (cardContent.size == 1.0 ? 1.0 : 0.5),
+                  height: 200,
+                  child: cardContent.builder(),
                 ),
               ),
             ),

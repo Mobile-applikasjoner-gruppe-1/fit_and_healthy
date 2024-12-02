@@ -16,6 +16,12 @@ class DashboardView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCards = ref.watch(CardProvider);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref
+          .read(CardProvider.notifier)
+          .loadCards(ref.read(allCardsProvider));
+    });
+
     return NestedScaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
@@ -43,12 +49,15 @@ class DashboardView extends ConsumerWidget {
                   ),
                   SizedBox(height: 12),
                   ElevatedButton(
-                      onPressed: () {
-                        ref.read(CardProvider.notifier).state = allCards
-                            .where((card) => ['5', '4', '6'].contains(card.id))
-                            .toList();
-                      },
-                      child: Text('Add Default'))
+                    onPressed: () {
+                      ref.read(CardProvider.notifier).setDefaultCards([
+                        '5',
+                        '4',
+                        '6',
+                      ]);
+                    },
+                    child: Text('Add Default'),
+                  ),
                 ],
               ),
             )
