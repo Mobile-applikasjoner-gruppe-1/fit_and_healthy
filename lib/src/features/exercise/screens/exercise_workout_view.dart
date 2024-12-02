@@ -7,6 +7,7 @@ import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_workout_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 /**
  * The ExerciseView widget displays a list of workouts, allowing users to view available
@@ -104,12 +105,14 @@ class ExerciseView extends ConsumerWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              _buildDateSelector(context, ref, selectedDate),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => navigateToAddWorkout(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                 ),
-                child: Text(
+                child: const Text(
                   'Add Workout',
                   style: TextStyle(
                     fontSize: 16,
@@ -144,6 +147,114 @@ class ExerciseView extends ConsumerWidget {
         centerTitle: true,
       ),
       body: content,
+    );
+  }
+
+  /**
+   * Custom date picker.
+   * Can go forwards or back a day, or press the center
+   * to get a normal date picker.
+   */
+  Widget _buildDateSelector(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime? selectedDate,
+  ) {
+    final displayDate = selectedDate ?? DateTime.now();
+    final dateFormat = DateFormat('d');
+    final monthFormat = DateFormat('MMMM');
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: () async {
+        final pickedDate = await showDatePicker(
+          context: context,
+          initialDate: displayDate,
+          firstDate: DateTime(2000),
+          lastDate: DateTime.now(),
+          builder: (context, child) {
+            return Theme(
+              data: theme.copyWith(
+                colorScheme: theme.colorScheme.copyWith(
+                  primary: theme.colorScheme.primary,
+                  onPrimary: theme.colorScheme.onPrimary,
+                  surface: theme.colorScheme.surface,
+                  onSurface: theme.colorScheme.onSurface,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+        if (pickedDate != null) {
+          ref
+              .read(exerciseDateNotifierProvider.notifier)
+              .changeDate(pickedDate);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: theme.shadowColor.withOpacity(0.2),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.arrow_left,
+                size: 28,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: () {
+                final newDate = displayDate.subtract(const Duration(days: 1));
+                ref
+                    .read(exerciseDateNotifierProvider.notifier)
+                    .changeDate(newDate);
+              },
+            ),
+            Column(
+              children: [
+                Text(
+                  dateFormat.format(displayDate),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  monthFormat.format(displayDate),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.arrow_right,
+                size: 28,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: () {
+                final newDate = displayDate.add(const Duration(days: 1));
+                ref
+                    .read(exerciseDateNotifierProvider.notifier)
+                    .changeDate(newDate);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
