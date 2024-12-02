@@ -1,3 +1,7 @@
+![Flutter image](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart image](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
+
 # Fit & Healthy
 
 Fit & Healthy is a fitness and food-tracking app designed to help users log workouts, track meals, and monitor their progress. The app includes predefined exercises and meals, tips for beginners, and allows users to view their activity history. It features an intuitive UI with navigation for easy access to workout logs, food intake, and progress tracking.

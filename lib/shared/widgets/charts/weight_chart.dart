@@ -32,13 +32,11 @@ class WeightChart extends StatelessWidget {
   LineChartData _buildLineChart(List<WeightEntry> entries) {
     if (entries.isEmpty) return LineChartData();
 
-    // Normalize x-axis by the earliest date
     final earliestDate = entries.first.timestamp;
     final spots = entries.map((entry) {
       final x =
           entry.timestamp.difference(earliestDate).inMilliseconds.toDouble();
-      return FlSpot(x / (24 * 60 * 60 * 1000),
-          entry.weight.toDouble()); // Convert milliseconds to days
+      return FlSpot(x / (24 * 60 * 60 * 1000), entry.weight.toDouble());
     }).toList();
 
     return LineChartData(
@@ -72,14 +70,12 @@ class WeightChart extends StatelessWidget {
           sideTitles: SideTitles(
             showTitles: true,
             getTitlesWidget: (value, meta) {
-              // Show labels only under data points
               final spot = spots.firstWhere(
                 (spot) => spot.x == value,
                 orElse: () => FlSpot.nullSpot,
               );
               if (spot.isNull()) return const SizedBox.shrink();
 
-              // Map the x value back to the corresponding date
               final daysFromStart = spot.x.toInt();
               final date = earliestDate.add(Duration(days: daysFromStart));
               return Text(
@@ -91,10 +87,10 @@ class WeightChart extends StatelessWidget {
           ),
         ),
         topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false), // Remove top titles
+          sideTitles: SideTitles(showTitles: false),
         ),
         rightTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false), // Remove right titles
+          sideTitles: SideTitles(showTitles: false),
         ),
       ),
       lineBarsData: [
@@ -102,7 +98,7 @@ class WeightChart extends StatelessWidget {
           isCurved: false,
           spots: spots,
           barWidth: 4,
-          color: Colors.blue,
+          color: Colors.lightBlue,
           dotData: FlDotData(show: true),
           belowBarData: BarAreaData(
             show: true,

@@ -1,10 +1,11 @@
 import 'package:fit_and_healthy/src/features/auth/auth_controller/auth_controller.dart';
 import 'package:fit_and_healthy/src/features/gdpr_policy/gdpr_settings_page.dart';
 import 'package:fit_and_healthy/src/features/goals/goals_settings_page.dart';
-import 'package:fit_and_healthy/src/features/metrics/measurement_settings_page.dart';
+import 'package:fit_and_healthy/src/features/measurement/measurement_settings_page.dart';
 import 'package:fit_and_healthy/src/features/profile/profile_settings_page.dart';
 import 'package:fit_and_healthy/src/features/settings/settings_appbar.dart';
-import 'package:fit_and_healthy/src/features/settings/settings_controller.dart';
+import 'package:fit_and_healthy/src/features/settings/settings_widget_page.dart';
+import 'package:fit_and_healthy/src/features/theme/theme_settings_view.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,8 +25,6 @@ class SettingsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settingsState = ref.watch(settingsControllerProvider).value;
-
     return NestedScaffold(
       appBar: SettingsAppBar,
       body: Column(
@@ -43,7 +42,7 @@ class SettingsView extends ConsumerWidget {
                 title: Text('Widgets'),
                 leading: Icon(Icons.widgets),
                 onTap: () {
-                  context.pushNamed(ProfileSettingsPage.routeName);
+                  context.pushNamed(WidgetSettingsPage.routeName);
                 },
               ),
               ListTile(
@@ -61,6 +60,13 @@ class SettingsView extends ConsumerWidget {
                 },
               ),
               ListTile(
+                title: Text('Theme'),
+                leading: Icon(Icons.color_lens),
+                onTap: () {
+                  context.pushNamed(ThemeSettingsPage.routeName);
+                },
+              ),
+              ListTile(
                 title: Text('GDPR'),
                 leading: Icon(Icons.document_scanner),
                 onTap: () {
@@ -75,34 +81,6 @@ class SettingsView extends ConsumerWidget {
                 },
               ),
             ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            // Glue the SettingsController to the theme selection DropdownButton.
-            //
-            // When a user selects a theme from the dropdown list, the
-            // SettingsController is updated, which rebuilds the MaterialApp.
-            child: DropdownButton<ThemeMode>(
-              // Read the selected themeMode from the controller
-              value: settingsState!.themeMode,
-              // Call the updateThemeMode method any time the user selects a theme.
-              onChanged:
-                  ref.read(settingsControllerProvider.notifier).updateThemeMode,
-              items: const [
-                DropdownMenuItem(
-                  value: ThemeMode.system,
-                  child: Text('System Theme'),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.light,
-                  child: Text('Light Theme'),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.dark,
-                  child: Text('Dark Theme'),
-                )
-              ],
-            ),
           ),
         ],
       ),
