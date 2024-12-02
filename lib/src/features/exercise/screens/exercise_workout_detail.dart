@@ -1,4 +1,4 @@
-import 'package:fit_and_healthy/src/features/exercise/workout_list_controller.dart';
+import 'package:fit_and_healthy/src/features/exercise/exercise_cache_notifier.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,14 +35,14 @@ class WorkoutDetailView extends ConsumerWidget {
     Widget content;
     Workout? workout;
 
-    final workoutListState = ref.watch(workoutNotifierProvider);
+    final exerciseCacheState = ref.watch(exerciseCacheNotifierProvider);
 
-    if (workoutListState is AsyncLoading) {
+    if (exerciseCacheState is AsyncLoading) {
       content = Center(child: CircularProgressIndicator());
-    } else if (workoutListState is AsyncError) {
-      content = Center(child: Text('Error: ${workoutListState.error}'));
+    } else if (exerciseCacheState is AsyncError) {
+      content = Center(child: Text('Error: ${exerciseCacheState.error}'));
     } else {
-      workout = workoutListState.value?.cachedWorkouts[workoutId];
+      workout = exerciseCacheState.value?.cachedWorkouts[workoutId];
 
       if (workout == null) {
         content = Center(child: Text('Workout not found'));
