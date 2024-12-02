@@ -17,6 +17,9 @@ import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_item.dart
 class WorkoutDetailView extends ConsumerWidget {
   const WorkoutDetailView({super.key, required this.workoutId});
 
+  static const route = ':id';
+  static const routeName = 'WorkoutDetail';
+
   final String workoutId; // The workout to be displayed.
 
   /**

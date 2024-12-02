@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/dialogs/exercise_selection_dialog.dart';
@@ -5,12 +6,12 @@ import 'package:fit_and_healthy/src/features/exercise/dialogs/create_new_exercis
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 
 class AddExercise extends StatefulWidget {
-  const AddExercise({super.key, required this.exerciseInfoList});
+  const AddExercise({super.key, required this.workoutId});
 
-  static const route = '/exercise';
-  static const routeName = 'Add Exercise';
+  static const route = ':id/add-exercise';
+  static const routeName = 'AddExercise';
 
-  final List<ExerciseInfoList> exerciseInfoList;
+  final String workoutId;
 
   @override
   State<AddExercise> createState() => _AddExerciseState();
@@ -42,7 +43,7 @@ class _AddExerciseState extends State<AddExercise> {
       context: context,
       builder: (context) {
         return ExerciseSelectionDialog(
-          exerciseInfoList: widget.exerciseInfoList,
+          exerciseInfoList: sampleExerciseInfoList,
           onExerciseSelected: (exercise) {
             if (exercise == null) {
               _showCreateNewExerciseDialog();

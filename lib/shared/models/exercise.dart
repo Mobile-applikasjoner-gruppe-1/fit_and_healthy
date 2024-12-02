@@ -149,13 +149,11 @@ class ExerciseOther {
 class Workout {
   final String id;
   final String title;
-  final String time;
   final DateTime dateTime;
   List<Exercise> exercises;
   Workout({
     required this.id,
     required this.title,
-    required this.time,
     required this.dateTime,
     required this.exercises,
   });
@@ -168,32 +166,36 @@ class Workout {
     }
 
     final title = data['title'];
-    final time = data['time'];
     final dateTime = data['dateTime'];
 
     if (title is! String) {
       throw Exception('Workout title is not a string');
-    }
-    if (time is! String) {
-      throw Exception('Workout time is not a string');
     }
     if (dateTime is! Timestamp) {
       throw Exception('Workout dateTime is not a Timestamp');
     }
 
     return Workout(
-        id: doc.id,
-        title: title,
-        time: time,
-        dateTime: dateTime.toDate(),
-        exercises: []);
+        id: doc.id, title: title, dateTime: dateTime.toDate(), exercises: []);
   }
 
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
-      'time': time,
       'dateTime': dateTime,
     };
+  }
+
+  Workout copyOf({
+    String? title,
+    DateTime? dateTime,
+    List<Exercise>? exercises,
+  }) {
+    return Workout(
+      id: id,
+      title: title ?? this.title,
+      dateTime: dateTime ?? this.dateTime,
+      exercises: exercises ?? this.exercises,
+    );
   }
 }

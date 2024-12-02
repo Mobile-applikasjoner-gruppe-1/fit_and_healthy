@@ -101,15 +101,12 @@ const List<Exercise> sampleExercises = [
   ),
 ];
 
-final List<Workout> emptyWorkouts = [
-
-];
+final List<Workout> emptyWorkouts = [];
 
 final List<Workout> sampleWorkouts = [
   Workout(
     id: '1',
     title: 'Chest & Back Day',
-    time: '10:00 AM',
     dateTime: DateTime.now(),
     exercises: [
       sampleExercises[0],
@@ -119,7 +116,6 @@ final List<Workout> sampleWorkouts = [
   Workout(
     id: '2',
     title: 'Leg Day',
-    time: '3:00 PM',
     dateTime: DateTime.now().add(Duration(days: 1)),
     exercises: [
       sampleExercises[2],
@@ -128,7 +124,6 @@ final List<Workout> sampleWorkouts = [
   Workout(
     id: '3',
     title: 'Upper Body Strength',
-    time: '5:00 PM',
     dateTime: DateTime.now().add(Duration(days: 2)),
     exercises: [
       sampleExercises[0],
