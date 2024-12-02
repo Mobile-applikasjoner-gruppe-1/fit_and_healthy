@@ -1,3 +1,4 @@
+import 'package:fit_and_healthy/src/features/nutrition/controllers/nutrition_cache_notifier.dart';
 import 'package:fit_and_healthy/src/features/nutrition/data/open_food_api.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal/meal.dart';
 import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart';
@@ -43,51 +44,89 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   }
 
   // Add a FoodItem to the meal
-  void _addProductToMeal(Map<String, dynamic> product, double grams) {
-    final foodItem = FoodItem(
-      name: product['product_name'] ?? 'Unknown Product',
-      barcode: product['code'] ?? 'No Barcode',
-      imageUrl: product['image_url'],
-      ingredients: product['ingredients_text'],
-      allergens: product['allergens'],
-      servingSize: product['serving_size'],
-      nutritionInfo: {
-        'calories': (product['nutriments']['energy-kcal_100g'] ?? 0).toDouble(),
-        'protein': (product['nutriments']['proteins_100g'] ?? 0).toDouble(),
-        'fat': (product['nutriments']['fat_100g'] ?? 0).toDouble(),
-        'sugars': (product['nutriments']['sugars_100g'] ?? 0).toDouble(),
-        'fiber': (product['nutriments']['fiber_100g'] ?? 0).toDouble(),
-        'carbs': (product['nutriments']['carbohydrates_100g'] ?? 0).toDouble(),
-      },
-      grams: grams,
-    );
-  }
+  // void _addProductToMeal(Map<String, dynamic> product, double grams) {
+  //   final foodItem = FoodItem(
+  //     name: product['product_name'] ?? 'Unknown Product',
+  //     barcode: product['code'] ?? 'No Barcode',
+  //     imageUrl: product['image_url'],
+  //     ingredients: product['ingredients_text'],
+  //     allergens: product['allergens'],
+  //     servingSize: product['serving_size'],
+  //     nutritionInfo: {
+  //       'calories': (product['nutriments']['energy-kcal_100g'] ?? 0).toDouble(),
+  //       'protein': (product['nutriments']['proteins_100g'] ?? 0).toDouble(),
+  //       'fat': (product['nutriments']['fat_100g'] ?? 0).toDouble(),
+  //       'sugars': (product['nutriments']['sugars_100g'] ?? 0).toDouble(),
+  //       'fiber': (product['nutriments']['fiber_100g'] ?? 0).toDouble(),
+  //       'carbs': (product['nutriments']['carbohydrates_100g'] ?? 0).toDouble(),
+  //     },
+  //     grams: grams,
+  //   );
+  // }
 
   // Edit grams of an existing food item
-  void _editFoodItemGrams(int index, double grams) {
-    // TODO: Consider using the id instead to make changing to database easier
-    setState(() {
-      widget.meal.items[index].setGrams(grams);
-    });
-  }
+  // void _editFoodItemGrams(int index, double grams) {
+  //   // TODO: Consider using the id instead to make changing to database easier
+  //   setState(() {
+  //     widget.meal.items[index].setGrams(grams);
+  //   });
+  // }
 
   // Remove a food item from the meal
-  void _removeFoodItem(int index) {
-    // TODO: Consider using the id instead to make changing to database easier
-    setState(() {
-      widget.meal.removeFoodItemByIndex(index);
-    });
-  }
-
-  // Calculate the total nutrition for the current meal
-  Map<String, double> _calculateTotalNutrition() {
-    return widget.meal.calculateTotalNutrition();
-  }
+  // void _removeFoodItem(int index) {
+  //   // TODO: Consider using the id instead to make changing to database easier
+  //   setState(() {
+  //     widget.meal.removeFoodItemByIndex(index);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final totalNutrition =
-        _calculateTotalNutrition(); // Calculate nutrition totals
+    Widget content;
+    Meal? meal;
+
+    String mealId = widget.mealId;
+
+    final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
+
+    if (nutritionCacheState is AsyncLoading) {
+      content = Center(child: CircularProgressIndicator());
+    } else if (nutritionCacheState is AsyncError) {
+      content = Center(child: Text('Error: ${nutritionCacheState.error}'));
+    } else {
+      meal = nutritionCacheState.value?.cachedMeals[mealId];
+
+      if (meal == null) {
+        content = Center(child: Text('Meal not found'));
+      } else {
+        content = SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Meal Date: ${_formatDate(workout.dateTime)}",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              if (meal.items.isEmpty)
+                Center(
+                  child: Text(
+                    "No meal items available",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                )
+              else
+                Column(
+                  children: meal.items.map((item) {
+                    return MealItemView(item: item);
+                  }).toList(),
+                ),
+            ],
+          ),
+        );
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(

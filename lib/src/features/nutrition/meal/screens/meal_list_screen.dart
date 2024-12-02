@@ -97,7 +97,7 @@ class MealListScreen extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: meals.length,
-              itemBuilder: (ctx, index) => MealItem(
+              itemBuilder: (ctx, index) => MealView(
                 meal: meals[index],
                 onSelectMeal: (meal) {
                   selectMeal(context, meal);

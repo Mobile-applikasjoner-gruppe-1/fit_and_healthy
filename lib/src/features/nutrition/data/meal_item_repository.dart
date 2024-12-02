@@ -5,8 +5,8 @@ import 'package:fit_and_healthy/src/features/nutrition/meal_item/food_item.dart'
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 
 final mealItemConverter = (
-  fromFirestore: (snapshot, _) => FoodItem.fromFirebase(snapshot),
-  toFirestore: (FoodItem foodItem, _) => foodItem.toFirebase(),
+  fromFirestore: (snapshot, _) => FoodItem.fromFirestore(snapshot),
+  toFirestore: (FoodItem foodItem, _) => foodItem.toFirestore(),
 );
 
 class MealItemRepository {
@@ -34,7 +34,7 @@ class MealItemRepository {
         .doc(mealId)
         .collection(collectionName)
         .withConverter<FoodItem>(
-          fromFirestore: (snapshot, _) => FoodItem.fromFirebase(snapshot),
+          fromFirestore: (snapshot, _) => FoodItem.fromFirestore(snapshot),
           toFirestore: mealItemConverter.toFirestore,
         );
   }

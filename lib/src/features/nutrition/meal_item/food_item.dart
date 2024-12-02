@@ -10,6 +10,7 @@ enum NutritionInfoKey {
 }
 
 class FoodItem {
+  final String? id;
   final String name;
   final String barcode;
   final String? imageUrl;
@@ -21,6 +22,7 @@ class FoodItem {
   final List<Function> changeNotifiers = [];
 
   FoodItem({
+    this.id,
     required this.name,
     required this.barcode,
     this.imageUrl,
@@ -140,7 +142,7 @@ class FoodItem {
     }
   }
 
-  factory FoodItem.fromFirebase(
+  factory FoodItem.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     final data = snapshot.data();
     if (data == null) {
@@ -190,6 +192,7 @@ class FoodItem {
     final nutritionInfo = nutritionInfoFromDynamic(data['nutritionInfo']);
 
     return FoodItem(
+      id: snapshot.id,
       name: name,
       barcode: barcode,
       imageUrl: imageUrl,
@@ -201,7 +204,7 @@ class FoodItem {
     );
   }
 
-  Map<String, dynamic> toFirebase() {
+  Map<String, dynamic> toFirestore() {
     return {
       'name': name,
       'barcode': barcode,
