@@ -3,6 +3,7 @@ import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 /**
  * The `AddWorkout` widget provides a user interface 
@@ -30,6 +31,7 @@ class AddWorkout extends StatefulWidget {
 }
 
 class _AddWorkoutState extends State<AddWorkout> {
+  final uuid = Uuid();
   String _title = 'New Workout'; // Default title of the workout
   DateTime _selectedDate = DateTime.now(); // Selected date
   TimeOfDay _selectedTime = TimeOfDay.now(); // Selected time
@@ -89,7 +91,7 @@ class _AddWorkoutState extends State<AddWorkout> {
    */
   Workout _createWorkout() {
     return Workout(
-      id: UniqueKey().toString(),
+      id: uuid.v4(),
       title: _title,
       dateTime: _selectedDate,
       time: _selectedTime.toString(),

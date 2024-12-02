@@ -28,6 +28,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:fit_and_healthy/shared/models/exercise.dart';
 
 part 'app_router.g.dart';
 
@@ -86,8 +87,9 @@ GoRouter appRouter(Ref ref) {
                     name: 'WorkoutDetail',
                     builder: (context, state) {
                       final workoutId = state.pathParameters['id']!;
+                      final workouts = state.extra as List<Workout>;
                       return WorkoutDetailView(
-                          workoutId: workoutId, workouts: sampleWorkouts);
+                          workoutId: workoutId, workouts: workouts);
                     },
                   ),
                 ],

@@ -42,7 +42,6 @@ class _ExerciseViewState extends State<ExerciseView> {
     _workouts.sort((a, b) => b.dateTime.compareTo(a.dateTime));
   }
 
-
   /**
    * Navigates to the WorkoutDetailView for the selected workout.
    *
@@ -53,7 +52,7 @@ class _ExerciseViewState extends State<ExerciseView> {
    */
   void selectWorkout(BuildContext context, Workout workout) {
     String id = workout.id;
-    context.push('${ExerciseView.route}/${id}');
+    context.push('${ExerciseView.route}/${id}', extra: _workouts,);
   }
 
   /**

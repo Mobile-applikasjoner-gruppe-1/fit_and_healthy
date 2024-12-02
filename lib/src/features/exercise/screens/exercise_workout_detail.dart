@@ -38,17 +38,12 @@ class WorkoutDetailView extends StatelessWidget {
  * - Exception if the workoutId is invalid or the workout is not found.
  */
   Workout _getWorkoutById(String workoutId) {
-    final id = int.tryParse(workoutId);
-    if (id == null) {
-      throw Exception('Invalid workout ID: $workoutId');
-    }
-
     return workouts.firstWhere(
-      (workout) => workout.id == workoutId,
-      orElse: () {
-        throw Exception('Workout with id $workoutId not found');
-      },
-    );
+    (workout) => workout.id == workoutId,
+    orElse: () {
+      throw Exception('Workout with id $workoutId not found');
+    },
+  );
   }
 
   /**
