@@ -9,7 +9,7 @@ class OpenFoodApi {
   // Search products by name specific to Norway
   Future<List<Map<String, dynamic>>> searchProductsByName(String query) async {
     final url = Uri.parse(
-        '$baseUrl/cgi/search.pl?search_terms=$query&search_simple=1&json=1&country=NO');
+        '$baseUrl/cgi/search.pl?search_terms=$query&search_simple=1&json=1&country=NO&page_size=20');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

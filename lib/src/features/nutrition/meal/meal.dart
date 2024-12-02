@@ -5,39 +5,16 @@ class Meal {
   final String id; // Unique identifier for the meal
   final String name; // Name of the meal
   final DateTime timestamp; // Time for the meal
-  final List<FoodItem> _items = []; // Food items in the meal
-  final List<Function> changeNotifiers = [];
+  List<FoodItem> items = []; // Food items in the meal
 
   Meal({required this.name, required this.timestamp, required this.id});
 
-  void addChangeNotifier(Function notifier) {
-    changeNotifiers.add(notifier);
-  }
-
-  void notifyChange() {
-    for (var notifier in changeNotifiers) {
-      notifier();
-    }
-  }
-
-  // Method to add a FoodItem with a specified weight in grams
-  void addFoodItem(FoodItem foodItem) {
-    _items.add(foodItem);
-    foodItem.addChangeNotifier(notifyChange);
-    notifyChange();
-  }
-
-  // Getter to access _items outside the class
-  List<FoodItem> get items => _items;
-
   // Method to remove a FoodItem based on its barcode or name
   void removeFoodItem({String? barcode, String? name}) {
-    _items.removeWhere((item) {
+    items.removeWhere((item) {
       if (barcode != null) {
-        notifyChange();
         return item.barcode == barcode; // Remove by barcode
       } else if (name != null) {
-        notifyChange();
         return item.name == name; // Remove by name
       }
       return false; // No match found
@@ -45,8 +22,7 @@ class Meal {
   }
 
   void removeFoodItemByIndex(int index) {
-    _items.removeAt(index);
-    notifyChange();
+    items.removeAt(index);
   }
 
   // Method to calculate total nutrition values for the meal
@@ -60,7 +36,7 @@ class Meal {
       'carbs': 0.0,
     };
 
-    for (var item in _items) {
+    for (var item in items) {
       final itemNutrion = item.calculateNutrition();
 
       totals['calories'] = totals['calories']! + (itemNutrion['calories']!);
@@ -79,7 +55,7 @@ class Meal {
     return {
       'id': id,
       'name': name,
-      'items': _items.map((item) => item.toJson()).toList(),
+      'items': items.map((item) => item.toJson()).toList(),
     };
   }
 
@@ -91,7 +67,7 @@ class Meal {
         id: json['id']);
     for (var item in json['items']) {
       final foodItem = FoodItem.fromFoodFactsJson(item['foodItem']);
-      meal.addFoodItem(foodItem);
+      meal.items.add(foodItem);
     }
     return meal;
   }
@@ -112,15 +88,11 @@ class Meal {
     final name = data['name'];
     final timestamp = data['timestamp'];
 
-    if (name == null || timestamp == null) {
-      throw Exception('Document data is missing required fields');
-    }
-
-    if (!name is String) {
+    if (name is! String) {
       throw Exception('Name is not a string');
     }
 
-    if (!timestamp is Timestamp) {
+    if (timestamp is! Timestamp) {
       throw Exception('Timestamp is not a Timestamp');
     }
 

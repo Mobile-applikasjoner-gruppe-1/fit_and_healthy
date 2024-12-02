@@ -11,7 +11,7 @@ import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 import 'package:fit_and_healthy/shared/widgets/cards/nutrition_card_full.dart';
 import 'package:fit_and_healthy/src/features/exercise/screens/exercise_workout_view.dart';
 import 'package:fit_and_healthy/src/features/measurement/measurement_settings_page.dart';
-import 'package:fit_and_healthy/src/features/nutrition/nutrition_screen.dart';
+import 'package:fit_and_healthy/src/features/nutrition/meal/screens/meal_list_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// A list of all available widget cards to be displayed on the dashboard.
@@ -60,7 +60,7 @@ final allCards = [
       proteinsGoal: 150,
       totalCalories: 3000,
     ),
-    route: NutritionScreen.routeName,
+    route: MealListScreen.routeName,
   ),
   WidgetCard(
     id: '7',
@@ -70,7 +70,7 @@ final allCards = [
     builder: () => CardCaloriesNutrition(
       caloriesConsumed: 1500,
     ),
-    route: NutritionScreen.routeName,
+    route: MealListScreen.routeName,
   ),
   WidgetCard(
     id: '8',
@@ -78,7 +78,7 @@ final allCards = [
     size: 0.5,
     widgetCardCategory: WidgetCardCategory.nutrition,
     builder: () => CardMacroNutritions(),
-    route: NutritionScreen.routeName,
+    route: MealListScreen.routeName,
   ),
   WidgetCard(
     id: '9',
