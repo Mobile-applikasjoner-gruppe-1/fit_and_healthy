@@ -154,9 +154,9 @@ class MetricsController extends _$MetricsController {
   Future<void> updateHeight(double height) async {
     final currentState = await future;
 
-    _userRepository.updateHeight(height);
+    final entry = await _userRepository.updateHeight(height);
 
-    state = AsyncValue.data(currentState.copyWith(height: height));
+    state = AsyncValue.data(currentState.copyWith(height: entry!));
   }
 
   Future<void> updateGender(Gender gender) async {
@@ -178,9 +178,9 @@ class MetricsController extends _$MetricsController {
   Future<void> updateWeeklyWorkoutGoal(int goal) async {
     final currentState = await future;
 
-    await _userRepository.updateWeeklyWorkoutGoal(goal);
+    final entry = await _userRepository.updateWeeklyWorkoutGoal(goal);
 
-    state = AsyncValue.data(currentState.copyWith(weeklyWorkoutGoal: goal));
+    state = AsyncValue.data(currentState.copyWith(weeklyWorkoutGoal: entry));
   }
 
   Future<void> updateWeightGoal(WeightGoal goal) async {

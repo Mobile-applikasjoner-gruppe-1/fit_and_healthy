@@ -166,14 +166,23 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         ],
       ),
       onTap: () async {
-        final newHeight = await HeightEditor.showDialogForHeight(
-          context,
-          height.toDouble(),
-        );
-        if (newHeight != null) {
-          await ref
-              .read(metricsControllerProvider.notifier)
-              .updateHeight(newHeight);
+        try {
+          final newHeight = await HeightEditor.showDialogForHeight(
+            context,
+            height.toDouble(),
+          );
+          if (newHeight != null) {
+            await ref
+                .read(metricsControllerProvider.notifier)
+                .updateHeight(newHeight);
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update height: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       },
     );

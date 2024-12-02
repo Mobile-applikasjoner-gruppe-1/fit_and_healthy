@@ -168,13 +168,22 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final int? newGoal = int.tryParse(workoutController.text);
                 if (newGoal != null) {
-                  ref
-                      .read(metricsControllerProvider.notifier)
-                      .updateWeeklyWorkoutGoal(newGoal);
-                  Navigator.of(context).pop();
+                  try {
+                    ref
+                        .read(metricsControllerProvider.notifier)
+                        .updateWeeklyWorkoutGoal(newGoal);
+                    Navigator.of(context).pop();
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter a valid number.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -348,50 +357,62 @@ class _GoalsSettingsPageState extends ConsumerState<GoalsSettingsPage> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState?.validate() ?? false) {
-                            final weight =
-                                double.tryParse(weightController.text) ?? 0;
-                            final height =
-                                double.tryParse(heightController.text) ?? 0;
+                            try {
+                              final weight =
+                                  double.tryParse(weightController.text) ?? 0;
+                              final height =
+                                  double.tryParse(heightController.text) ?? 0;
 
-                            if (birthday == null &&
-                                birthdayController.text.isNotEmpty) {
-                              final parts = birthdayController.text.split('/');
-                              final newBirthday = DateTime(
-                                int.parse(parts[2]),
-                                int.parse(parts[1]),
-                                int.parse(parts[0]),
+                              if (birthday == null &&
+                                  birthdayController.text.isNotEmpty) {
+                                final parts =
+                                    birthdayController.text.split('/');
+                                final newBirthday = DateTime(
+                                  int.parse(parts[2]),
+                                  int.parse(parts[1]),
+                                  int.parse(parts[0]),
+                                );
+                                await ref
+                                    .read(metricsControllerProvider.notifier)
+                                    .setBirthday(newBirthday);
+                              }
+
+                              if (!height.isNaN) {
+                                await ref
+                                    .read(metricsControllerProvider.notifier)
+                                    .updateHeight(height);
+                              }
+
+                              if (selectedActivityLevel != null) {
+                                await ref
+                                    .read(metricsControllerProvider.notifier)
+                                    .addWeight(weight);
+                                await ref
+                                    .read(metricsControllerProvider.notifier)
+                                    .updateActivityLevel(
+                                        selectedActivityLevel!);
+                                final calories =
+                                    CalorieCalculator.calculateCalories(
+                                  weight: weight,
+                                  height: height,
+                                  birthday: birthday!,
+                                  activityLevel: ActivityLevel.moderatelyActive,
+                                  gender: Gender.male,
+                                  weightGoal: WeightGoal.maintain,
+                                );
+                                setState(() {
+                                  _caloriesNeeded = calories.totalCalorie;
+                                });
+                                Navigator.of(context).pop();
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('Failed to calculate calories: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
                               );
-                              await ref
-                                  .read(metricsControllerProvider.notifier)
-                                  .setBirthday(newBirthday);
-                            }
-
-                            if (!height.isNaN) {
-                              await ref
-                                  .read(metricsControllerProvider.notifier)
-                                  .updateHeight(height);
-                            }
-
-                            if (selectedActivityLevel != null) {
-                              await ref
-                                  .read(metricsControllerProvider.notifier)
-                                  .addWeight(weight);
-                              await ref
-                                  .read(metricsControllerProvider.notifier)
-                                  .updateActivityLevel(selectedActivityLevel!);
-                              final calories =
-                                  CalorieCalculator.calculateCalories(
-                                weight: weight,
-                                height: height,
-                                birthday: birthday!,
-                                activityLevel: ActivityLevel.moderatelyActive,
-                                gender: Gender.male,
-                                weightGoal: WeightGoal.maintain,
-                              );
-                              setState(() {
-                                _caloriesNeeded = calories.totalCalorie;
-                              });
-                              Navigator.of(context).pop();
                             }
                           }
                         },

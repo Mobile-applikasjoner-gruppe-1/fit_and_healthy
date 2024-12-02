@@ -82,14 +82,14 @@ class CardMacroNutritions extends ConsumerWidget {
                       label: 'Protein',
                       value: 100,
                       goal: caloriesModel.recommendedProtein,
-                      color: Colors.red,
+                      color: Colors.deepOrange,
                     ),
                     const SizedBox(height: 8),
                     HorizontalBarChart(
                       label: 'Carbs',
                       value: 100,
                       goal: caloriesModel.recommendedCarbs,
-                      color: Colors.black,
+                      color: Colors.deepPurple,
                     ),
                     const SizedBox(height: 8),
                     HorizontalBarChart(

@@ -124,7 +124,7 @@ class NutritionCard extends ConsumerWidget {
                           label: 'Carbs',
                           value: 100,
                           goal: caloriesModel.recommendedCarbs,
-                          color: Colors.green,
+                          color: Colors.deepPurple,
                         ),
                         const SizedBox(height: 8),
                         HorizontalBarChart(
