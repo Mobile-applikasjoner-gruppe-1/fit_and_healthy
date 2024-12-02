@@ -4,6 +4,8 @@ import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// A widget that displays a card showing the user's weight progress over time.
+/// The weight progress is visualized using a line chart.
 class CardWeight extends ConsumerWidget {
   const CardWeight({Key? key}) : super(key: key);
 

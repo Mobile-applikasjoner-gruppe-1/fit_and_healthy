@@ -2,6 +2,9 @@ import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 
+// This page displays the privacy policy and GDPR compliance information
+/// to the user. It outlines the app's commitment to user data protection,
+/// security, and compliance with GDPR standards.
 class PrivacyGdprPolicySettingsPage extends StatelessWidget {
   const PrivacyGdprPolicySettingsPage({super.key});
 

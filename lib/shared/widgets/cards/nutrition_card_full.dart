@@ -5,15 +5,21 @@ import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// A widget that displays a user's nutritional metrics, including:
+/// - Calories consumed vs total calories.
+/// - Macronutrient (proteins, carbs, fats) progress vs goals.
+///
+/// The card dynamically calculates the user's recommended calories and macronutrient goals
+/// based on their personal metrics and activity level.
 class NutritionCard extends ConsumerWidget {
   final double caloriesConsumed;
   final double totalCalories;
-  final double carbs; // In grams
-  final double fats; // In grams
-  final double proteins; // In grams
-  final double carbsGoal; // In grams
-  final double fatsGoal; // In grams
-  final double proteinsGoal; // In grams
+  final double carbs;
+  final double fats;
+  final double proteins;
+  final double carbsGoal;
+  final double fatsGoal;
+  final double proteinsGoal;
 
   const NutritionCard({
     Key? key,
@@ -85,7 +91,6 @@ class NutritionCard extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   ),
-                  //Icon(Icons.monitor_weight, color: Colors.white),
                 ],
               ),
             ),
@@ -103,7 +108,7 @@ class NutritionCard extends ConsumerWidget {
                   ),
                   const SizedBox(width: 24),
                   Expanded(
-                    flex: 2, // Takes 2/3 of the space
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,

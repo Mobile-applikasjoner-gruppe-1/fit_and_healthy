@@ -11,6 +11,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metrics_controller.g.dart';
 
+/// This Riverpod controller manages user metrics such as:
+/// - Height
+/// - Weight history
+/// - Gender
+/// - Birthday
+/// - Weekly workout goal
+/// - Weight goal
+/// - Activity level
+///
+/// It interacts with user and weight repositories to fetch, update, and persist
+/// user metrics in a centralized and stateful manner.
 @Riverpod(keepAlive: true)
 class MetricsController extends _$MetricsController {
   late final UserRepository _userRepository;
@@ -74,8 +85,7 @@ class MetricsController extends _$MetricsController {
       height: metricsState.height,
       gender: metricsState.gender,
       birthday: metricsState.birthday,
-      weeklyWorkoutGoal:
-          metricsState.weeklyWorkoutGoal, // Retain existing value
+      weeklyWorkoutGoal: metricsState.weeklyWorkoutGoal,
       weightGoal: metricsState.weightGoal,
       activityLevel: metricsState.activityLevel,
     );
@@ -104,7 +114,6 @@ class MetricsController extends _$MetricsController {
     ));
   }
 
-  // Handle the weight
   Future<void> addWeight(double weight) async {
     final currentState = await future;
     final entry = NewWeightEntry(timestamp: DateTime.now(), weight: weight);
@@ -154,7 +163,6 @@ class MetricsController extends _$MetricsController {
     state = AsyncValue.data(currentState.copyWith(birthday: birthday));
   }
 
-  // Handle the weekly workouts
   Future<void> updateWeeklyWorkoutGoal(int goal) async {
     final currentState = await future;
 
@@ -163,7 +171,6 @@ class MetricsController extends _$MetricsController {
     state = AsyncValue.data(currentState.copyWith(weeklyWorkoutGoal: goal));
   }
 
-  // Handle the weight goal
   Future<void> updateWeightGoal(WeightGoal goal) async {
     final currentState = await future;
 
@@ -172,7 +179,6 @@ class MetricsController extends _$MetricsController {
     state = AsyncValue.data(currentState.copyWith(weightGoal: goal));
   }
 
-  // Handle the activity level
   Future<void> updateActivityLevel(ActivityLevel activityLevel) async {
     final currentState = await future;
 

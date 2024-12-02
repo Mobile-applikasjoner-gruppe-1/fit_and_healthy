@@ -6,6 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+/// This is the main dashboard view of the application, where users can see a
+/// grid of selected widgets. It provides the following functionalities:
+/// - Displays widgets selected by the user.
+/// - Allows users to navigate to a widget settings page to add widgets.
+/// - Provides an option to add default widgets if none are selected.
 class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
 

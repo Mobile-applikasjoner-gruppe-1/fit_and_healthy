@@ -3,6 +3,16 @@ import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 
+/// Represents the state of user metrics including:
+/// - Weight history
+/// - Height
+/// - Gender
+/// - Birthday
+/// - Weekly workout goal
+/// - Weight goal
+/// - Activity level
+///
+/// This class is immutable, and updates are achieved using the `copyWith` method.
 class MetricsState {
   final List<WeightEntry> weightHistory;
   final double height;

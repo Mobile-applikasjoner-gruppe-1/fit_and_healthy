@@ -7,6 +7,15 @@ import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:fit_and_healthy/src/features/metrics/metric_state.dart';
 
+/// This page allows users to set up or update their metrics information such as:
+/// - Height
+/// - Weight
+/// - Gender
+/// - Birthday
+/// - Weight goal
+/// - Activity level
+///
+/// It validates user input and updates the metrics state in the database.
 class MetricsSetupPage extends ConsumerWidget {
   const MetricsSetupPage({super.key});
 
@@ -18,7 +27,6 @@ class MetricsSetupPage extends ConsumerWidget {
     final metricsController = ref.read(metricsControllerProvider.notifier);
     final metricsState = ref.watch(metricsControllerProvider).valueOrNull;
 
-    // Initialize values from the current state or default values
     final initialState = metricsState ??
         MetricsState(
           height: 170.0,

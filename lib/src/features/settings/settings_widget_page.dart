@@ -4,6 +4,9 @@ import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// A page that allows users to manage and customize their widget cards.
+/// It groups the cards by category, allows users to select or deselect cards,
+/// and provides a preview feature for each card.
 class WidgetSettingsPage extends ConsumerStatefulWidget {
   const WidgetSettingsPage({super.key});
 
@@ -57,6 +60,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     );
   }
 
+  /// Builds a card for a specific widget category and its cards.
   Widget _buildCategoryCard(
     BuildContext context,
     ThemeData theme,
@@ -180,6 +184,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     );
   }
 
+  /// Groups all available cards by their respective categories.
   Map<WidgetCardCategory, List<WidgetCard>> _groupCardsByCategory() {
     return {
       for (var category in WidgetCardCategory.values)
@@ -189,6 +194,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     };
   }
 
+  /// Maps the widget card category enum to its display name.
   String _categoryName(WidgetCardCategory category) {
     switch (category) {
       case WidgetCardCategory.workout:
@@ -202,6 +208,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     }
   }
 
+  /// Displays a full-screen preview of the card content.
   void _showCardPreview(BuildContext context, WidgetCard cardContent) {
     late OverlayEntry overlayEntry;
 

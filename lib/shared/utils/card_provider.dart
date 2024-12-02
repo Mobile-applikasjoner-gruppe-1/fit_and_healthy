@@ -14,8 +14,12 @@ import 'package:fit_and_healthy/src/features/measurement/measurement_settings_pa
 import 'package:fit_and_healthy/src/features/nutrition/nutrition_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-//TODO: Remove parameters in classes/methods, the card itself should handle fetching the data.
+/// A list of all available widget cards to be displayed on the dashboard.
+///
+/// Each card is associated with a unique ID, size, category, widget builder,
+/// and a route for detailed views.
 
+//TODO: Remove parameters in classes/methods, the card itself should handle fetching the data.
 final allCards = [
   WidgetCard(
     id: '3',
@@ -88,11 +92,15 @@ final allCards = [
   ),
 ];
 
+/// A provider for managing the state of selected widget cards on the dashboard.
 final CardProvider =
     StateNotifierProvider<CardNotifier, List<WidgetCard>>((ref) {
   return CardNotifier(ref);
 });
 
+/// A [StateNotifier] that manages the list of selected widget cards.
+///
+/// Provides methods to load, save, and modify the selected cards.
 class CardNotifier extends StateNotifier<List<WidgetCard>> {
   final Ref _ref;
 
@@ -137,4 +145,5 @@ class CardNotifier extends StateNotifier<List<WidgetCard>> {
   }
 }
 
+/// A provider that supplies the list of all available widget cards.
 final allCardsProvider = Provider<List<WidgetCard>>((_) => allCards);

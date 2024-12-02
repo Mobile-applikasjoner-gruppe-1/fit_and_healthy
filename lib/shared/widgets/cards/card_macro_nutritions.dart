@@ -4,6 +4,9 @@ import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// A widget that displays a card showing the user's macronutrient progress.
+/// The progress is visualized using horizontal bar charts for protein, carbs, and fats.
+/// Each bar shows the consumed value versus the recommended goal based on user metrics.
 class CardMacroNutritions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,7 +54,6 @@ class CardMacroNutritions extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and Icon
             Padding(
               padding: const EdgeInsets.all(8),
               child: Row(
@@ -65,11 +67,9 @@ class CardMacroNutritions extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   ),
-                  //Icon(Icons.monitor_weight, color: Colors.white),
                 ],
               ),
             ),
-            // Chart
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Expanded(

@@ -11,17 +11,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Displays the various settings that can be customized by the user.
-///
-/// When a user changes a setting, the SettingsController is updated and
-/// Widgets that listen to the SettingsController are rebuilt.
+/// This view displays the settings page, allowing users to navigate to various
+/// customizable sections like profile, widgets, measurements, goals, theme, and GDPR policies.
+/// It also provides an option to sign out.
 class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
   static const route = '/settings';
   static const routeName = 'Settings';
-
-  //final SettingsController controller;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

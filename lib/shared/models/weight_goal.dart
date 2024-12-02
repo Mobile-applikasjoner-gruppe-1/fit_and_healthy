@@ -1,10 +1,16 @@
+// Enum representing weight management goals.
+///
+/// Goals:
+/// - [gain]: Gain weight.
+/// - [maintain]: Maintain current weight.
+/// - [lose]: Lose weight.
 enum WeightGoal {
   gain,
   maintain,
   lose,
 }
 
-// Extension for descriptions
+/// Extension for [WeightGoal] to add utility methods and descriptions.
 extension WeightGoalExtension on WeightGoal {
   String get description {
     switch (this) {

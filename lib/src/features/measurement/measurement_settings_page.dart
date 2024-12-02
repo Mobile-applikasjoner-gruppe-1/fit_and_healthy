@@ -5,18 +5,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/weight_chart.dart';
 
+/// A state provider for managing the selected chart filter.
 final chartFilterProvider =
     StateProvider<ChartFilter>((ref) => ChartFilter.all);
 
+/// Enum representing available chart filters: month, year, or all time.
 enum ChartFilter { month, year, all }
 
+// This page allows users to view and manage their weight measurements over time.
+/// It displays a weight progress chart with filter options (past month, past year, all time),
+/// and provides functionality to add new weight entries.
 class MeasurementSettingsPage extends ConsumerWidget {
   const MeasurementSettingsPage({super.key});
 
   static const route = '/measurement';
   static const routeName = 'Measurement Settings';
-
-  // TODO, Fetch data for 30 days, and if they want a year, fetch the rest!
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,7 +72,6 @@ class MeasurementSettingsPage extends ConsumerWidget {
               child: WeightChart(entries: filteredEntries),
             ),
             const SizedBox(height: 16),
-            // Informational Text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
@@ -97,6 +99,13 @@ class MeasurementSettingsPage extends ConsumerWidget {
     );
   }
 
+  /// Builds a filter button for the chart.
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [ref]: The Riverpod reference.
+  /// - [filter]: The filter type (month, year, or all).
+  /// - [label]: The button label.
   Widget _buildFilterButton(
     BuildContext context,
     WidgetRef ref,
@@ -121,6 +130,14 @@ class MeasurementSettingsPage extends ConsumerWidget {
     );
   }
 
+  /// Filters weight entries based on the selected chart filter.
+  ///
+  /// Parameters:
+  /// - [entries]: List of weight entries.
+  /// - [filter]: The selected chart filter.
+  ///
+  /// Returns:
+  /// - A filtered list of weight entries sorted by timestamp.
   List<WeightEntry> _filterEntries(
       List<WeightEntry> entries, ChartFilter filter) {
     final now = DateTime.now();
@@ -147,6 +164,11 @@ class MeasurementSettingsPage extends ConsumerWidget {
     return filtered;
   }
 
+  /// Displays a modal for adding a new weight entry.
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [metricsController]: The metrics controller for handling weight entry.
   void _showAddWeightModal(
       BuildContext context, MetricsController metricsController) {
     final TextEditingController weightController = TextEditingController();
