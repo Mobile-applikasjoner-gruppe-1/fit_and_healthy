@@ -8,15 +8,8 @@ import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-/**
-   * Navigates to the WorkoutDetailView for the selected workout.
-   *
-   * Functionality:
-   * - Converts the workout's integer ID to a string, as GoRouter expects path parameters to be strings.
-   * - Uses the GoRouter's `context.push` method to navigate to the WorkoutDetailView.
-   * - Appends the workout ID to the route path as a path parameter.
-   */
 void selectMeal(BuildContext context, Meal meal) {
   context
       .pushNamed(MealDetailScreen.routeName, pathParameters: {'id': meal.id});
@@ -64,9 +57,8 @@ class MealListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Widget? loggedMeals;
-    Widget content = const Center(child: Text('temp'));
-    Widget? nutritionSummary;
+    Widget loggedMeals = const SizedBox();
+    Widget nutritionSummary = const SizedBox();
 
     final nutritionDate = ref.watch(nutritionDateNotifierProvider);
     final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
@@ -110,7 +102,7 @@ class MealListScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Total Nutrition for All Meals:',
+                  const Text('Total Nutrition for All Meals:',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   Text(
@@ -141,153 +133,164 @@ class MealListScreen extends ConsumerWidget {
             );
           }
         }
-
-        content = SingleChildScrollView(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: () => navigateToAddMeal(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                    ),
-                    child: Text(
-                      'Add Meal',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  if (nutritionSummary != null) ...[
-                    const SizedBox(height: 16),
-                    nutritionSummary,
-                  ],
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Logged',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Divider(
-                    thickness: 1,
-                    color: Colors.blue,
-                  ),
-                  const SizedBox(height: 16),
-                  if (loggedMeals != null) ...[
-                    loggedMeals,
-                  ],
-                ],
-              ),
-            ),
-          ),
-        );
       }
     }
 
     return NestedScaffold(
       appBar: AppBar(
-        title: Text('Nutrition'),
+        title: const Text('Nutrition'),
         centerTitle: true,
       ),
-      body: content,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                _buildDateSelector(context, ref, selectedDate),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => navigateToAddMeal(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                  ),
+                  child: const Text(
+                    'Add Meal',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                if (nutritionSummary != null) ...[
+                  const SizedBox(height: 16),
+                  nutritionSummary,
+                ],
+                const SizedBox(height: 16),
+                const Text(
+                  'Logged',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Divider(
+                  thickness: 1,
+                  color: Colors.blue,
+                ),
+                const SizedBox(height: 16),
+                if (loggedMeals != null) ...[
+                  loggedMeals,
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
     );
+  }
 
-// Old code:
-    // return Scaffold(
-    //         appBar: AppBar(
-    //           title: Text(
-    //             'Meals on ${selectedDate?.toLocal().toString().split(' ')[0] ?? 'No Date Selected'}',
-    //           ),
-    //         ),
-    //         body:
-    //         // TODO: Display content here instead
-    //         Column(
-    //           children: [
-    //             // Display total nutrition
-    //             Padding(
-    //               padding: const EdgeInsets.all(16.0),
-    //               child: Column(
-    //                 crossAxisAlignment: CrossAxisAlignment.start,
-    //                 children: [
-    //                   Text('Total Nutrition for All Meals:',
-    //                       style: TextStyle(
-    //                           fontSize: 18, fontWeight: FontWeight.bold)),
-    //                   Text(
-    //                       'Calories: ${totalNutrition['calories']!.toStringAsFixed(2)} kcal'),
-    //                   Text(
-    //                       'Protein: ${totalNutrition['protein']!.toStringAsFixed(2)} g'),
-    //                   Text(
-    //                       'Fat: ${totalNutrition['fat']!.toStringAsFixed(2)} g'),
-    //                   Text(
-    //                       'Sugars: ${totalNutrition['sugars']!.toStringAsFixed(2)} g'),
-    //                   Text(
-    //                       'Fiber: ${totalNutrition['fiber']!.toStringAsFixed(2)} g'),
-    //                   Text(
-    //                       'Carbs: ${totalNutrition['carbs']!.toStringAsFixed(2)} g'),
-    //                 ],
-    //               ),
-    //             ),
-    //             Expanded(
-    //               child: ListView.builder(
-    //                 itemCount: mealHolder.meals.length,
-    //                 itemBuilder: (context, index) {
-    //                   final meal = mealHolder.meals[index];
-    //                   return ListTile(
-    //                     title: Text(meal.name),
-    //                     trailing: IconButton(
-    //                       icon: Icon(Icons.delete),
-    //                       onPressed: () => ref
-    //                           .read(mealControllerProvider.notifier)
-    //                           .removeMeal(meal.id),
-    //                     ),
-    //                     onTap: () {
-    //                       context.pushNamed(MealDetailScreen.routeName, pathParameters: {'mealId': meal.id});
-    //                     },
-    //                   );
-    //                 },
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //         floatingActionButton: FloatingActionButton(
-    //           child: Icon(Icons.add),
-    //           onPressed: () async {
-    //             context.pushNamed(MealCreationScreen.routeName);
-    //           },
-    //         ),
-    //       );
+  Widget _buildDateSelector(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime? selectedDate,
+  ) {
+    final displayDate = selectedDate ?? DateTime.now();
+    final dateFormat = DateFormat('d');
+    final monthFormat = DateFormat('MMMM');
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: () async {
+        final pickedDate = await showDatePicker(
+          context: context,
+          initialDate: displayDate,
+          firstDate: DateTime(2000),
+          lastDate: DateTime.now(),
+          builder: (context, child) {
+            return Theme(
+              data: theme.copyWith(
+                colorScheme: theme.colorScheme.copyWith(
+                  primary: theme.colorScheme.primary,
+                  onPrimary: theme.colorScheme.onPrimary,
+                  surface: theme.colorScheme.surface,
+                  onSurface: theme.colorScheme.onSurface,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+        if (pickedDate != null) {
+          ref
+              .read(nutritionDateNotifierProvider.notifier)
+              .changeDate(pickedDate);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: theme.shadowColor.withOpacity(0.2),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.arrow_left,
+                size: 28,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: () {
+                final newDate = displayDate.subtract(const Duration(days: 1));
+                ref
+                    .read(nutritionDateNotifierProvider.notifier)
+                    .changeDate(newDate);
+              },
+            ),
+            Column(
+              children: [
+                Text(
+                  dateFormat.format(displayDate),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  monthFormat.format(displayDate),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.arrow_right,
+                size: 28,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: () {
+                final newDate = displayDate.add(const Duration(days: 1));
+                ref
+                    .read(nutritionDateNotifierProvider.notifier)
+                    .changeDate(newDate);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
-
-// TODO: Remove this and implement entering name on the MealCreationScreen
-// Future<String?> _showAddMealDialog(BuildContext context) {
-//   final TextEditingController controller = TextEditingController();
-//   return showDialog<String>(
-//     context: context,
-//     builder: (context) {
-//       return AlertDialog(
-//         title: Text('New Meal'),
-//         content: TextField(
-//           controller: controller,
-//           decoration: InputDecoration(hintText: 'Enter meal name'),
-//         ),
-//         actions: [
-//           TextButton(
-//             child: Text('Cancel'),
-//             onPressed: () => Navigator.pop(context),
-//           ),
-//           TextButton(
-//             child: Text('Add'),
-//             onPressed: () => Navigator.pop(context, controller.text),
-//           ),
-//         ],
-//       );
-//     },
-//   );
-// }

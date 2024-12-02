@@ -191,26 +191,35 @@ class MetricsSetupPage extends ConsumerWidget {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
-                    final height = double.tryParse(heightController.text)!;
-                    final weight = double.tryParse(weightController.text)!;
+                    try {
+                      final height = double.tryParse(heightController.text)!;
+                      final weight = double.tryParse(weightController.text)!;
 
-                    final updatedMetrics = MetricsState(
-                      height: height,
-                      weightHistory: initialState.weightHistory
-                        ..add(WeightEntry(
-                          id: '',
-                          timestamp: DateTime.now(),
-                          weight: weight,
-                        )),
-                      gender: gender,
-                      birthday: birthday,
-                      weeklyWorkoutGoal: initialState.weeklyWorkoutGoal,
-                      weightGoal: weightGoal,
-                      activityLevel: activityLevel,
-                    );
+                      final updatedMetrics = MetricsState(
+                        height: height,
+                        weightHistory: initialState.weightHistory
+                          ..add(WeightEntry(
+                            id: '',
+                            timestamp: DateTime.now(),
+                            weight: weight,
+                          )),
+                        gender: gender,
+                        birthday: birthday,
+                        weeklyWorkoutGoal: initialState.weeklyWorkoutGoal,
+                        weightGoal: weightGoal,
+                        activityLevel: activityLevel,
+                      );
 
-                    await metricsController.addAllMetrics(updatedMetrics);
-                    await metricsController.reloadAuthUserDataFromDB();
+                      await metricsController.addAllMetrics(updatedMetrics);
+                      await metricsController.reloadAuthUserDataFromDB();
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to save metrics: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 },
                 child: const Text('Save Metrics'),
