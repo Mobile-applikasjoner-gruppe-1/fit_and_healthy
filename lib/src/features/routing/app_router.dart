@@ -28,9 +28,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fit_and_healthy/src/features/exercise/exercise_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:fit_and_healthy/shared/models/exercise.dart';
 
 part 'app_router.g.dart';
 
@@ -69,29 +67,27 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: ExerciseView.route,
                 name: ExerciseView.routeName,
-                builder: (context, state) =>
-                    ExerciseView(workouts: sampleWorkouts),
+                builder: (context, state) {
+                  return ExerciseView();
+                },
                 routes: [
                   GoRoute(
-                    path: 'add-workout',
-                    name: 'AddWorkout',
-                    builder: (context, state) =>
-                        AddWorkout(),
+                    path: AddWorkout.route,
+                    name: AddWorkout.routeName,
+                    builder: (context, state) => AddWorkout(),
                   ),
                   GoRoute(
-                      path: 'add-exercise',
-                      name: 'AddExercise',
+                      path: AddExercise.route,
+                      name: AddExercise.routeName,
                       builder: (context, state) {
-                        return AddExercise(exerciseInfoList: sampleExerciseInfoList);
+                        return AddExercise();
                       }),
                   GoRoute(
-                    path: ':id',
-                    name: 'WorkoutDetail',
+                    path: WorkoutDetailView.route,
+                    name: WorkoutDetailView.routeName,
                     builder: (context, state) {
                       final workoutId = state.pathParameters['id']!;
-                      final workouts = state.extra as List<Workout>;
-                      return WorkoutDetailView(
-                          workoutId: workoutId, workouts: workouts);
+                      return WorkoutDetailView(workoutId: workoutId);
                     },
                   ),
                 ],

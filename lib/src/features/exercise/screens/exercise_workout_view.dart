@@ -1,7 +1,11 @@
+import 'package:fit_and_healthy/src/features/exercise/exercise_date_notifier.dart';
+import 'package:fit_and_healthy/src/features/exercise/screens/exercise_add_workout.dart';
+import 'package:fit_and_healthy/src/features/exercise/workout_list_controller.dart';
 import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_and_healthy/shared/models/exercise.dart';
 import 'package:fit_and_healthy/src/features/exercise/widgets/exercise_workout_item.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /**
@@ -13,34 +17,11 @@ import 'package:go_router/go_router.dart';
  * - Lists all workouts using ExerciseWorkoutItem widgets.
  * - Navigates to the WorkoutDetailView when a workout is selected.
  */
-class ExerciseView extends StatefulWidget {
-  const ExerciseView({super.key, required this.workouts});
+class ExerciseView extends ConsumerWidget {
+  const ExerciseView({super.key});
 
   static const route = '/exercise';
   static const routeName = 'Exercise';
-
-  final List<Workout> workouts; // The list of workouts
-
-  @override
-  State<ExerciseView> createState() => _ExerciseViewState();
-}
-
-class _ExerciseViewState extends State<ExerciseView> {
-  late List<Workout> _workouts; // State to manage the dynamic workout list.
-
-  @override
-  void initState() {
-    super.initState();
-    _workouts = List.from(widget.workouts); 
-    _sortWorkoutsByDate();
-  }
-
-    /**
-   * Sorts the workouts by date in descending order (latest first).
-   */
-  void _sortWorkoutsByDate() {
-    _workouts.sort((a, b) => b.dateTime.compareTo(a.dateTime));
-  }
 
   /**
    * Navigates to the WorkoutDetailView for the selected workout.
@@ -52,7 +33,7 @@ class _ExerciseViewState extends State<ExerciseView> {
    */
   void selectWorkout(BuildContext context, Workout workout) {
     String id = workout.id;
-    context.push('${ExerciseView.route}/${id}', extra: _workouts,);
+    context.push('${ExerciseView.route}/${id}');
   }
 
   /**
@@ -60,36 +41,61 @@ class _ExerciseViewState extends State<ExerciseView> {
    * Adds the new workout to the list if one is returned.
    */
   Future<void> navigateToAddWorkout(BuildContext context) async {
-    final newWorkout = await context.push<Workout?>('${ExerciseView.route}/add-workout');
-    if (newWorkout != null) {
-      setState(() {
-        _workouts.add(newWorkout);
-        _sortWorkoutsByDate(); 
-      });
-    }
+    await context.pushNamed(AddWorkout.routeName);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Widget loggedWorkouts;
 
-    if (_workouts.isEmpty) {
-      loggedWorkouts = const Text(
-        'No workouts logged',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-      );
+    final exerciseDate = ref.watch(exerciseDateNotifierProvider);
+    final workoutListState = ref.watch(workoutNotifierProvider);
+
+    DateTime? selectedDate;
+
+    if (exerciseDate is AsyncLoading) {
+      loggedWorkouts = const Center(child: CircularProgressIndicator());
+    } else if (exerciseDate is AsyncError) {
+      loggedWorkouts = Center(child: Text('Error: ${exerciseDate.error}'));
     } else {
-      loggedWorkouts = ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _workouts.length,
-        itemBuilder: (ctx, index) => ExerciseWorkoutItem(
-          workout: _workouts[index],
-          onSelectWorkout: (workout) {
-            selectWorkout(context, workout);
-          },
-        ),
-      );
+      selectedDate = exerciseDate.value;
+      if (selectedDate == null) {
+        loggedWorkouts = const Center(child: CircularProgressIndicator());
+      } else {
+        final workoutNotifier = ref.read(workoutNotifierProvider.notifier);
+        workoutNotifier.listenToDate(selectedDate);
+      }
+    }
+
+    if (workoutListState is AsyncLoading) {
+      loggedWorkouts = const Center(child: CircularProgressIndicator());
+    } else if (workoutListState is AsyncError) {
+      loggedWorkouts = Center(child: Text('Error: ${workoutListState.error}'));
+    } else {
+      if (workoutListState.value == null) {
+        loggedWorkouts = const Center(child: CircularProgressIndicator());
+      }
+
+      final workouts = workoutListState.value!.cachedDateWorkouts[selectedDate];
+
+      if (workouts == null || workouts.isEmpty) {
+        loggedWorkouts = const Text(
+          'No workouts logged',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+        );
+      } else {
+        loggedWorkouts = ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: workouts.length,
+          itemBuilder: (ctx, index) => ExerciseWorkoutItem(
+            workout: workouts[index],
+            onSelectWorkout: (workout) {
+              selectWorkout(context, workout);
+            },
+          ),
+        );
+      }
     }
 
     Widget content = SingleChildScrollView(
@@ -103,7 +109,7 @@ class _ExerciseViewState extends State<ExerciseView> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                 ),
-                child: const Text(
+                child: Text(
                   'Add Workout',
                   style: TextStyle(
                     fontSize: 16,

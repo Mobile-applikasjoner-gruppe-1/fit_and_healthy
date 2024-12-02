@@ -46,8 +46,10 @@ FutureOr<String?> appRouterRedirectHandler(
       state.matchedLocation == AddDisplayNameView.route;
 
   // Checks for user data.
-  final bool isLoggedInWithoutData = isLoggedIn && currentUser.appUser == null;
-  final bool isLoggedInWithData = isLoggedIn && currentUser.appUser != null;
+  final bool isLoggedInWithoutData =
+      isLoggedIn && !currentUser.userLoading && currentUser.appUser == null;
+  final bool isLoggedInWithData =
+      isLoggedIn && !currentUser.userLoading && currentUser.appUser != null;
   final bool isAddingData = state.matchedLocation == MetricsSetupPage.route;
 
   // Redirect to the add display name page if the user is logged in but the display name is not set.
