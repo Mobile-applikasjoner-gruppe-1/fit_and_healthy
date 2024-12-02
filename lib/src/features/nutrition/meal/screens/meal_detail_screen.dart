@@ -169,6 +169,14 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
           // Loading Indicator
           if (_isLoading) CircularProgressIndicator(),
 
+          Text(
+            'Searched products',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontSize: 16, // Make the text smaller
+                  fontWeight: FontWeight.bold, // Optional: Adjust text weight
+                ),
+            textAlign: TextAlign.start, // Align text to the left
+          ),
           // Search Results List
           Expanded(
             child: ListView.builder(
@@ -189,6 +197,14 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
             ),
           ),
 
+          Text(
+            'Added Products',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontSize: 16, // Make the text smaller
+                  fontWeight: FontWeight.bold, // Optional: Adjust text weight
+                ),
+            textAlign: TextAlign.start, // Align text to the left
+          ),
           // Display meal items with options to edit grams and delete item
           Expanded(
             child: ListView.builder(
