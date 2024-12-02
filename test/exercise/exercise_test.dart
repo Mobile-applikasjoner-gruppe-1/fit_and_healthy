@@ -7,17 +7,16 @@ void main() {
   group('ExerciseInfoList', () {
     test('ExerciseInfoList should be instantiated correctly', () {
       final exerciseInfo = ExerciseInfoList(
-        id: "1",
         name: 'Bench Press',
         exerciseCategory: ExerciseCategory.chest,
         info: 'A strength training exercise for chest muscles.',
       );
 
       try {
-        expect(exerciseInfo.id, "1");
         expect(exerciseInfo.name, 'Bench Press');
         expect(exerciseInfo.exerciseCategory, ExerciseCategory.chest);
-        expect(exerciseInfo.info, 'A strength training exercise for chest muscles.');
+        expect(exerciseInfo.info,
+            'A strength training exercise for chest muscles.');
         print('PASS: ExerciseInfoList instantiated correctly.');
       } catch (e) {
         print('FAIL: ExerciseInfoList failed with error: $e');
@@ -66,7 +65,6 @@ void main() {
   group('Exercise', () {
     test('Exercise should link ExerciseInfoList and sets correctly', () {
       final exerciseInfo = ExerciseInfoList(
-        id: "2",
         name: 'Squat',
         exerciseCategory: ExerciseCategory.legs,
         info: 'A compound exercise targeting the lower body.',
@@ -77,7 +75,10 @@ void main() {
         exerciseInfoList: exerciseInfo,
         sets: [
           ExerciseSet(repititions: 12, weight: 60.0),
-          ExerciseSet(repititions: 10, weight: 70.0, exerciseSetType: ExerciseSetType.warmup),
+          ExerciseSet(
+              repititions: 10,
+              weight: 70.0,
+              exerciseSetType: ExerciseSetType.warmup),
         ],
         note: 'Focus on form',
       );
@@ -100,7 +101,6 @@ void main() {
       final exercise1 = Exercise(
         id: "1",
         exerciseInfoList: ExerciseInfoList(
-          id: "1",
           name: 'Bench Press',
           exerciseCategory: ExerciseCategory.chest,
           info: 'A strength training exercise for chest muscles.',
@@ -113,7 +113,6 @@ void main() {
       final exercise2 = Exercise(
         id: "2",
         exerciseInfoList: ExerciseInfoList(
-          id: "2",
           name: 'Squat',
           exerciseCategory: ExerciseCategory.legs,
           info: 'A compound exercise targeting the lower body.',
@@ -126,7 +125,6 @@ void main() {
       final workout = Workout(
         id: "1",
         title: 'Leg Day',
-        time: '1 hour',
         dateTime: DateTime.parse('2024-11-18'),
         exercises: [exercise1, exercise2],
       );
@@ -134,7 +132,6 @@ void main() {
       try {
         expect(workout.id, "1");
         expect(workout.title, 'Leg Day');
-        expect(workout.time, '1 hour');
         expect(workout.dateTime, DateTime.parse('2024-11-18'));
         expect(workout.exercises.length, 2);
         print('PASS: Workout handles multiple exercises.');

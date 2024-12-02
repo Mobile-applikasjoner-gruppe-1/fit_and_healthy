@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum ExerciseCategory {
   back,
   chest,
@@ -9,55 +11,46 @@ enum ExerciseCategory {
   legs,
 }
 
+extension ExerciseCategoryExtension on ExerciseCategory {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+
+  static ExerciseCategory fromShortString(String shortString) {
+    return ExerciseCategory.values.firstWhere(
+      (element) => element.toShortString() == shortString,
+    );
+  }
+}
+
 enum ExerciseSetType {
   warmup,
   dropset,
   tofailure,
 }
 
+extension ExerciseSetTypeExtension on ExerciseSetType {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+
+  static ExerciseSetType fromShortString(String shortString) {
+    return ExerciseSetType.values.firstWhere(
+      (element) => element.toShortString() == shortString,
+    );
+  }
+}
+
 // Keep the information about predefined exercises, like bench press or squat.
 class ExerciseInfoList {
-  final String id;
   final String name;
   final ExerciseCategory exerciseCategory;
   final String info;
   const ExerciseInfoList({
-    required this.id,
     required this.name,
     required this.exerciseCategory,
     required this.info,
   });
-
-  factory ExerciseInfoList.fromFirebase(Map<String, dynamic> json) {
-    if (json['id'] is! String) {
-      throw TypeError();
-    }
-    if (json['name'] is! String) {
-      throw TypeError();
-    }
-    if (json['exerciseCategory'] is! ExerciseCategory) {
-      throw TypeError();
-    }
-    if (json['info'] is! String) {
-      throw TypeError();
-    }
-
-    return ExerciseInfoList(
-      id: json['id'],
-      name: json['name'],
-      exerciseCategory: json['exerciseCategory'],
-      info: json['info'],
-    );
-  }
-
-  Map<String, dynamic> toFirestore() {
-    return {
-      'id': id,
-      'name': name,
-      'exerciseCategory': exerciseCategory,
-      'info': info,
-    };
-  }
 }
 
 // Keep information about the sets repitition, weigth, and if it is a special set
@@ -70,6 +63,40 @@ class ExerciseSet {
     required this.weight,
     this.exerciseSetType,
   });
+
+  factory ExerciseSet.fromFirestore(Map<String, dynamic> json) {
+    final repititions = json['repititions'];
+    final weight = json['weight'];
+    final exerciseSetType = json['exerciseSetType'] ?? null;
+
+    if (repititions is! int) {
+      throw Exception('Exercise set repititions is not an integer');
+    }
+
+    if (weight is! double) {
+      throw Exception('Exercise set weight is not a double');
+    }
+
+    if (exerciseSetType != null && exerciseSetType is! String) {
+      throw Exception('Exercise set type is not a string');
+    }
+
+    return ExerciseSet(
+      repititions: repititions,
+      weight: weight,
+      exerciseSetType: exerciseSetType == null
+          ? null
+          : ExerciseSetTypeExtension.fromShortString(exerciseSetType),
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'repititions': repititions,
+      'weight': weight,
+      'exerciseSetType': exerciseSetType?.toShortString(),
+    };
+  }
 }
 
 // The main Exercise
@@ -86,32 +113,64 @@ class Exercise {
     this.note,
   });
 
-  factory Exercise.fromFirebase(Map<String, dynamic> json) {
-    if (json['id'] is! int) {
-      throw TypeError();
-    }
-    if (json['exerciseInfoList'] is! ExerciseInfoList) {
-      throw TypeError();
-    }
-    if (json['sets'] is! List) {
-      throw TypeError();
+  factory Exercise.fromFirebase(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final json = doc.data();
+
+    if (json == null) {
+      throw Exception('Document data is null');
     }
 
+    final id = doc.id;
+    final name = json['name'];
+    final exerciseCategory = json['exerciseCategory'];
+    final info = json['info'];
+    final note = json['note'];
+    final sets = json['sets'];
+
+    if (name is! String) {
+      throw Exception('Exercise name is not a string');
+    }
+
+    if (exerciseCategory is! String) {
+      throw Exception('Exercise category is not a string');
+    }
+
+    if (info is! String) {
+      throw Exception('Exercise info is not a string');
+    }
+
+    if (note is! String) {
+      throw Exception('Exercise note is not a string');
+    }
+
+    if (sets is! List) {
+      throw Exception('Exercise sets is not a list');
+    }
+
+    final exerciseInfoList = ExerciseInfoList(
+      name: name,
+      exerciseCategory:
+          ExerciseCategoryExtension.fromShortString(exerciseCategory),
+      info: info,
+    );
+
+    final parsedSets = sets.map((e) => ExerciseSet.fromFirestore(e)).toList();
+
     return Exercise(
-      id: json['id'],
-      exerciseInfoList: json['exerciseInfoList'],
-      sets: json['sets'],
-      note: json['note'],
+      id: id,
+      exerciseInfoList: exerciseInfoList,
+      sets: parsedSets,
+      note: note,
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  Map<String, Object?> toFirestore() {
     return {
-      'id': id,
       'name': exerciseInfoList.name,
-      'exerciseCategory': exerciseInfoList.exerciseCategory,
+      'exerciseCategory': exerciseInfoList.exerciseCategory.toShortString(),
       'info': exerciseInfoList.info,
       'note': note,
+      'sets': sets.map((e) => e.toFirestore()).toList(),
     };
     // TODO: Add sets as a subcollection
   }
@@ -134,50 +193,53 @@ class ExerciseOther {
 class Workout {
   final String id;
   final String title;
-  final String time;
   final DateTime dateTime;
-  final List<Exercise> exercises;
-  const Workout({
+  List<Exercise> exercises;
+  Workout({
     required this.id,
     required this.title,
-    required this.time,
     required this.dateTime,
     required this.exercises,
   });
 
-  factory Workout.fromFirebase(Map<String, dynamic> json) {
-    if (json['id'] is! String) {
-      throw TypeError();
+  factory Workout.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data();
+
+    if (data == null) {
+      throw Exception('Document data is null');
     }
-    if (json['title'] is! String) {
-      throw TypeError();
+
+    final title = data['title'];
+    final dateTime = data['dateTime'];
+
+    if (title is! String) {
+      throw Exception('Workout title is not a string');
     }
-    if (json['time'] is! String) {
-      throw TypeError();
-    }
-    if (json['dateTime'] is! DateTime) {
-      throw TypeError();
-    }
-    if (json['exercises'] is! List) {
-      throw TypeError();
+    if (dateTime is! Timestamp) {
+      throw Exception('Workout dateTime is not a Timestamp');
     }
 
     return Workout(
-      id: json['id'],
-      title: json['title'],
-      time: json['time'],
-      dateTime: json['dateTime'],
-      exercises: json['exercises'],
-    );
+        id: doc.id, title: title, dateTime: dateTime.toDate(), exercises: []);
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
       'title': title,
-      'time': time,
       'dateTime': dateTime,
-      'exercises': exercises.map((e) => e.toFirestore()).toList(),
     };
+  }
+
+  Workout copyOf({
+    String? title,
+    DateTime? dateTime,
+    List<Exercise>? exercises,
+  }) {
+    return Workout(
+      id: id,
+      title: title ?? this.title,
+      dateTime: dateTime ?? this.dateTime,
+      exercises: exercises ?? this.exercises,
+    );
   }
 }

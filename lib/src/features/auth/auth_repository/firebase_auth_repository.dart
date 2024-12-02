@@ -194,7 +194,7 @@ class FirebaseAuthRepository {
 
     final appUser = await userRepo.getUser();
 
-    _authUser = _authUser!.copyOf(appUser: appUser);
+    _authUser = _authUser!.copyOf(appUser: appUser, userLoading: false);
 
     _hasGottenUser = true;
 

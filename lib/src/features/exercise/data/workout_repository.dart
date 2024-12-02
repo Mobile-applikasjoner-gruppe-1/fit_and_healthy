@@ -6,7 +6,7 @@ import 'package:fit_and_healthy/src/features/exercise/data/exercise_repository.d
 import 'package:fit_and_healthy/src/features/user/user_repository.dart';
 
 final workoutConverter = (
-  fromFirestore: (snapshot, _) => Workout.fromFirebase(snapshot.data()!),
+  fromFirestore: (snapshot, _) => Workout.fromFirestore(snapshot),
   toFirestore: (Workout workout, _) => workout.toFirestore(),
 );
 
@@ -37,7 +37,7 @@ class WorkoutRepository {
   /// The date parameter is automatically converted to the start of the day.
   /// Will return an empty list if no workouts are found.
   /// Will throw an error if the query fails.
-  Future<List<Workout>> getAllWorkoutsForDay(DateTime date) async {
+  Future<List<Workout>> getAllWorkoutsForDate(DateTime date) async {
     DateTime startOfDay = DateTime(date.year, date.month, date.day);
     DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
@@ -50,6 +50,30 @@ class WorkoutRepository {
         .get();
 
     return querySnapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  /// Returns a stream of all workouts for a given day.
+  /// The date parameter is automatically converted to the start of the day.
+  Stream<List<Workout>> getWorkoutsStreamForDate(DateTime date) {
+    DateTime startOfDay = DateTime(date.year, date.month, date.day);
+    DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
+
+    final AuthUser user = _authRepository.currentUser!;
+
+    print('Getting workouts from database for date: $startOfDay');
+
+    return _firestore
+        .collection(UserRepository.collectionName)
+        .doc(user.firebaseUser.uid)
+        .collection(collectionName)
+        .withConverter<Workout>(
+          fromFirestore: workoutConverter.fromFirestore,
+          toFirestore: workoutConverter.toFirestore,
+        )
+        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+        .where('dateTime', isLessThanOrEqualTo: endOfDay)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   /// Adds a new workout to the database.

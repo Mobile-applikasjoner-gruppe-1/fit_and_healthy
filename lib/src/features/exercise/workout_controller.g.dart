@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'meal_controller.dart';
+part of 'workout_controller.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$mealControllerHash() => r'bb17accde5a14d3e42be2e5e7f96531363c125ad';
+String _$workoutControllerHash() => r'7450d06a8da02241cd62f3d9e2150ac6825220bb';
 
-/// See also [MealController].
-@ProviderFor(MealController)
-final mealControllerProvider =
-    AutoDisposeAsyncNotifierProvider<MealController, MealHolder>.internal(
-  MealController.new,
-  name: r'mealControllerProvider',
+/// See also [WorkoutController].
+@ProviderFor(WorkoutController)
+final workoutControllerProvider =
+    AutoDisposeAsyncNotifierProvider<WorkoutController, void>.internal(
+  WorkoutController.new,
+  name: r'workoutControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$mealControllerHash,
+      : _$workoutControllerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$MealController = AutoDisposeAsyncNotifier<MealHolder>;
+typedef _$WorkoutController = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
