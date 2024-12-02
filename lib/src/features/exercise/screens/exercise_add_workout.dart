@@ -152,17 +152,7 @@ class _AddWorkoutState extends ConsumerState<AddWorkout> {
     );
 
     if (shouldContinue == true) {
-      final newWorkout = _getWorkoutFromFields();
-      if (mounted) {
-        Navigator.pop(context, newWorkout);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Workout added successfully!'),
-            duration: Duration(seconds: 2),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      _createWorkout();
     }
   }
 

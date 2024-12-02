@@ -6,6 +6,7 @@ import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class MealCreationScreen extends ConsumerStatefulWidget {
   static const route = 'create';
@@ -16,12 +17,15 @@ class MealCreationScreen extends ConsumerStatefulWidget {
 }
 
 class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
+  final TextEditingController _titleController = TextEditingController();
+
   Meal _getMealFromFields() {
     // TODO: Implement getting meal from fields in form
     final meal = Meal(
-      id: '1',
-      name: 'New Meal',
-      timestamp: DateTime.now(),
+      id: 'temp',
+      name: _titleController.text,
+      timestamp: DateTime(_selectedDate.year, _selectedDate.month,
+          _selectedDate.day, _selectedTime.hour, _selectedTime.minute),
     );
 
     // TODO: Implement getting meal from UI
@@ -47,8 +51,6 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
   void _createMeal() async {
     final meal = _getMealFromFields();
 
-    print(meal);
-
     final mealController = ref.read(mealControllerProvider.notifier);
     final mealItemController = ref.read(mealItemControllerProvider.notifier);
 
@@ -68,22 +70,166 @@ class _MealCreationScreenState extends ConsumerState<MealCreationScreen> {
     }
   }
 
+  DateTime _selectedDate = DateTime.now(); // Selected date
+  TimeOfDay _selectedTime = TimeOfDay.now(); // Selected time
+  List<FoodItem> _items = []; // List of items added to the meal.
+
+  /**
+   * Handles the date selection process using `showDatePicker`.
+   * Updates the selected date if the user picks one.
+   */
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  /**
+   * Handles the time selection process using `showTimePicker`.
+   * Updates the selected time if the user picks one.
+   */
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+    );
+    if (pickedTime != null) {
+      setState(() {
+        _selectedTime = pickedTime;
+      });
+    }
+  }
+
+  /**
+   * Displays an alert dialog when no exercises are added.
+   */
+  Future<void> _showNoItemsDialog(BuildContext context) async {
+    final shouldContinue = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('No Items Added'),
+          content: const Text(
+              'You have not added any items. Do you want to continue?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldContinue == true) {
+      _createMeal();
+    }
+  }
+
+  final TextEditingController dateTimeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    // TODO: Add form to create a meal with a searchfield and camera to add items
+    Widget content = SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            child: Column(
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(label: Text('Title')),
+                  controller: _titleController,
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () async {
+                    await _selectDate(context);
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${DateFormat.EEEE().format(_selectedDate)} ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await _selectTime(context);
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.access_alarms_outlined),
+                      const SizedBox(width: 8),
+                      Text(' ${_selectedTime.format(context)}'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Items Added',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Divider(
+                  thickness: 1,
+                  color: Colors.blue,
+                ),
+                const SizedBox(height: 16),
+                if (_items.isNotEmpty)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _items.length,
+                    itemBuilder: (context, index) {
+                      final item = _items[index];
+                      return ListTile(
+                        title: Text('${item.name} (${item.grams})'),
+                      );
+                    },
+                  )
+                else
+                  const Text('No items added yet.'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
     return NestedScaffold(
       appBar: AppBar(
         title: Text('Create Meal'),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
-            onPressed: _createMeal,
+            onPressed: () {
+              if (_items.isEmpty) {
+                _showNoItemsDialog(context);
+              } else {
+                _createMeal();
+              }
+            },
           ),
         ],
       ),
-      body: Center(
-        child: Text('Create Meal'),
-      ),
+      body: content,
     );
   }
 }
