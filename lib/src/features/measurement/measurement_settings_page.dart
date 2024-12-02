@@ -5,18 +5,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 import 'package:fit_and_healthy/shared/widgets/charts/weight_chart.dart';
 
+/// A state provider for managing the selected chart filter.
 final chartFilterProvider =
     StateProvider<ChartFilter>((ref) => ChartFilter.all);
 
+/// Enum representing available chart filters: month, year, or all time.
 enum ChartFilter { month, year, all }
 
+// This page allows users to view and manage their weight measurements over time.
+/// It displays a weight progress chart with filter options (past month, past year, all time),
+/// and provides functionality to add new weight entries.
 class MeasurementSettingsPage extends ConsumerWidget {
   const MeasurementSettingsPage({super.key});
 
   static const route = '/measurement';
   static const routeName = 'Measurement Settings';
-
-  // TODO, Fetch data for 30 days, and if they want a year, fetch the rest!
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,7 +56,6 @@ class MeasurementSettingsPage extends ConsumerWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 16),
-            // Chart Filters
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -69,7 +71,6 @@ class MeasurementSettingsPage extends ConsumerWidget {
               child: WeightChart(entries: filteredEntries),
             ),
             const SizedBox(height: 16),
-            // Informational Text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
@@ -82,13 +83,25 @@ class MeasurementSettingsPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            // Add Weight Button
             Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  _showAddWeightModal(context, metricsController);
-                },
-                child: const Text('Add Weight'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _showAddWeightModal(context, metricsController);
+                    },
+                    child: const Text('Add Weight'),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      _showDeleteWeightModal(
+                          context, weightHistory, metricsController);
+                    },
+                    child: const Text('Delete Weight'),
+                  ),
+                ],
               ),
             ),
           ],
@@ -97,6 +110,13 @@ class MeasurementSettingsPage extends ConsumerWidget {
     );
   }
 
+  /// Builds a filter button for the chart.
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [ref]: The Riverpod reference.
+  /// - [filter]: The filter type (month, year, or all).
+  /// - [label]: The button label.
   Widget _buildFilterButton(
     BuildContext context,
     WidgetRef ref,
@@ -121,6 +141,14 @@ class MeasurementSettingsPage extends ConsumerWidget {
     );
   }
 
+  /// Filters weight entries based on the selected chart filter.
+  ///
+  /// Parameters:
+  /// - [entries]: List of weight entries.
+  /// - [filter]: The selected chart filter.
+  ///
+  /// Returns:
+  /// - A filtered list of weight entries sorted by timestamp.
   List<WeightEntry> _filterEntries(
       List<WeightEntry> entries, ChartFilter filter) {
     final now = DateTime.now();
@@ -147,6 +175,11 @@ class MeasurementSettingsPage extends ConsumerWidget {
     return filtered;
   }
 
+  /// Displays a modal for adding a new weight entry.
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [metricsController]: The metrics controller for handling weight entry.
   void _showAddWeightModal(
       BuildContext context, MetricsController metricsController) {
     final TextEditingController weightController = TextEditingController();
@@ -244,6 +277,111 @@ class MeasurementSettingsPage extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteWeightModal(
+    BuildContext context,
+    List<WeightEntry> weightHistory,
+    MetricsController metricsController,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Delete Weight Entries',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 16),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: weightHistory.length,
+                itemBuilder: (context, index) {
+                  final entry = weightHistory[index];
+                  return ListTile(
+                    title: Text(
+                      '${entry.weight} kg',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    subtitle: Text(
+                      '${entry.timestamp.day}/${entry.timestamp.month}/${entry.timestamp.year}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final shouldDelete = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Confirm Delete'),
+                            content: Text(
+                              'Are you sure you want to delete the entry for ${entry.weight} kg?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (shouldDelete == true) {
+                          try {
+                            await metricsController.deleteWeight(entry.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text('Weight entry deleted successfully.'),
+                              ),
+                            );
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Failed to delete weight entry.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         );
       },

@@ -4,6 +4,9 @@ import 'package:fit_and_healthy/src/features/metrics/metrics_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// A widget that displays a card showing the user's calorie intake progress.
+/// The progress is visualized using a donut chart, which compares the consumed
+/// calories to the total recommended calorie intake.
 class CardCaloriesNutrition extends ConsumerWidget {
   final double caloriesConsumed;
   const CardCaloriesNutrition({
@@ -71,11 +74,9 @@ class CardCaloriesNutrition extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   ),
-                  //Icon(Icons.monitor_weight, color: Colors.white),
                 ],
               ),
             ),
-            // Chart
             SizedBox(
               height: 100,
               child: DonutChart(

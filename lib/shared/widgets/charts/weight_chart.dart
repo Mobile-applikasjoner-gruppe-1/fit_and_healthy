@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fit_and_healthy/shared/models/weight_entry.dart';
 
+/// A widget that displays a line chart of weight entries over time using the `fl_chart` package.
+/// The chart shows weight progression and provides a visual representation of user data.
 class WeightChart extends StatelessWidget {
   final List<WeightEntry> entries;
 

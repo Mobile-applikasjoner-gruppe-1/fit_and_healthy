@@ -104,4 +104,13 @@ class WeightRepository {
   Future<List<WeightEntry>> getWeightHistoryPastYear() {
     return getWeightHistoryDaysBack(365);
   }
+
+  Future<void> deleteWeightEntry(String id) async {
+    try {
+      final weightEntryCollectionRef = _getWeightEntryCollection();
+      await weightEntryCollectionRef.doc(id).delete();
+    } catch (e) {
+      throw Exception('Failed to delete weight entry: $e');
+    }
+  }
 }

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+/// A widget that displays a bar chart representing the number of completed exercises
+/// compared to the weekly goal.
+///
+/// This chart provides a visual indication of whether the user's weekly exercise goal
+/// has been met or not.
 class WeeklyExerciseChart extends StatelessWidget {
   final int completedExercises;
   final int weeklyGoal;

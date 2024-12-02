@@ -6,6 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
+/// This page provides users with GDPR-related settings, including:
+/// - Updating personal information
+/// - Downloading user data
+/// - Deleting the user account
+/// - Viewing GDPR policies
 class GdprSettingsPage extends StatelessWidget {
   const GdprSettingsPage({super.key});
 
@@ -68,7 +73,14 @@ class GdprSettingsPage extends StatelessWidget {
     );
   }
 
-  // Common ListTile Widget
+  /// Builds a common ListTile widget for GDPR options.
+  ///
+  /// Parameters:
+  /// - [context]: Build context.
+  /// - [icon]: Icon to display in the leading position.
+  /// - [title]: Title of the option.
+  /// - [subtitle]: Optional subtitle for additional context.
+  /// - [onTap]: Action to perform when the tile is tapped.
   Widget _buildListTile(
     BuildContext context, {
     required IconData icon,
@@ -89,6 +101,7 @@ class GdprSettingsPage extends StatelessWidget {
     );
   }
 
+  /// Builds the delete account tile with a confirmation dialog.
   Widget _buildDeleteAccountTile(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -114,6 +127,13 @@ class GdprSettingsPage extends StatelessWidget {
     );
   }
 
+  /// Displays a confirmation dialog for sensitive actions.
+  ///
+  /// Parameters:
+  /// - [context]: Build context.
+  /// - [title]: Title of the dialog.
+  /// - [content]: Content of the dialog explaining the action.
+  /// - [onConfirm]: Action to perform when the user confirms.
   void _showConfirmationDialog(
     BuildContext context, {
     required String title,
@@ -145,12 +165,12 @@ class GdprSettingsPage extends StatelessWidget {
     );
   }
 
-  // Placeholder: Download Data Action
+  /// Placeholder for the download data action.
   void _downloadData() {
     debugPrint("User data download initiated.");
   }
 
-  // Placeholder: Delete Account Action
+  /// Placeholder for the delete account action.
   void _deleteAccount() {
     debugPrint("User account deletion initiated.");
   }

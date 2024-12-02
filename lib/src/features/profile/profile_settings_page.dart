@@ -6,6 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fit_and_healthy/src/common/styles/sizes.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 
+/// This page allows users to view and edit their profile information, including:
+/// - Gender
+/// - Height
+/// - Birthday
+///
+/// The data is managed using the MetricsController.
 class ProfileSettingsPage extends ConsumerStatefulWidget {
   const ProfileSettingsPage({super.key});
 
@@ -109,6 +115,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     );
   }
 
+  /// Builds a ListTile for editing the user's gender.
   Widget _buildEditableGenderField(
     BuildContext context,
     WidgetRef ref,
@@ -136,6 +143,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     );
   }
 
+  /// Builds a ListTile for editing the user's height.
   Widget _buildEditableHeightField(
     BuildContext contex,
     WidgetRef ref,
@@ -158,20 +166,29 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
         ],
       ),
       onTap: () async {
-        //_showHeightEditDialog(context, ref, height);
-        final newHeight = await HeightEditor.showDialogForHeight(
-          context,
-          height.toDouble(),
-        );
-        if (newHeight != null) {
-          await ref
-              .read(metricsControllerProvider.notifier)
-              .updateHeight(newHeight);
+        try {
+          final newHeight = await HeightEditor.showDialogForHeight(
+            context,
+            height.toDouble(),
+          );
+          if (newHeight != null) {
+            await ref
+                .read(metricsControllerProvider.notifier)
+                .updateHeight(newHeight);
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update height: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       },
     );
   }
 
+  /// Builds a ListTile for editing the user's birthday.
   Widget _buildEditableBirthdayField(
       BuildContext context, WidgetRef ref, DateTime? birthday) {
     final theme = Theme.of(context);
@@ -198,10 +215,12 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     );
   }
 
+  /// Builds a divider between editable fields.
   Widget _buildDivider() {
     return const Divider(height: 1, thickness: 1);
   }
 
+  /// Shows a dialog for editing the user's gender.
   void _showGenderEditDialog(
     BuildContext context,
     WidgetRef ref,
@@ -235,6 +254,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     );
   }
 
+  /// Shows a dialog for editing the user's birthday.
   void _showBirthdayEditDialog(
       BuildContext context, WidgetRef ref, DateTime? birthday) {
     showDialog(

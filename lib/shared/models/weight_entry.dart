@@ -1,16 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Enum representing the fields of a weight entry document in Firestore.
+///
+/// Fields:
+/// - [timestamp]: The timestamp of the weight entry.
+/// - [weight]: The weight value in the entry.
 enum WeightEntryField {
   timestamp,
   weight,
 }
 
+/// Extension on [WeightEntryField] to provide utility methods.
 extension WeightEntryFieldExtension on WeightEntryField {
   String toShortString() {
     return this.toString().split('.').last;
   }
 }
 
+/// Represents a weight entry fetched from Firestore.
+///
+/// Contains an ID, timestamp, and weight value.
 class WeightEntry {
   final String id;
   final DateTime timestamp;
@@ -38,6 +47,9 @@ class WeightEntry {
   }
 }
 
+/// Represents a new weight entry to be added to Firestore.
+///
+/// Contains validation methods for ensuring valid data before saving.
 class NewWeightEntry {
   final DateTime timestamp;
   final double weight;

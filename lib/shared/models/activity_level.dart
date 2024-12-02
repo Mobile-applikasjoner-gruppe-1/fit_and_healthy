@@ -1,3 +1,11 @@
+/// Enum representing various activity levels of an individual.
+///
+/// Each level corresponds to the amount and intensity of physical activity performed:
+/// - [sedentary]: Little or no exercise.
+/// - [lightlyActive]: Light exercise or sports 1-3 days per week.
+/// - [moderatelyActive]: Moderate exercise or sports 3-5 days per week.
+/// - [veryActive]: Hard exercise or sports 6-7 days per week.
+/// - [superActive]: Very hard exercise or physical job.
 enum ActivityLevel {
   sedentary,
   lightlyActive,
@@ -6,6 +14,7 @@ enum ActivityLevel {
   superActive,
 }
 
+/// Extension on [ActivityLevel] to provide additional utility methods and properties.
 extension ActivityLevelExtension on ActivityLevel {
   String get description {
     switch (this) {

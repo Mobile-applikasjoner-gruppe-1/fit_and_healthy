@@ -4,6 +4,9 @@ import 'package:fit_and_healthy/src/nested_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// A page that allows users to manage and customize their widget cards.
+/// It groups the cards by category, allows users to select or deselect cards,
+/// and provides a preview feature for each card.
 class WidgetSettingsPage extends ConsumerStatefulWidget {
   const WidgetSettingsPage({super.key});
 
@@ -21,7 +24,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
   void initState() {
     super.initState();
     for (var category in WidgetCardCategory.values) {
-      _expandedState[category] = false; // Default: all collapsed
+      _expandedState[category] = false;
     }
   }
 
@@ -57,13 +60,14 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     );
   }
 
+  /// Builds a card for a specific widget category and its cards.
   Widget _buildCategoryCard(
     BuildContext context,
     ThemeData theme,
     String categoryName,
     List<WidgetCard> categoryCards,
     List<WidgetCard> selectedCards,
-    StateController<List<WidgetCard>> notifier,
+    CardNotifier notifier,
     WidgetCardCategory category,
   ) {
     final isExpanded = _expandedState[category] ?? false;
@@ -102,9 +106,9 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
                 return GestureDetector(
                   onTap: () {
                     if (isSelected) {
-                      notifier.state = List.from(notifier.state)..remove(card);
+                      notifier.removeCard(card);
                     } else {
-                      notifier.state = List.from(notifier.state)..add(card);
+                      notifier.addCard(card);
                     }
                   },
                   child: Card(
@@ -180,6 +184,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     );
   }
 
+  /// Groups all available cards by their respective categories.
   Map<WidgetCardCategory, List<WidgetCard>> _groupCardsByCategory() {
     return {
       for (var category in WidgetCardCategory.values)
@@ -189,6 +194,7 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     };
   }
 
+  /// Maps the widget card category enum to its display name.
   String _categoryName(WidgetCardCategory category) {
     switch (category) {
       case WidgetCardCategory.workout:
@@ -202,31 +208,28 @@ class _WidgetSettingsPageState extends ConsumerState<WidgetSettingsPage> {
     }
   }
 
+  /// Displays a full-screen preview of the card content.
   void _showCardPreview(BuildContext context, WidgetCard cardContent) {
     late OverlayEntry overlayEntry;
 
     overlayEntry = OverlayEntry(
       builder: (context) => GestureDetector(
         onTap: () {
-          overlayEntry.remove(); // Remove the overlay on tap
+          overlayEntry.remove();
         },
         child: Stack(
           children: [
-            // Semi-transparent background
             Container(
               color: Colors.black.withOpacity(0.7),
             ),
-            // Centered card content
             Center(
               child: Padding(
-                padding: const EdgeInsets.all(16.0), // Padding around the card
+                padding: const EdgeInsets.all(16.0),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width *
-                      (cardContent.size == 1.0
-                          ? 1.0
-                          : 0.5), // Width for 1.0 or 0.5
-                  height: 200, // Set standard height (similar to dashboard)
-                  child: cardContent.builder(), // Render the card's content
+                      (cardContent.size == 1.0 ? 1.0 : 0.5),
+                  height: 200,
+                  child: cardContent.builder(),
                 ),
               ),
             ),

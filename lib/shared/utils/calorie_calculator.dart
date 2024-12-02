@@ -3,6 +3,10 @@ import 'package:fit_and_healthy/shared/models/calorie_calculator_model.dart';
 import 'package:fit_and_healthy/shared/models/gender.dart';
 import 'package:fit_and_healthy/shared/models/weight_goal.dart';
 
+/// A utility class for calculating daily caloric needs and macronutrient recommendations.
+///
+/// This class uses the Mifflin-St Jeor Equation to calculate the Basal Metabolic Rate (BMR),
+/// adjusts it based on activity level, and determines total caloric needs based on weight goals.
 class CalorieCalculator {
   static CalorieCalculatorModel calculateCalories({
     required double weight,

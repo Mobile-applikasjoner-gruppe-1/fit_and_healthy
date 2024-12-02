@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// A widget that displays a horizontal progress bar representing a value compared to a goal.
+/// The progress bar is color-coded and includes a label with the current and goal values.
 class HorizontalBarChart extends StatelessWidget {
   final String label;
   final double value;
