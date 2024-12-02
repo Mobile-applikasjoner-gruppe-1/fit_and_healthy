@@ -36,6 +36,8 @@ FutureOr<String?> appRouterRedirectHandler(
       currentUser.firebaseUser.emailVerified;
   final bool isVerifyingEmail =
       state.matchedLocation == EmailVerificationView.route;
+  final bool isLoggedInWithoutEmail =
+      isLoggedIn && currentUser.firebaseUser.email == null;
 
   // Checks for display name.
   final bool isLoggedInWithoutDisplayName =
@@ -64,7 +66,7 @@ FutureOr<String?> appRouterRedirectHandler(
 
   // Redirect to the page where the user is supposed to add data if the user is logged in but required data is not added.
   if (isLoggedInWithDisplayName &&
-      isVerifiedEmail &&
+      (isVerifiedEmail || isLoggedInWithoutEmail) &&
       isLoggedInWithoutData &&
       !isAddingData) {
     return MetricsSetupPage.route;

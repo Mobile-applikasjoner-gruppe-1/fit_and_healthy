@@ -18,9 +18,16 @@ class CardCaloriesNutrition extends ConsumerWidget {
     final nutritionDate = ref.watch(nutritionDateNotifierProvider);
     final nutritionCacheState = ref.watch(nutritionCacheNotifierProvider);
 
+    // final now = DateTime.now();
+    // final selectedDate = DateTime(now.year, now.month, now.day);
+
+    // ref
+    //     .read(nutritionCacheNotifierProvider.notifier)
+    //     .listenToDate(selectedDate, true);
+
     final data = metricsState.value;
 
-    if (data == null || nutritionDate.value == null) {
+    if (data == null) {
       return const Center(child: Text('No data available.'));
     }
 
